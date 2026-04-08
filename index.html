@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanz AI Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #c084fc;
+    --accent3: #38bdf8;
+    --text: #e8e8f0;
+    --text2: #8888a8;
+    --success: #34d399;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --glow: rgba(124, 106, 247, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  .logo-text { font-size: 18px; font-weight: 700; }
+  .logo-text span { color: var(--accent2); }
+
+  .new-chat-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    padding: 12px 16px;
+    color: white; font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s; margin-bottom: 8px;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+  .new-chat-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,106,247,0.3); }
+
+  .sidebar-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--text2); text-transform: uppercase;
+    letter-spacing: 1px; padding: 8px 12px 4px;
+  }
+
+  .subject-btn {
+    background: transparent; border: 1px solid transparent;
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--text2); font-family: 'Sora', sans-serif;
+    font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s; text-align: left;
+  }
+  .subject-btn:hover, .subject-btn.active {
+    background: var(--surface2); border-color: var(--border);
+    color: var(--text);
+  }
+  .subject-btn.active { border-color: var(--accent); color: var(--accent2); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text2);
+    text-align: center; line-height: 1.6;
+  }
+  .sidebar-footer strong { color: var(--accent2); }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .header-left { display: flex; align-items: center; gap: 12px; }
+
+  .grade-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 13px;
+    cursor: pointer; outline: none;
+  }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 12px; font-size: 12px;
+  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Chat Area */
+  .chat-area {
+    flex: 1; overflow-y: auto;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-track { background: transparent; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Welcome */
+  .welcome {
+    text-align: center; padding: 60px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .welcome-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; box-shadow: 0 0 40px var(--glow);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .welcome h2 { font-size: 28px; font-weight: 700; }
+  .welcome h2 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .welcome p { color: var(--text2); font-size: 15px; max-width: 400px; line-height: 1.6; }
+
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .quick-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 8px 16px;
+    color: var(--text2); font-family: 'Sora', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent2); background: var(--glow); }
+
+  /* Messages */
+  .message { display: flex; gap: 12px; max-width: 800px; animation: msgIn 0.3s ease; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .message.user { flex-direction: row-reverse; align-self: flex-end; }
+
+  .msg-avatar {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .ai-avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+  .user-avatar { background: linear-gradient(135deg, var(--accent3), #0ea5e9); }
+
+  .msg-bubble {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 18px;
+    font-size: 14px; line-height: 1.7; max-width: 600px;
+  }
+  .message.user .msg-bubble {
+    background: linear-gradient(135deg, rgba(124,106,247,0.2), rgba(192,132,252,0.1));
+    border-color: rgba(124,106,247,0.3);
+  }
+
+  .msg-meta { font-size: 11px; color: var(--text2); margin-top: 6px; display: flex; gap: 8px; align-items: center; }
+  .verified-badge { background: rgba(52,211,153,0.15); color: var(--success); padding: 2px 8px; border-radius: 20px; font-size: 10px; }
+  .rag-badge { background: rgba(56,189,248,0.15); color: var(--accent3); padding: 2px 8px; border-radius: 20px; font-size: 10px; }
+
+  .graph-img { margin-top: 12px; border-radius: 12px; max-width: 100%; border: 1px solid var(--border); }
+
+  /* Typing indicator */
+  .typing { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+  .typing span { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  /* Input area */
+  .input-area {
+    padding: 16px 24px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  /* File preview */
+  .file-preview {
+    display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .file-chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text2);
+  }
+  .file-chip button { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 14px; padding: 0; }
+  .file-chip img { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
+
+  .input-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 16px; display: flex; align-items: flex-end; gap: 8px;
+    padding: 12px 12px 12px 16px; transition: border-color 0.2s;
+  }
+  .input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+
+  #questionInput {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 14px;
+    resize: none; max-height: 120px; line-height: 1.5;
+  }
+  #questionInput::placeholder { color: var(--text2); }
+
+  .input-actions { display: flex; gap: 6px; align-items: center; }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.2s;
+  }
+  .icon-btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent2); }
+  .icon-btn.recording { background: rgba(248,113,113,0.15); border-color: var(--danger); color: var(--danger); animation: recordPulse 1s infinite; }
+  @keyframes recordPulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.3)} 50%{box-shadow:0 0 0 6px rgba(248,113,113,0)} }
+
+  .send-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.2s;
+    box-shadow: 0 4px 12px var(--glow);
+  }
+  .send-btn:hover { transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .input-hint { font-size: 11px; color: var(--text2); margin-top: 8px; text-align: center; }
+
+  /* Hidden inputs */
+  #imageInput, #fileInput { display: none; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 20px; font-size: 13px;
+    display: none; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show { display: block; animation: toastIn 0.3s ease; }
+  @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  /* Banned / Creator message */
+  .special-msg {
+    background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(192,132,252,0.05));
+    border: 1px solid rgba(124,106,247,0.3);
+    border-radius: 16px; padding: 20px; text-align: center;
+    line-height: 1.8; font-size: 14px;
+  }
+  .banned-msg {
+    background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3);
+    color: var(--danger);
+  }
+
+  /* Name input overlay */
+  .name-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; backdrop-filter: blur(8px);
+  }
+  .name-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px; max-width: 400px; width: 90%;
+    text-align: center; display: flex; flex-direction: column; gap: 20px;
+    box-shadow: 0 0 60px var(--glow);
+  }
+  .name-card h2 { font-size: 24px; }
+  .name-card h2 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .name-card p { color: var(--text2); font-size: 14px; line-height: 1.6; }
+  .name-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 15px;
+    outline: none; text-align: center;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; padding: 14px;
+    color: white; font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,247,0.4); }
+</style>
+</head>
+<body>
+
+<!-- Name Overlay -->
+<div class="name-overlay" id="nameOverlay">
+  <div class="name-card">
+    <div style="font-size:48px">👋</div>
+    <h2>ආයුබෝවන්! <span>Sanz AI</span> ට</h2>
+    <p>ඔයාගේ නම කියන්න — ඔයාට personalized ලෙස උදව් කරන්නම්!</p>
+    <input class="name-input" id="nameInput" placeholder="ඔයාගේ නම..." maxlength="30">
+    <select class="grade-select" id="gradeInputOverlay" style="text-align:center; border-radius:12px; padding:14px;">
+      <option value="">ශ්‍රේණිය තෝරන්න</option>
+      <option value="6">6 ශ්‍රේණිය</option>
+      <option value="7">7 ශ්‍රේණිය</option>
+      <option value="8">8 ශ්‍රේණිය</option>
+      <option value="9">9 ශ්‍රේණිය</option>
+      <option value="10">10 ශ්‍රේණිය</option>
+      <option value="11">11 ශ්‍රේණිය</option>
+    </select>
+    <button class="start-btn" onclick="startChat()">පටන් ගමු! 🚀</button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <div class="logo-text">Sanz <span>AI</span></div>
+  </div>
+
+  <button class="new-chat-btn" onclick="newChat()">
+    <span>✨</span> නව සංවාදයක්
+  </button>
+
+  <div class="sidebar-label">විෂයයන්</div>
+  <button class="subject-btn active" onclick="setSubject('ගණිතය', this)">📐 ගණිතය</button>
+  <button class="subject-btn" onclick="setSubject('විද්‍යාව', this)">🔬 විද්‍යාව</button>
+  <button class="subject-btn" onclick="setSubject('සිංහල', this)">📖 සිංහල</button>
+  <button class="subject-btn" onclick="setSubject('ඉංග්‍රීසි', this)">🌐 ඉංග්‍රීසි</button>
+  <button class="subject-btn" onclick="setSubject('ඉතිහාසය', this)">🏛️ ඉතිහාසය</button>
+  <button class="subject-btn" onclick="setSubject('භූගෝල විද්‍යාව', this)">🌍 භූගෝල විද්‍යාව</button>
+  <button class="subject-btn" onclick="setSubject('තොරතුරු තාක්ෂණය', this)">💻 ICT</button>
+
+  <div class="sidebar-footer">
+    Made with 💜 by <strong>Sanz Queen</strong><br>
+    <span style="font-size:10px">AI Powered Education Platform</span>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <span id="subjectLabel" style="font-weight:600; font-size:15px">📐 ගණිතය</span>
+      <select class="grade-select" id="gradeSelect">
+        <option value="6">6 ශ්‍රේණිය</option>
+        <option value="7">7 ශ්‍රේණිය</option>
+        <option value="8">8 ශ්‍රේණිය</option>
+        <option value="9">9 ශ්‍රේණිය</option>
+        <option value="10">10 ශ්‍රේණිය</option>
+        <option value="11">11 ශ්‍රේණිය</option>
+      </select>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span id="userName">Loading...</span>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">🎓</div>
+      <h2>හෙලෝ! <span>Sanz AI</span> ට ආයුබෝවන්!</h2>
+      <p>ඔයාගේ ඕනෑම ප්‍රශ්නයක් අහන්න — text, voice, හෝ photo!</p>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickQ('2x² + 5x + 3 සාධක කරන්න')">📐 ගණිත ප්‍රශ්නයක්</button>
+        <button class="quick-btn" onclick="quickQ('ප්‍රකාශ සංශ්ලේෂණය පැහැදිලි කරන්න')">🔬 විද්‍යා ප්‍රශ්නයක්</button>
+        <button class="quick-btn" onclick="quickQ('සිංහල රචනාවක් ලිවීමට උදව් කරන්න')">📖 සිංහල ප්‍රශ්නයක්</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="file-preview" id="filePreview"></div>
+    <div class="input-box">
+      <textarea id="questionInput" placeholder="ඔයාගේ ප්‍රශ්නය මෙතට ලියන්න..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <div class="input-actions">
+        <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Image">🖼️</button>
+        <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="File">📎</button>
+        <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice">🎤</button>
+        <button class="send-btn" id="sendBtn" onclick="sendQuestion()">➤</button>
+      </div>
+    </div>
+    <div class="input-hint">Enter = Send &nbsp;|&nbsp; Shift+Enter = New Line &nbsp;|&nbsp; 🎤 = Voice</div>
+  </div>
+</div>
+
+<input type="file" id="imageInput" accept="image/*" onchange="handleFile(this, 'image')">
+<input type="file" id="fileInput" accept=".pdf,.txt,.doc" onchange="handleFile(this, 'file')">
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──
+  const BACKEND = 'https://your-backend.onrender.com'; // ← ඔයාගේ Render URL
+  let userName = '', userGrade = '10', currentSubject = 'ගණිතය';
+  let selectedImage = null, recognition = null, isRecording = false;
+
+  // ── Init ──
+  function startChat() {
+    const name = document.getElementById('nameInput').value.trim();
+    const grade = document.getElementById('gradeInputOverlay').value;
+    if (!name) { showToast('⚠️ නම ලියන්න!'); return; }
+    if (!grade) { showToast('⚠️ ශ්‍රේණිය තෝරන්න!'); return; }
+    userName = name; userGrade = grade;
+    document.getElementById('userName').textContent = `👋 ${name}`;
+    document.getElementById('gradeSelect').value = grade;
+    document.getElementById('nameOverlay').style.display = 'none';
+  }
+
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startChat();
+  });
+
+  // ── Subject ──
+  function setSubject(subj, btn) {
+    currentSubject = subj;
+    document.getElementById('subjectLabel').textContent = btn.textContent;
+    document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── New Chat ──
+  function newChat() {
+    const area = document.getElementById('chatArea');
+    area.innerHTML = `<div class="welcome" id="welcome">
+      <div class="welcome-icon">🎓</div>
+      <h2>හෙලෝ! <span>Sanz AI</span> ට ආයුබෝවන්!</h2>
+      <p>ඔයාගේ ඕනෑම ප්‍රශ්නයක් අහන්න — text, voice, හෝ photo!</p>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickQ('2x² + 5x + 3 සාධක කරන්න')">📐 ගණිත ප්‍රශ්නයක්</button>
+        <button class="quick-btn" onclick="quickQ('ප්‍රකාශ සංශ්ලේෂණය පැහැදිලි කරන්න')">🔬 විද්‍යා ප්‍රශ්නයක්</button>
+        <button class="quick-btn" onclick="quickQ('සිංහල රචනාවක් ලිවීමට උදව් කරන්න')">📖 සිංහල ප්‍රශ්නයක්</button>
+      </div>
+    </div>`;
+    selectedImage = null;
+    document.getElementById('filePreview').innerHTML = '';
+  }
+
+  // ── Quick Questions ──
+  function quickQ(q) {
+    document.getElementById('questionInput').value = q;
+    sendQuestion();
+  }
+
+  // ── File Handling ──
+  function handleFile(input, type) {
+    const file = input.files[0];
+    if (!file) return;
+    if (type === 'image') {
+      selectedImage = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = `<div class="file-chip">
+          <img src="${e.target.result}">
+          <span>${file.name}</span>
+          <button onclick="removeFile()">✕</button>
+        </div>`;
+      };
+      reader.readAsDataURL(file);
+    }
+    input.value = '';
+  }
+
+  function removeFile() {
+    selectedImage = null;
+    document.getElementById('filePreview').innerHTML = '';
+  }
+
+  // ── Voice Recognition ──
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      showToast('⚠️ ඔයාගේ browser voice support කරන්නේ නෑ!'); return;
+    }
+    if (isRecording) { recognition.stop(); return; }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'si-LK';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('voiceBtn').classList.add('recording');
+      document.getElementById('voiceBtn').textContent = '⏹️';
+      showToast('🎤 කතා කරන්න...');
+    };
+    recognition.onresult = e => {
+      document.getElementById('questionInput').value = e.results[0][0].transcript;
+      autoResize(document.getElementById('questionInput'));
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceBtn').textContent = '🎤';
+    };
+    recognition.onerror = () => {
+      showToast('⚠️ Voice error! නැවත try කරන්න.');
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceBtn').textContent = '🎤';
+    };
+    recognition.start();
+  }
+
+  // ── Text to Speech ──
+  function speakText(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[#*`>\[\]]/g, '').trim();
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'si-LK'; utt.rate = 0.9; utt.pitch = 1;
+    window.speechSynthesis.speak(utt);
+  }
+
+  // ── Send Question ──
+  async function sendQuestion() {
+    const q = document.getElementById('questionInput').value.trim();
+    if (!q) return;
+    if (!userName) { showToast('⚠️ නම දෙන්න!'); return; }
+
+    hideWelcome();
+    addMessage('user', q, null);
+    document.getElementById('questionInput').value = '';
+    autoResize(document.getElementById('questionInput'));
+    document.getElementById('sendBtn').disabled = true;
+
+    const typingId = addTyping();
+
+    try {
+      const formData = new FormData();
+      formData.append('name', userName);
+      formData.append('grade', document.getElementById('gradeSelect').value);
+      formData.append('subject', currentSubject);
+      formData.append('question', q);
+      if (selectedImage) formData.append('image', selectedImage);
+
+      const res = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
+      const data = await res.json();
+
+      removeTyping(typingId);
+
+      if (data.status === 'banned') {
+        addSpecialMessage(data.message, 'banned');
+      } else if (data.status === 'creator') {
+        addSpecialMessage(data.message, 'creator');
+      } else if (data.status === 'success') {
+        addMessage('ai', data.answer, data.graph_url, data.verified, data.rag_used);
+        speakText(data.answer);
+      } else {
+        addMessage('ai', '⚠️ Error: ' + data.message, null);
+      }
+    } catch (e) {
+      removeTyping(typingId);
+      addMessage('ai', '⚠️ Backend එකට connect වෙන්න බෑ!', null);
+    }
+
+    document.getElementById('sendBtn').disabled = false;
+    removeFile();
+  }
+
+  // ── UI Helpers ──
+  function hideWelcome() {
+    const w = document.getElementById('welcome');
+    if (w) w.remove();
+  }
+
+  function addMessage(role, text, graphUrl, verified, ragUsed) {
+    const area = document.getElementById('chatArea');
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    const time = new Date().toLocaleTimeString('si-LK', { hour: '2-digit', minute: '2-digit' });
+    const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    let badges = '';
+    if (verified !== undefined) badges += verified
+      ? `<span class="verified-badge">✅ Verified</span>`
+      : `<span style="background:rgba(251,191,36,0.15);color:#fbbf24;padding:2px 8px;border-radius:20px;font-size:10px">⚠️ Corrected</span>`;
+    if (ragUsed) badges += `<span class="rag-badge">📚 Textbook</span>`;
+    div.innerHTML = `
+      <div class="${role === 'ai' ? 'ai' : 'user'}-avatar msg-avatar">${role === 'ai' ? '🧠' : '👤'}</div>
+      <div>
+        <div class="msg-bubble">${formatted}${graphUrl ? `<img class="graph-img" src="${graphUrl}">` : ''}</div>
+        <div class="msg-meta">${time} ${badges}</div>
+      </div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function addSpecialMessage(msg, type) {
+    const area = document.getElementById('chatArea');
+    const div = document.createElement('div');
+    div.className = `special-msg ${type === 'banned' ? 'banned-msg' : ''}`;
+    div.style.maxWidth = '600px';
+    div.innerHTML = msg.replace(/\n/g, '<br>');
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function addTyping() {
+    const area = document.getElementById('chatArea');
+    const id = 'typing_' + Date.now();
+    const div = document.createElement('div');
+    div.className = 'message'; div.id = id;
+    div.innerHTML = `<div class="ai-avatar msg-avatar">🧠</div>
+      <div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuestion(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
