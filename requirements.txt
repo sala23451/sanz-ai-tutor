@@ -5,3 +5,4 @@ anthropic
 matplotlib
 numpy
 PyMuPDF
+gunicorn
