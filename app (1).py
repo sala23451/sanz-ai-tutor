@@ -7,7 +7,6 @@ import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
-import anthropic
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -22,18 +21,15 @@ except ImportError:
 app = Flask(__name__)
 CORS(app)
 
-GOOGLE_API_KEY    = os.environ.get("GOOGLE_API_KEY")
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-ADMIN_PASSWORD    = os.environ.get("ADMIN_PASSWORD", "admin123")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
-if not ANTHROPIC_API_KEY:
-    raise ValueError("ANTHROPIC_API_KEY not set!")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-gemini_flash  = genai.GenerativeModel('gemini-2.5-flash')
-claude_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+gemini_flash = genai.GenerativeModel('gemini-2.5-flash')
+gemini_check = genai.GenerativeModel('gemini-2.0-flash')
 
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
@@ -226,24 +222,20 @@ def solve_math():
             image_data = image_file.read()
             content_list.append({"mime_type": "image/jpeg", "data": image_data})
 
-        # 7. Gemini Flash
+        # 7. Gemini Flash - Main Answer
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 8. Claude Haiku Cross Check (FIXED model name)
+        # 8. Gemini Cross Check (Free - No Claude needed)
         cross_check_prompt = f"""
         Is this answer correct?
         Question: {question}
         Answer: {answer1[:500]}
         {lang_cfg['cross_check']}
         """
-        claude_response = claude_client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=500,
-            messages=[{"role": "user", "content": cross_check_prompt}]
-        )
-        cross_check  = claude_response.content[0].text
-        correct_word = lang_cfg['correct_word']
+        cross_response = gemini_check.generate_content(cross_check_prompt)
+        cross_check    = cross_response.text
+        correct_word   = lang_cfg['correct_word']
 
         if correct_word in cross_check:
             final_answer = answer1
