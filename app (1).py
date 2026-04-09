@@ -28,8 +28,8 @@ if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-gemini_flash = genai.GenerativeModel('gemini-2.5-flash')
-gemini_check = genai.GenerativeModel('gemini-2.0-flash')
+gemini_flash = genai.GenerativeModel('gemini-1.5-flash')
+gemini_check = genai.GenerativeModel('gemini-1.5-flash')
 
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
