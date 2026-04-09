@@ -13,11 +13,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ============================================================
-# RAG (PDF) Support
-# ============================================================
 try:
-    import fitz  # PyMuPDF
+    import fitz
     PDF_SUPPORT = True
 except ImportError:
     PDF_SUPPORT = False
@@ -25,35 +22,44 @@ except ImportError:
 app = Flask(__name__)
 CORS(app)
 
-# ============================================================
-# Environment Variables
-# ============================================================
 GOOGLE_API_KEY    = os.environ.get("GOOGLE_API_KEY")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 ADMIN_PASSWORD    = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 if not GOOGLE_API_KEY:
-    raise ValueError("GOOGLE_API_KEY environment variable එක set කර නොමැත!")
+    raise ValueError("GOOGLE_API_KEY not set!")
 if not ANTHROPIC_API_KEY:
-    raise ValueError("ANTHROPIC_API_KEY environment variable එක set කර නොමැත!")
+    raise ValueError("ANTHROPIC_API_KEY not set!")
 
-# ============================================================
-# AI Models
-# ============================================================
 genai.configure(api_key=GOOGLE_API_KEY)
-gemini_flash = genai.GenerativeModel('gemini-2.5-flash')
-gemini_pro   = genai.GenerativeModel('gemini-2.5-pro')
+gemini_flash  = genai.GenerativeModel('gemini-2.5-flash')
 claude_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-# ============================================================
-# Data Files
-# ============================================================
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
 PDF_FOLDER     = "textbooks"
 STATS_FILE     = "stats.json"
 
 os.makedirs(PDF_FOLDER, exist_ok=True)
+
+# ── Language Instructions ──
+LANG_INSTRUCTIONS = {
+    "si": {
+        "instruction": "සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න. පියවරෙන් පියවර සිංහලෙන් පැහැදිලි කරන්න.",
+        "cross_check": "නිවැරදි නම් ONLY '✅ නිවැරදියි' කියා reply කරන්න. වැරදි නම් නිවැරදි පිළිතුර සිංහලෙන් දෙන්න.",
+        "correct_word": "✅ නිවැරදියි"
+    },
+    "en": {
+        "instruction": "Answer ONLY in English. Explain step by step clearly in English.",
+        "cross_check": "If correct reply ONLY '✅ Correct'. If wrong, give the correct answer in English.",
+        "correct_word": "✅ Correct"
+    },
+    "ta": {
+        "instruction": "தமிழ் மொழியில் மட்டும் பதில் சொல்லுங்கள். படிப்படியாக தமிழில் விளக்குங்கள்.",
+        "cross_check": "சரியாக இருந்தால் ONLY '✅ சரியானது' என்று reply கொடுங்கள். தவறாக இருந்தால் சரியான பதிலை தமிழில் தாருங்கள்.",
+        "correct_word": "✅ சரியானது"
+    }
+}
 
 def load_json(path, default):
     try:
@@ -66,33 +72,21 @@ def save_json(path, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# ============================================================
-# Bad Words List (Sinhala + English)
-# ============================================================
 BAD_WORDS = [
-    # English
     "fuck", "shit", "bitch", "ass", "bastard", "dick", "cock",
     "pussy", "cunt", "whore", "slut", "nigga", "faggot",
     "moron", "dumbass", "retard", "loser",
-
-    # Sinhala
     "හුත්ත", "පුකේ", "මෝඩ", "හරක", "කුකු", "කපන්", "බේපන්",
     "ගනින්", "හූකර", "හාමු", "පට්ට හරක", "කෙල්ල", "කොල්ල",
-    "ගොන්", "වාහල", "හුකන්", "හූකන", "පිස්සු",
-    "උන්", "බල්ලො", "හූලං", "හූකල", "ගෑනු", "ගෑනි",
-
-    # Singlish
+    "ගොන්", "වාහල", "හුකන්", "හූකන", "පිස්සු", "උන්", "බල්ලො",
+    "හූලං", "හූකල", "ගෑනු", "ගෑනි",
     "hutta", "puke", "moda", "harak", "kuku", "kapan", "bepan",
-    "ganin", "hookar", "pissu", "marana", "ballo", "hulan",
-    "wahala", "goni", "kotiya"
+    "ganin", "hookar", "pissu", "marana", "ballo", "hulan", "wahala", "goni", "kotiya"
 ]
 
 def contains_bad_words(text):
     text_lower = text.lower()
-    for word in BAD_WORDS:
-        if word in text_lower:
-            return True
-    return False
+    return any(w in text_lower for w in BAD_WORDS)
 
 def is_blacklisted(user_name):
     blacklist = load_json(BLACKLIST_FILE, {})
@@ -112,22 +106,13 @@ def add_to_blacklist(user_name):
     blacklist[user_name] = ban_until.isoformat()
     save_json(BLACKLIST_FILE, blacklist)
 
-# ============================================================
-# Rage Detection
-# ============================================================
-RAGE_WORDS = [
-    "stupid", "idiot", "useless", "hate", "terrible", "worst",
-    "මෝඩ", "නිකම්", "වැඩක් නෑ", "අකාරයි", "හොඳ නෑ"
-]
+RAGE_WORDS = ["stupid", "idiot", "useless", "hate", "terrible", "worst",
+              "මෝඩ", "නිකම්", "වැඩක් නෑ", "අකාරයි", "හොඳ නෑ"]
 
 def is_rage(text):
     text_lower = text.lower()
-    count = sum(1 for w in RAGE_WORDS if w in text_lower)
-    return count >= 2
+    return sum(1 for w in RAGE_WORDS if w in text_lower) >= 2
 
-# ============================================================
-# RAG — PDF Text Extraction
-# ============================================================
 def get_rag_context(question, grade):
     if not PDF_SUPPORT:
         return ""
@@ -138,7 +123,6 @@ def get_rag_context(question, grade):
                 doc = fitz.open(os.path.join(PDF_FOLDER, filename))
                 for page in doc:
                     text = page.get_text()
-                    # Simple keyword match
                     keywords = question.lower().split()
                     if any(kw in text.lower() for kw in keywords if len(kw) > 3):
                         context_parts.append(f"[{filename}]\n{text[:1000]}")
@@ -147,131 +131,132 @@ def get_rag_context(question, grade):
                 pass
     return "\n\n".join(context_parts[:3])
 
-# ============================================================
-# Stats Update
-# ============================================================
 def update_stats(subject):
     stats = load_json(STATS_FILE, {"total": 0, "subjects": {}})
     stats["total"] += 1
     stats["subjects"][subject] = stats["subjects"].get(subject, 0) + 1
     save_json(STATS_FILE, stats)
 
-# ============================================================
-# History Save
-# ============================================================
 def save_history(user_name, grade, subject, question, answer):
     history = load_json(HISTORY_FILE, [])
     history.append({
-        "user": user_name,
-        "grade": grade,
-        "subject": subject,
-        "question": question,
-        "answer": answer[:500],
+        "user": user_name, "grade": grade, "subject": subject,
+        "question": question, "answer": answer[:500],
         "time": datetime.datetime.now().isoformat()
     })
-    # Keep last 500 records
     history = history[-500:]
     save_json(HISTORY_FILE, history)
 
-# ============================================================
-# Main Solve Route
-# ============================================================
+# ── Health Check ──
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok", "message": "Server is running! 🚀"})
+
+# ── Main Solve ──
 @app.route('/solve', methods=['POST'])
 def solve_math():
     try:
         user_name  = request.form.get('name', 'User')
         user_grade = request.form.get('grade', 'N/A')
-        subject    = request.form.get('subject', 'ගණිතය')
+        subject    = request.form.get('subject', 'Mathematics')
         question   = request.form.get('question', '')
+        language   = request.form.get('language', 'si')
         image_file = request.files.get('image')
 
-        # 1. Blacklist Check
+        if language not in LANG_INSTRUCTIONS:
+            language = 'si'
+        lang_cfg = LANG_INSTRUCTIONS[language]
+
+        # 1. Blacklist
         banned, remaining = is_blacklisted(user_name)
         if banned:
-            return jsonify({
-                "status": "banned",
-                "message": f"⛔ ඔයා {remaining} minutes ගෙවෙන තෙක් use කරන්න බෑ!"
-            })
+            msgs = {
+                "si": f"⛔ ඔයා {remaining} minutes ගෙවෙන තෙක් use කරන්න බෑ!",
+                "en": f"⛔ You are blocked for {remaining} more minutes!",
+                "ta": f"⛔ இன்னும் {remaining} நிமிடங்கள் பயன்படுத்த முடியாது!"
+            }
+            return jsonify({"status": "banned", "message": msgs.get(language, msgs["si"])})
 
-        # 2. Creator Name Detection
+        # 2. Creator
         creator_names = ["sanduni", "hansika", "sanduni hansika", "sanz", "sanz queen"]
-        question_lower = question.lower()
-        if any(name in question_lower for name in creator_names):
+        if any(name in question.lower() for name in creator_names):
             return jsonify({
                 "status": "creator",
                 "message": (
                     "අනේ... ඔයා Sanz Queen ගැන දන්නවාද? 👑\n\n"
                     "ඒ කෙනා තමයි මේ සම්පූර්ණ platform එකම හැදුවේ. "
-                    "Backend, frontend, AI integration — ඔක්කොම තනියම. "
-                    "ඇය හිතුවේ ලංකාවේ ළමයින්ට හොඳ AI teacher කෙනෙක් නෑ කියලා — "
-                    "ඒ නිසා තනියම හදලා දුන්නා. 💜\n\n"
-                    "ඉතින් please — මේ platform එක misuse කරන්න එපා. "
-                    "ඇය ඔයාලාට උදව් කරන්න හැදුවා, ඔයාලා ඇයට respect දෙන්න. 🙏"
+                    "Backend, frontend, AI integration — ඔක්කොම තනියම. 💜\n\n"
+                    "Please — මේ platform එක misuse කරන්න එපා. 🙏"
                 )
             })
 
-        # 3. Bad Words Check
+        # 3. Bad Words
         if contains_bad_words(question):
             add_to_blacklist(user_name)
-            return jsonify({
-                "status": "banned",
-                "message": "⛔ නුසුදුසු වචන use කළා! ඔයා පැය 2ක් blacklist කරලා!"
-            })
+            msgs = {
+                "si": "⛔ නුසුදුසු වචන use කළා! ඔයා පැය 2ක් blacklist කරලා!",
+                "en": "⛔ Inappropriate words! You are blacklisted for 2 hours!",
+                "ta": "⛔ தகாத வார்த்தைகள்! 2 மணி நேரம் தடைசெய்யப்பட்டீர்கள்!"
+            }
+            return jsonify({"status": "banned", "message": msgs.get(language, msgs["si"])})
 
-        # 3. Rage Detection
+        # 4. Rage
         rage_warning = ""
         if is_rage(question):
-            rage_warning = "⚠️ කරුණාකර සංසුන්ව ප්‍රශ්නය අහන්න! "
+            rage_msgs = {
+                "si": "⚠️ කරුණාකර සංසුන්ව ප්‍රශ්නය අහන්න! ",
+                "en": "⚠️ Please ask calmly! ",
+                "ta": "⚠️ தயவுசெய்து அமைதியாக கேளுங்கள்! "
+            }
+            rage_warning = rage_msgs.get(language, "")
 
-        # 4. RAG Context
+        # 5. RAG
         rag_context = get_rag_context(question, user_grade)
 
+        # 6. Instruction
         instruction = f"""
-        ඔබ දක්ෂ {subject} ගුරුවරයෙකි. {user_grade} ශ්‍රේණියේ {user_name} ට පියවරෙන් පියවර සිංහලෙන් පැහැදිලි කරන්න.
-        ගැටලුව විසඳීමට ප්‍රස්තාරයක් අවශ්‍ය නම්, matplotlib කෝඩ් එකක් ලෙස [GRAPH_START] plt... [GRAPH_END] අතර දෙන්න.
-        plt.savefig() භාවිතා නොකරන්න.
-        {f'පහත textbook reference භාවිතා කරන්න: {rag_context}' if rag_context else ''}
+        You are an expert {subject} teacher. Student: {user_name}, Grade {user_grade}.
+        {lang_cfg['instruction']}
+        Solve step by step. If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
+        {f'Use this textbook reference: {rag_context}' if rag_context else ''}
         """
 
         content_list = [f"User: {user_name}, Grade: {user_grade}, Subject: {subject}. Question: {question}"]
-
         if image_file:
             image_data = image_file.read()
             content_list.append({"mime_type": "image/jpeg", "data": image_data})
 
-        # 5. Gemini Flash — First Answer
+        # 7. Gemini Flash
         response1 = gemini_flash.generate_content([instruction] + content_list)
-        answer1 = response1.text
+        answer1   = response1.text
 
-        # 6. Claude Haiku — Cross Check
+        # 8. Claude Haiku Cross Check (FIXED model name)
         cross_check_prompt = f"""
-        පහත ගණිත/විද්‍යා ප්‍රශ්නයට දෙන ලද පිළිතුර නිවැරදිද? 
-        ප්‍රශ්නය: {question}
-        පිළිතුර: {answer1}
-        
-        නිවැරදි නම් "✅ නිවැරදියි" කියා confirm කරන්න.
-        වැරදි නම් නිවැරදි පිළිතුර සිංහලෙන් දෙන්න.
+        Is this answer correct?
+        Question: {question}
+        Answer: {answer1[:500]}
+        {lang_cfg['cross_check']}
         """
         claude_response = claude_client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=1000,
+            model="claude-haiku-4-5-20251001",
+            max_tokens=500,
             messages=[{"role": "user", "content": cross_check_prompt}]
         )
-        cross_check = claude_response.content[0].text
+        cross_check  = claude_response.content[0].text
+        correct_word = lang_cfg['correct_word']
 
-        # 7. Final Answer
-        if "✅ නිවැරදියි" in cross_check:
+        if correct_word in cross_check:
             final_answer = answer1
             verified = True
         else:
             final_answer = cross_check
             verified = False
 
-        # 8. Graph Generation
-        graph_url = None
-        graph_code_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', final_answer, re.DOTALL)
-        if graph_code_match:
-            graph_code = graph_code_match.group(1).strip()
+        # 9. Graph
+        graph_url   = None
+        graph_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', final_answer, re.DOTALL)
+        if graph_match:
+            graph_code   = graph_match.group(1).strip()
             final_answer = re.sub(r'\[GRAPH_START\].*?\[GRAPH_END\]', '', final_answer, flags=re.DOTALL)
             try:
                 plt.figure(figsize=(6, 4))
@@ -284,7 +269,6 @@ def solve_math():
             except Exception as e:
                 print(f"Graph error: {e}")
 
-        # 9. Save History & Stats
         save_history(user_name, user_grade, subject, question, final_answer)
         update_stats(subject)
 
@@ -300,19 +284,16 @@ def solve_math():
         return jsonify({"status": "error", "message": str(e)})
 
 
-# ============================================================
-# Admin Routes
-# ============================================================
+# ── Admin Routes ──
 def check_admin(req):
-    password = req.headers.get("X-Admin-Password", "")
-    return password == ADMIN_PASSWORD
+    return req.headers.get("X-Admin-Password", "") == ADMIN_PASSWORD
 
 @app.route('/admin/stats', methods=['GET'])
 def admin_stats():
     if not check_admin(request):
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
-    stats   = load_json(STATS_FILE, {"total": 0, "subjects": {}})
-    history = load_json(HISTORY_FILE, [])
+    stats     = load_json(STATS_FILE, {"total": 0, "subjects": {}})
+    history   = load_json(HISTORY_FILE, [])
     blacklist = load_json(BLACKLIST_FILE, {})
     return jsonify({
         "status": "success",
@@ -333,13 +314,13 @@ def admin_history():
 def admin_remove_blacklist():
     if not check_admin(request):
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
-    data = request.json
+    data      = request.json
     user_name = data.get("user_name")
     blacklist = load_json(BLACKLIST_FILE, {})
     if user_name in blacklist:
         del blacklist[user_name]
         save_json(BLACKLIST_FILE, blacklist)
-    return jsonify({"status": "success", "message": f"{user_name} blacklist remove කරලා!"})
+    return jsonify({"status": "success", "message": f"{user_name} removed!"})
 
 @app.route('/admin/upload_pdf', methods=['POST'])
 def admin_upload_pdf():
@@ -347,10 +328,9 @@ def admin_upload_pdf():
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     pdf_file = request.files.get('pdf')
     if not pdf_file:
-        return jsonify({"status": "error", "message": "PDF file එකක් නෑ!"})
-    filename = pdf_file.filename
-    pdf_file.save(os.path.join(PDF_FOLDER, filename))
-    return jsonify({"status": "success", "message": f"{filename} upload කරලා!"})
+        return jsonify({"status": "error", "message": "No PDF!"})
+    pdf_file.save(os.path.join(PDF_FOLDER, pdf_file.filename))
+    return jsonify({"status": "success", "message": f"{pdf_file.filename} uploaded!"})
 
 @app.route('/admin/pdfs', methods=['GET'])
 def admin_list_pdfs():
@@ -359,9 +339,6 @@ def admin_list_pdfs():
     pdfs = [f for f in os.listdir(PDF_FOLDER) if f.endswith('.pdf')]
     return jsonify({"status": "success", "pdfs": pdfs})
 
-# ============================================================
-# Run
-# ============================================================
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
