@@ -304,7 +304,6 @@
             </div>
         </div>
 
-        <!-- Online/Offline Quick View -->
         <div class="two-col">
             <div class="user-list-card">
                 <div class="card-head">
@@ -337,7 +336,7 @@
         </div>
     </div>
 
-    <!-- Users / Online Page -->
+    <!-- Users Page -->
     <div class="page" id="page-online">
         <div class="header-row">
             <h1>User Status</h1>
@@ -444,7 +443,7 @@
     const BACKEND    = 'https://sanz-ai-tutor.onrender.com';
     const ADMIN_USER = 'sanduni';
     const ADMIN_PASS = 'momsanzdad2001#';
-    const ONLINE_THRESHOLD_MINUTES = 10; // users active within 10 min = online
+    const ONLINE_THRESHOLD_MINUTES = 10;
 
     let authed = false;
     let attempts = parseInt(localStorage.getItem('adm_att') || '0');
@@ -452,7 +451,6 @@
     let allHistory = [];
     let autoRefreshTimer = null;
 
-    // ── Session Bypass ──
     window.onload = () => {
         if (sessionStorage.getItem('admin_pw') === ADMIN_PASS) {
             authed = true;
@@ -510,28 +508,18 @@
         if (name === 'resources') loadPDFs();
     }
 
-    // ── TIME HELPERS ──
     function timeAgo(ts) {
         if (!ts) return '—';
-        const now = Date.now();
-        const then = new Date(ts).getTime();
-        const diff = Math.floor((now - then) / 1000);
+        const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
         if (diff < 60) return diff + 's ago';
         if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
         if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
         return Math.floor(diff / 86400) + 'd ago';
     }
 
-    function formatTime(ts) {
-        if (!ts) return '—';
-        const d = new Date(ts);
-        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    }
-
     function isOnline(ts) {
         if (!ts) return false;
-        const diff = (Date.now() - new Date(ts).getTime()) / 60000;
-        return diff <= ONLINE_THRESHOLD_MINUTES;
+        return (Date.now() - new Date(ts).getTime()) / 60000 <= ONLINE_THRESHOLD_MINUTES;
     }
 
     function initials(name) {
@@ -539,87 +527,83 @@
         return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     }
 
-    // ── LOAD DATA ──
+    // ── LOAD DATA — fetches both /admin/stats AND /admin/history ──
     async function loadData() {
         if (!authed) return;
         try {
-            const res = await fetch(`${BACKEND}/admin/stats`, {
-                headers: { 'X-Admin-Password': ADMIN_PASS }
-            });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const headers = { 'X-Admin-Password': ADMIN_PASS };
 
-            const stats = await res.json();
+            const [statsRes, histRes] = await Promise.all([
+                fetch(`${BACKEND}/admin/stats`, { headers }),
+                fetch(`${BACKEND}/admin/history`, { headers })
+            ]);
+
+            if (!statsRes.ok) throw new Error('HTTP ' + statsRes.status);
+
+            const stats   = await statsRes.json();
+            const histData = histRes.ok ? await histRes.json() : {};
+
             document.getElementById('errorBanner').style.display = 'none';
 
-            // --- Overview stats ---
-            const history = stats.history || stats.questions || [];
-            allHistory = history;
+            // History from /admin/history endpoint
+            // Backend saves: { user, grade, subject, question, answer, time }
+            const history     = histData.history || [];
+            allHistory        = history;
             const blacklisted = stats.blacklisted_users || [];
-            const totalQ = stats.total_questions ?? history.length;
 
-            document.getElementById('totalQ').textContent = totalQ;
+            document.getElementById('totalQ').textContent      = stats.total_questions ?? history.length;
             document.getElementById('bannedCount').textContent = blacklisted.length;
             document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
 
-            // --- Build user sessions from history ---
+            // Build user map from history
             const userMap = {};
             history.forEach(entry => {
-                const key = entry.student_id || entry.user_id || entry.name || 'Unknown';
+                const key = entry.user || entry.name || 'Unknown';
                 if (!userMap[key]) {
                     userMap[key] = {
-                        name: entry.name || entry.student_name || key,
+                        name: key,
                         grade: entry.grade || '—',
-                        lastSeen: entry.timestamp || entry.time || null,
+                        lastSeen: entry.time || null,
                         count: 0
                     };
                 }
                 userMap[key].count++;
-                const ts = entry.timestamp || entry.time;
+                const ts = entry.time;
                 if (ts && (!userMap[key].lastSeen || new Date(ts) > new Date(userMap[key].lastSeen))) {
                     userMap[key].lastSeen = ts;
                 }
             });
 
-            const users = Object.values(userMap);
+            const users        = Object.values(userMap);
             const onlineUsers  = users.filter(u => isOnline(u.lastSeen));
             const offlineUsers = users.filter(u => !isOnline(u.lastSeen));
 
-            // update online count stat
-            document.getElementById('onlineCount').textContent = onlineUsers.length;
-            document.getElementById('onlineCountBadge').textContent = onlineUsers.length;
+            document.getElementById('onlineCount').textContent       = onlineUsers.length;
+            document.getElementById('onlineCountBadge').textContent  = onlineUsers.length;
             document.getElementById('offlineCountBadge').textContent = offlineUsers.length;
-            document.getElementById('onlineCountFull').textContent = onlineUsers.length;
-            document.getElementById('offlineCountFull').textContent = offlineUsers.length;
+            document.getElementById('onlineCountFull').textContent   = onlineUsers.length;
+            document.getElementById('offlineCountFull').textContent  = offlineUsers.length;
 
-            // --- Render online lists ---
             renderUserList('onlineListOverview', onlineUsers, true);
             renderUserList('offlineListOverview', offlineUsers, false);
             renderUserList('onlineListFull', onlineUsers, true);
             renderUserList('offlineListFull', offlineUsers, false);
             renderUsersTable('usersBody', users);
 
-            // --- Recent activity (last 10) ---
             renderHistoryRows('recentBody', history.slice(-10).reverse(), false);
-
-            // --- Full history ---
             renderHistoryRows('historyBody', [...history].reverse(), true);
             document.getElementById('historyCount').textContent = `Showing ${history.length} total records`;
 
-            // --- Blacklist ---
             renderBlacklist(blacklisted);
-
-            // --- Subjects ---
-            renderSubjects(history);
+            renderSubjects(history, stats.subjects || {});
 
         } catch (err) {
             console.error('Load error:', err);
             document.getElementById('errorBanner').style.display = 'block';
-            document.getElementById('errorText').textContent = 'Backend error: ' + err.message + '. Check your server is running.';
+            document.getElementById('errorText').textContent = 'Backend error: ' + err.message;
             showToast('⚠️ Could not connect to backend');
         }
     }
-
-    // ── RENDER HELPERS ──
 
     function renderUserList(containerId, users, online) {
         const el = document.getElementById(containerId);
@@ -677,12 +661,13 @@
             return;
         }
         tbody.innerHTML = rows.map((r, i) => {
-            const student = escHtml(r.name || r.student_name || r.student_id || 'Unknown');
-            const grade   = escHtml(r.grade || '—');
-            const subject = escHtml(r.subject || '—');
-            const question = escHtml(r.question || r.message || '—');
-            const time    = timeAgo(r.timestamp || r.time);
-            const num = numbered ? `<td style="color:var(--text-dim)">${i+1}</td>` : '';
+            // Backend saves as: user, grade, subject, question, time
+            const student  = escHtml(r.user || r.name || 'Unknown');
+            const grade    = escHtml(r.grade || '—');
+            const subject  = escHtml(r.subject || '—');
+            const question = escHtml(r.question || '—');
+            const time     = timeAgo(r.time || r.timestamp);
+            const num      = numbered ? `<td style="color:var(--text-dim)">${i+1}</td>` : '';
             return `<tr>
                 ${num}
                 <td>${student}</td>
@@ -701,7 +686,7 @@
             return;
         }
         el.innerHTML = list.map(u => {
-            const name = typeof u === 'string' ? u : (u.name || u.student_id || JSON.stringify(u));
+            const name = typeof u === 'string' ? u : (u.name || u.user_name || JSON.stringify(u));
             return `<div class="bl-user">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <div class="avatar" style="background:rgba(255,77,77,0.1);color:var(--error)">${initials(name)}</div>
@@ -718,12 +703,15 @@
         }).join('');
     }
 
-    function renderSubjects(history) {
-        const counts = {};
-        history.forEach(r => {
-            const s = r.subject || 'Unknown';
-            counts[s] = (counts[s] || 0) + 1;
-        });
+    function renderSubjects(history, statsSubjects) {
+        // Use stats.subjects if available, otherwise count from history
+        const counts = Object.keys(statsSubjects).length ? statsSubjects : {};
+        if (!Object.keys(counts).length) {
+            history.forEach(r => {
+                const s = r.subject || 'Unknown';
+                counts[s] = (counts[s] || 0) + 1;
+            });
+        }
         const el = document.getElementById('subjTags');
         const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
         if (!entries.length) {
@@ -735,41 +723,40 @@
         ).join('');
     }
 
-    // ── HISTORY SEARCH FILTER ──
     function filterHistory() {
         const q = document.getElementById('historySearch').value.toLowerCase();
         const filtered = allHistory.filter(r => {
-            const name    = (r.name || r.student_name || '').toLowerCase();
+            const name    = (r.user || r.name || '').toLowerCase();
             const subject = (r.subject || '').toLowerCase();
-            const question = (r.question || r.message || '').toLowerCase();
+            const question = (r.question || '').toLowerCase();
             return name.includes(q) || subject.includes(q) || question.includes(q);
         });
         renderHistoryRows('historyBody', [...filtered].reverse(), true);
         document.getElementById('historyCount').textContent = `Showing ${filtered.length} of ${allHistory.length} records`;
     }
 
-    // ── UNBAN ──
-    async function unbanUser(userId) {
-        if (!confirm('Unban ' + userId + '?')) return;
+    // ── UNBAN — fixed endpoint & field name ──
+    async function unbanUser(userName) {
+        if (!confirm('Unban ' + userName + '?')) return;
         try {
-            const res = await fetch(`${BACKEND}/admin/unban`, {
+            const res = await fetch(`${BACKEND}/admin/blacklist/remove`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-Admin-Password': ADMIN_PASS },
-                body: JSON.stringify({ user_id: userId })
+                body: JSON.stringify({ user_name: userName })
             });
-            if (res.ok) { showToast('✅ ' + userId + ' unbanned'); loadData(); }
+            if (res.ok) { showToast('✅ ' + userName + ' unbanned'); loadData(); }
             else showToast('❌ Unban failed');
         } catch { showToast('❌ Network error'); }
     }
 
-    // ── PDFs ──
+    // ── PDFs — fixed endpoint & field name ──
     async function loadPDFs() {
         if (!authed) return;
         document.getElementById('pdfList').innerHTML = '<div class="empty">Loading...</div>';
         try {
-            const res = await fetch(`${BACKEND}/admin/pdfs`, { headers: { 'X-Admin-Password': ADMIN_PASS } });
+            const res  = await fetch(`${BACKEND}/admin/pdfs`, { headers: { 'X-Admin-Password': ADMIN_PASS } });
             const data = await res.json();
-            const files = data.files || data.pdfs || [];
+            const files = data.pdfs || data.files || [];
             if (!files.length) {
                 document.getElementById('pdfList').innerHTML = '<div class="empty">No PDFs uploaded yet</div>';
                 return;
@@ -788,7 +775,7 @@
                     <button class="delete-btn" onclick="deletePDF('${escHtml(name)}')"><i class="fas fa-trash"></i> Delete</button>
                 </div>`;
             }).join('');
-        } catch (err) {
+        } catch {
             document.getElementById('pdfList').innerHTML = '<div class="empty">Could not load PDFs</div>';
         }
     }
@@ -797,10 +784,10 @@
         const input = document.getElementById('pdfInput');
         if (!input.files.length) { showToast('⚠️ No file selected'); return; }
         const form = new FormData();
-        form.append('file', input.files[0]);
+        form.append('pdf', input.files[0]); // field name must be 'pdf'
         showToast('⏳ Uploading...');
         try {
-            const res = await fetch(`${BACKEND}/admin/upload`, {
+            const res = await fetch(`${BACKEND}/admin/upload_pdf`, { // fixed endpoint
                 method: 'POST',
                 headers: { 'X-Admin-Password': ADMIN_PASS },
                 body: form
@@ -822,7 +809,6 @@
         } catch { showToast('❌ Network error'); }
     }
 
-    // ── UTILS ──
     function logout() {
         clearInterval(autoRefreshTimer);
         sessionStorage.removeItem('admin_pw');
