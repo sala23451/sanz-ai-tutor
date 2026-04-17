@@ -4,13 +4,26 @@ import base64
 import re
 import json
 import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import google.generativeai as genai
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+
+# ── Voice Libraries ──
+try:
+    import speech_recognition as sr
+    STT_SUPPORT = True
+except ImportError:
+    STT_SUPPORT = False
+
+try:
+    from gtts import gTTS
+    TTS_SUPPORT = True
+except ImportError:
+    TTS_SUPPORT = False
 
 try:
     import fitz
@@ -37,26 +50,43 @@ PDF_FOLDER     = "textbooks"
 STATS_FILE     = "stats.json"
 
 os.makedirs(PDF_FOLDER, exist_ok=True)
+os.makedirs("temp_audio", exist_ok=True)
 
 # ── Language Instructions ──
 LANG_INSTRUCTIONS = {
     "si": {
         "instruction": "සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න. පියවරෙන් පියවර සිංහලෙන් පැහැදිලි කරන්න.",
         "cross_check": "නිවැරදි නම් ONLY '✅ නිවැරදියි' කියා reply කරන්න. වැරදි නම් නිවැරදි පිළිතුර සිංහලෙන් දෙන්න.",
-        "correct_word": "✅ නිවැරදියි"
+        "correct_word": "✅ නිවැරදියි",
+        "gtts_lang": "si"
     },
     "en": {
         "instruction": "Answer ONLY in English. Explain step by step clearly in English.",
         "cross_check": "If correct reply ONLY '✅ Correct'. If wrong, give the correct answer in English.",
-        "correct_word": "✅ Correct"
+        "correct_word": "✅ Correct",
+        "gtts_lang": "en"
     },
     "ta": {
         "instruction": "தமிழ் மொழியில் மட்டும் பதில் சொல்லுங்கள். படிப்படியாக தமிழில் விளக்குங்கள்.",
         "cross_check": "சரியாக இருந்தால் ONLY '✅ சரியானது' என்று reply கொடுங்கள். தவறாக இருந்தால் சரியான பதிலை தமிழில் தாருங்கள்.",
-        "correct_word": "✅ சரியானது"
+        "correct_word": "✅ சரியானது",
+        "gtts_lang": "ta"
     }
 }
 
+# ── Language Detection ──
+def detect_language(text):
+    """Auto detect Sinhala / Tamil / English"""
+    sinhala_count = sum(1 for c in text if '\u0D80' <= c <= '\u0DFF')
+    tamil_count   = sum(1 for c in text if '\u0B80' <= c <= '\u0BFF')
+    if sinhala_count > 2:
+        return "si"
+    elif tamil_count > 2:
+        return "ta"
+    else:
+        return "en"
+
+# ── JSON Helpers ──
 def load_json(path, default):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -68,6 +98,7 @@ def save_json(path, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+# ── Bad Words ──
 BAD_WORDS = [
     "fuck", "shit", "bitch", "ass", "bastard", "dick", "cock",
     "pussy", "cunt", "whore", "slut", "nigga", "faggot",
@@ -143,12 +174,166 @@ def save_history(user_name, grade, subject, question, answer):
     history = history[-500:]
     save_json(HISTORY_FILE, history)
 
+# ══════════════════════════════════════════
 # ── Health Check ──
+# ══════════════════════════════════════════
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "ok", "message": "Server is running! 🚀"})
+    return jsonify({
+        "status": "ok",
+        "message": "Server is running! 🚀",
+        "stt_support": STT_SUPPORT,
+        "tts_support": TTS_SUPPORT,
+        "pdf_support": PDF_SUPPORT
+    })
 
+# ══════════════════════════════════════════
+# ── Voice Input (STT) ──
+# ══════════════════════════════════════════
+@app.route('/voice-input', methods=['POST'])
+def voice_input():
+    """
+    🎤 Record button → Frontend sends audio blob → Backend converts to text
+    Returns: { text, detected_language }
+    """
+    try:
+        if not STT_SUPPORT:
+            return jsonify({
+                "status": "error",
+                "message": "STT library not installed. Run: pip install SpeechRecognition"
+            }), 500
+
+        audio_file = request.files.get('audio')
+        if not audio_file:
+            return jsonify({"status": "error", "message": "No audio file received!"}), 400
+
+        # Save temp audio file
+        temp_path = os.path.join("temp_audio", "input.wav")
+        audio_file.save(temp_path)
+
+        # Speech to Text
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(temp_path) as source:
+            audio_data = recognizer.record(source)
+
+        # Try all 3 languages
+        detected_text = None
+        detected_lang = "en"
+
+        # Try Sinhala first
+        try:
+            text = recognizer.recognize_google(audio_data, language="si-LK")
+            if text:
+                detected_text = text
+                detected_lang = "si"
+        except:
+            pass
+
+        # Try Tamil
+        if not detected_text:
+            try:
+                text = recognizer.recognize_google(audio_data, language="ta-LK")
+                if text:
+                    detected_text = text
+                    detected_lang = "ta"
+            except:
+                pass
+
+        # Try English
+        if not detected_text:
+            try:
+                text = recognizer.recognize_google(audio_data, language="en-US")
+                if text:
+                    detected_text = text
+                    detected_lang = "en"
+            except:
+                pass
+
+        # Cleanup temp file
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+
+        if not detected_text:
+            return jsonify({
+                "status": "error",
+                "message": "Could not understand audio. Please try again."
+            }), 400
+
+        # Also verify language from text
+        text_lang = detect_language(detected_text)
+        if text_lang != "en":
+            detected_lang = text_lang
+
+        return jsonify({
+            "status": "success",
+            "text": detected_text,
+            "detected_language": detected_lang
+        })
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# ══════════════════════════════════════════
+# ── TTS (Text to Speech) ──
+# ══════════════════════════════════════════
+@app.route('/tts', methods=['POST'])
+def text_to_speech():
+    """
+    ▶️ Play button click → Frontend sends text + language → Returns audio file
+    Returns: MP3 audio stream
+    """
+    try:
+        if not TTS_SUPPORT:
+            return jsonify({
+                "status": "error",
+                "message": "TTS library not installed. Run: pip install gTTS"
+            }), 500
+
+        data     = request.json
+        text     = data.get('text', '')
+        language = data.get('language', 'si')
+
+        if not text:
+            return jsonify({"status": "error", "message": "No text provided!"}), 400
+
+        if language not in LANG_INSTRUCTIONS:
+            language = detect_language(text)
+
+        gtts_lang = LANG_INSTRUCTIONS[language]['gtts_lang']
+
+        # Clean text — remove markdown symbols for better TTS
+        clean_text = re.sub(r'[*_#`\[\]()~>]', '', text)
+        clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+
+        # Limit text length for TTS (too long = slow)
+        if len(clean_text) > 1000:
+            clean_text = clean_text[:1000] + "..."
+
+        # Generate TTS
+        tts = gTTS(text=clean_text, lang=gtts_lang, slow=False)
+
+        # Save to buffer
+        audio_buffer = io.BytesIO()
+        tts.write_to_fp(audio_buffer)
+        audio_buffer.seek(0)
+
+        return send_file(
+            audio_buffer,
+            mimetype='audio/mpeg',
+            as_attachment=False,
+            download_name='response.mp3'
+        )
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# ══════════════════════════════════════════
 # ── Main Solve ──
+# ══════════════════════════════════════════
 @app.route('/solve', methods=['POST'])
 def solve_math():
     try:
@@ -159,8 +344,10 @@ def solve_math():
         language   = request.form.get('language', 'si')
         image_file = request.files.get('image')
 
+        # Auto-detect language if not provided
         if language not in LANG_INSTRUCTIONS:
-            language = 'si'
+            language = detect_language(question)
+
         lang_cfg = LANG_INSTRUCTIONS[language]
 
         # 1. Blacklist
@@ -226,7 +413,7 @@ def solve_math():
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 8. Gemini Cross Check (Free - No Claude needed)
+        # 8. Gemini Cross Check
         cross_check_prompt = f"""
         Is this answer correct?
         Question: {question}
@@ -269,14 +456,17 @@ def solve_math():
             "answer": rage_warning + final_answer,
             "graph_url": graph_url,
             "verified": verified,
-            "rag_used": bool(rag_context)
+            "rag_used": bool(rag_context),
+            "detected_language": language  # Frontend එකට language return කරනවා TTS වලට
         })
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
 
+# ══════════════════════════════════════════
 # ── Admin Routes ──
+# ══════════════════════════════════════════
 def check_admin(req):
     return req.headers.get("X-Admin-Password", "") == ADMIN_PASSWORD
 
