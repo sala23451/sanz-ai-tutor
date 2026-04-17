@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sanz AI Tutor</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Sanz AI Tutor - Pro Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
@@ -13,263 +13,287 @@
     --border: #2a2a3a;
     --accent: #7c6af7;
     --accent2: #c084fc;
-    --accent3: #38bdf8;
     --text: #e8e8f0;
     --text2: #8888a8;
-    --success: #34d399;
     --danger: #f87171;
-    --warning: #fbbf24;
-    --glow: rgba(124, 106, 247, 0.15);
+    --success: #34d399;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
-  /* ── Overlays ── */
-  .name-overlay, .admin-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 200; backdrop-filter: blur(8px);
-  }
-  .name-card, .admin-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 24px; padding: 40px; max-width: 420px; width: 90%;
-    text-align: center; display: flex; flex-direction: column; gap: 16px;
-    box-shadow: 0 0 60px var(--glow);
-  }
-
   /* ── Sidebar ── */
-  .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 16px; gap: 8px; flex-shrink: 0; }
-  .logo { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 8px; }
-  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .logo-text { font-size: 18px; font-weight: 700; }
-  .logo-text span { color: var(--accent2); }
+  .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 16px; gap: 6px; flex-shrink: 0; overflow-y: auto; }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 15px; font-weight: 700; font-size: 20px; }
+  .logo span { color: var(--accent2); }
   
-  .new-chat-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; padding: 12px 16px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-bottom: 8px; }
-  .subject-btn { background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 10px 14px; color: var(--text2); cursor: pointer; text-align: left; transition: 0.2s; }
+  .subject-btn { background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 10px 14px; color: var(--text2); cursor: pointer; text-align: left; transition: 0.2s; font-size: 13.5px; display: flex; align-items: center; gap: 10px; }
+  .subject-btn:hover { background: var(--surface2); }
   .subject-btn.active { background: var(--surface2); border-color: var(--accent); color: var(--accent2); }
 
   /* ── Main ── */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
-  .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--surface); align-items: center; z-index: 10; }
+  .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; background-image: radial-gradient(circle at 50% 50%, #161622 0%, #0a0a0f 100%); }
   
   /* ── Messages ── */
-  .message { display: flex; gap: 12px; max-width: 800px; animation: msgIn 0.3s ease; }
-  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .message.user { flex-direction: row-reverse; align-self: flex-end; }
-  .msg-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .ai-avatar { background: var(--accent); }
-  .user-avatar { background: var(--accent3); }
-  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; font-size: 14px; line-height: 1.7; position: relative; }
+  .message { display: flex; gap: 12px; max-width: 85%; animation: msgIn 0.3s ease; }
+  @keyframes msgIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+  .message.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px; font-size: 14px; line-height: 1.6; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .message.user .msg-bubble { background: var(--accent); color: white; border: none; }
   
   /* ── Listen Button ── */
   .listen-btn {
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
-    background: rgba(124, 106, 247, 0.1); border: 1px solid var(--accent);
-    color: var(--accent2); padding: 6px 12px; border-radius: 20px;
-    font-size: 12px; cursor: pointer; transition: 0.2s;
+    margin-top: 12px; background: rgba(124, 106, 247, 0.1); border: 1px solid var(--accent);
+    color: var(--accent2); padding: 7px 15px; border-radius: 20px; font-size: 12px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-weight: 500;
   }
   .listen-btn:hover { background: var(--accent); color: white; }
-  .listen-btn.playing { border-color: var(--danger); color: var(--danger); }
+  .listen-btn.playing { border-color: var(--danger); color: var(--danger); background: rgba(248, 113, 113, 0.1); }
 
-  /* ── Input ── */
-  .input-area { padding: 16px 24px 20px; background: var(--surface); border-top: 1px solid var(--border); }
-  .input-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
-  #questionInput { flex: 1; background: none; border: none; outline: none; color: var(--text); resize: none; max-height: 120px; }
-  .icon-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .icon-btn.recording { background: var(--danger); color: white; border: none; }
-  .send-btn { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: white; cursor: pointer; }
+  /* ── Input Area ── */
+  .input-area { padding: 20px 24px; background: var(--surface); border-top: 1px solid var(--border); }
+  .input-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: center; padding: 8px 16px; gap: 12px; }
+  #questionInput { flex: 1; background: none; border: none; outline: none; color: var(--text); resize: none; font-family: inherit; font-size: 14px; padding: 8px 0; }
+  .icon-btn { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 20px; transition: 0.2s; display: flex; align-items: center; }
+  .icon-btn.recording { color: var(--danger); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+  .send-btn { background: var(--accent); color: white; border: none; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+  .send-btn:hover { transform: scale(1.05); background: var(--accent2); }
 
-  /* Misc */
-  .field-label { font-size: 11px; color: var(--text2); text-align: left; margin-bottom: 4px; text-transform: uppercase; }
-  .name-input, .grade-select-overlay, .pass-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; }
-  .lang-btns { display: flex; gap: 8px; margin-bottom: 15px; }
-  .lang-btn { flex: 1; padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text2); cursor: pointer; }
-  .lang-btn.active { border-color: var(--accent); color: var(--accent2); }
-  .start-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+  /* ── Overlay ── */
+  .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  .card { background: var(--surface); border: 1px solid var(--border); padding: 40px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+  .card input, .card select { width: 100%; padding: 14px; margin: 10px 0; background: var(--surface2); border: 1px solid var(--border); color: white; border-radius: 12px; outline: none; font-family: inherit; }
+  .primary-btn { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+
+  .graph-img { margin-top: 15px; border-radius: 12px; max-width: 100%; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
-<div class="name-overlay" id="nameOverlay">
-  <div class="name-card">
-    <h2>ආයුබෝවන්! <span>Sanz AI</span></h2>
-    <div class="lang-btns">
-      <button class="lang-btn active" onclick="selectLang('si', this)">🇱🇰 සිංහල</button>
-      <button class="lang-btn" onclick="selectLang('en', this)">🇬🇧 English</button>
-    </div>
-    <input class="name-input" id="nameInput" placeholder="ඔයාගේ නම...">
-    <select class="grade-select-overlay" id="gradeInputOverlay">
-      <option value="6">Grade 6</option><option value="7">Grade 7</option>
-      <option value="8">Grade 8</option><option value="9">Grade 9</option>
-      <option value="10" selected>Grade 10</option><option value="11">Grade 11</option>
+<div class="overlay" id="loginOverlay">
+  <div class="card">
+    <h2 style="margin-bottom: 10px;">Sanz <span>AI</span> Tutor</h2>
+    <p style="color: var(--text2); font-size: 13px; margin-bottom: 25px;">ඔබේ තොරතුරු ඇතුළත් කර ආරම්භ කරන්න</p>
+    <input type="text" id="userNameInput" placeholder="ඔයාගේ නම...">
+    <select id="userGradeInput">
+      <option value="6">Grade 6</option>
+      <option value="7">Grade 7</option>
+      <option value="8">Grade 8</option>
+      <option value="9">Grade 9</option>
+      <option value="10" selected>Grade 10</option>
+      <option value="11">Grade 11</option>
     </select>
-    <input class="pass-input" id="userPassInput" type="password" placeholder="Password (sanz2024)">
-    <button class="start-btn" onclick="startChat()">පටන් ගමු! 🚀</button>
+    <button class="primary-btn" onclick="login()">ඉදිරියට යමු 🚀</button>
   </div>
 </div>
 
 <div class="sidebar">
-  <div class="logo"><div class="logo-icon">🎓</div><div class="logo-text">Sanz <span>AI</span></div></div>
-  <button class="new-chat-btn" onclick="location.reload()"><span>✨</span> New Chat</button>
-  <button class="subject-btn active">📐 Mathematics</button>
-  <button class="subject-btn">🔬 Science</button>
-  <button class="subject-btn">📖 Sinhala</button>
-  <div style="margin-top: auto; font-size: 11px; color: var(--text2); text-align: center;">Made by <b>Sanz Queen</b></div>
+  <div class="logo">🧠 Sanz <span>AI</span></div>
+  <p style="font-size: 11px; color: var(--text2); margin: 10px 12px; text-transform: uppercase; letter-spacing: 1px;">විෂයයන් තෝරන්න</p>
+  
+  <button class="subject-btn active" onclick="setSubject('Mathematics', this)">📐 Mathematics</button>
+  <button class="subject-btn" onclick="setSubject('Science', this)">🔬 Science</button>
+  <button class="subject-btn" onclick="setSubject('Geography', this)">🌍 Geography</button>
+  <button class="subject-btn" onclick="setSubject('ICT', this)">💻 ICT</button>
+  <button class="subject-btn" onclick="setSubject('Health', this)">🏥 Health & Physical</button>
+  <button class="subject-btn" onclick="setSubject('History', this)">🏛️ History</button>
+  <button class="subject-btn" onclick="setSubject('Civic Education', this)">⚖️ Civic Education</button>
+  <button class="subject-btn" onclick="setSubject('Sinhala', this)">📖 Sinhala Language</button>
+  <button class="subject-btn" onclick="setSubject('English', this)">🌐 English Language</button>
+
+  <div style="margin-top: auto; padding: 15px; font-size: 10px; color: var(--text2); text-align: center; border-top: 1px solid var(--border);">
+    Developed by <b>Sanz Queen</b><br>v2.0 Beta
+  </div>
 </div>
 
 <div class="main">
   <div class="header">
-    <div id="subjectLabel">📐 Mathematics</div>
-    <div id="userName">...</div>
+    <div id="currentSubject" style="font-weight: 600; font-size: 15px;">📐 Mathematics</div>
+    <div id="displayName" style="font-size: 13px; font-weight: 500; color: var(--accent2); background: rgba(124,106,247,0.1); padding: 5px 12px; border-radius: 20px;"></div>
   </div>
-  <div class="chat-area" id="chatArea"></div>
+  
+  <div class="chat-area" id="chatArea">
+    <div class="message ai">
+      <div class="msg-bubble">ආයුබෝවන්! මම Sanz AI. මම ඔයාගේ අධ්‍යාපන කටයුතු වලට උදව් කරන්න සූදානම්. ඕනෑම ප්‍රශ්නයක් අහන්න!</div>
+    </div>
+  </div>
+
   <div class="input-area">
     <div class="input-box">
-      <textarea id="questionInput" placeholder="Write your question..." rows="1"></textarea>
-      <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
-      <button class="send-btn" onclick="sendQuestion()">➤</button>
+      <textarea id="questionInput" placeholder="ඔබේ ප්‍රශ්නය මෙතන ලියන්න..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';"></textarea>
+      <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="දිගටම අසා සිටීමට">🎤</button>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
   </div>
 </div>
 
 <script>
-  const BACKEND = 'https://sanz-ai-tutor.onrender.com';
-  const PASS = 'sanz2024';
-  let userName = '', userGrade = '10', selectedLang = 'si';
-  let recognition = null, isRecording = false;
+  const API_URL = "https://sanz-ai-tutor.onrender.com"; 
+  let userName = "";
+  let userGrade = "10";
+  let currentSubject = "Mathematics";
+  let recognition = null;
+  let isRecording = false;
 
-  function selectLang(lang, btn) {
-    selectedLang = lang;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  function login() {
+    const name = document.getElementById('userNameInput').value.trim();
+    if(!name) { alert("කරුණාකර නම ඇතුළත් කරන්න!"); return; }
+    userName = name;
+    userGrade = document.getElementById('userGradeInput').value;
+    document.getElementById('displayName').innerText = "Student: " + userName;
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+
+  function setSubject(subj, btn) {
+    currentSubject = subj;
+    document.getElementById('currentSubject').innerText = btn.innerText;
+    document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
 
-  function startChat() {
-    const name = document.getElementById('nameInput').value.trim();
-    const pass = document.getElementById('userPassInput').value;
-    if(!name || pass !== PASS) { alert("Check Name or Password!"); return; }
-    userName = name;
-    userGrade = document.getElementById('gradeInputOverlay').value;
-    document.getElementById('userName').textContent = "👋 " + userName;
-    document.getElementById('nameOverlay').style.display = 'none';
+  // ── Manual Continuous Listening ──
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechSDK = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechSDK();
+    recognition.continuous = true; 
+    recognition.interimResults = true;
+    recognition.lang = 'si-LK'; 
+
+    recognition.onresult = (event) => {
+      let result = "";
+      for (let i = 0; i < event.results.length; i++) {
+        result += event.results[i][0].transcript;
+      }
+      document.getElementById('questionInput').value = result;
+    };
+
+    recognition.onend = () => {
+      if(isRecording) recognition.start(); 
+    };
   }
 
-  // ── Continuous Listening (Manual Off) ──
   function toggleVoice() {
-    const SpeechSDK = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!recognition) {
-      recognition = new SpeechSDK();
-      recognition.lang = (selectedLang === 'si') ? 'si-LK' : 'en-US';
-      recognition.continuous = true; // මේකෙන් තමයි නතර වෙන්නේ නැතුව දිගටම අහන් ඉන්නේ
-
-      recognition.onresult = (e) => {
-        const transcript = e.results[e.results.length - 1][0].transcript;
-        document.getElementById('questionInput').value += transcript;
-      };
-    }
-
-    if (isRecording) {
-      recognition.stop();
-      isRecording = false;
-      document.getElementById('voiceBtn').classList.remove('recording');
-      document.getElementById('voiceBtn').innerHTML = '🎤';
-    } else {
+    const btn = document.getElementById('voiceBtn');
+    if (!isRecording) {
       recognition.start();
       isRecording = true;
-      document.getElementById('voiceBtn').classList.add('recording');
-      document.getElementById('voiceBtn').innerHTML = '⏹️';
+      btn.classList.add('recording');
+      btn.innerText = "⏹️";
+    } else {
+      isRecording = false;
+      recognition.stop();
+      btn.classList.remove('recording');
+      btn.innerText = "🎤";
     }
   }
 
-  async function sendQuestion() {
-    const q = document.getElementById('questionInput').value.trim();
+  async function sendMsg() {
+    const input = document.getElementById('questionInput');
+    const q = input.value.trim();
     if(!q) return;
+
     addMessage('user', q);
-    document.getElementById('questionInput').value = '';
+    input.value = "";
+    input.style.height = 'auto';
 
     const formData = new FormData();
-    formData.append('question', q);
     formData.append('name', userName);
     formData.append('grade', userGrade);
-    formData.append('language', selectedLang);
+    formData.append('subject', currentSubject);
+    formData.append('question', q);
+    formData.append('language', 'si');
 
     try {
-      const res = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
+      const res = await fetch(`${API_URL}/solve`, { method: 'POST', body: formData });
       const data = await res.json();
+
       if(data.status === 'success') {
-        addMessage('ai', data.answer);
+        addMessage('ai', data.answer, data.graph_url);
+      } else {
+        addMessage('ai', "Error: " + data.message);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      addMessage('ai', "Backend connection failed. Please check your URL.");
+    }
   }
 
-  function addMessage(role, text) {
-    const area = document.getElementById('chatArea');
-    const msg = document.createElement('div');
-    msg.className = `message ${role}`;
+  function addMessage(role, text, graphUrl = null) {
+    const chatArea = document.getElementById('chatArea');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}`;
     
-    const avatar = role === 'ai' ? '🧠' : '👤';
-    const avatarClass = role === 'ai' ? 'ai-avatar' : 'user-avatar';
+    let content = `<div class="msg-bubble">${text.replace(/\n/g, '<br>')}`;
+    
+    if(graphUrl) {
+      content += `<br><img src="${graphUrl}" class="graph-img">`;
+    }
 
-    msg.innerHTML = `
-      <div class="msg-avatar ${avatarClass}">${avatar}</div>
-      <div class="msg-bubble">
-        <div>${text.replace(/\n/g, '<br>')}</div>
-        ${role === 'ai' ? `<button class="listen-btn" onclick="getSummary(this, '${text.replace(/'/g, "\\'")}')">🔊 Listen Summary</button>` : ''}
-      </div>
-    `;
-    area.appendChild(msg);
-    area.scrollTop = area.scrollHeight;
+    if(role === 'ai') {
+      content += `<br><button class="listen-btn" onclick="playSummary(this, '${text.replace(/'/g, "\\'")}')">🔊 Listen Summary</button>`;
+    }
+
+    content += `</div>`;
+    msgDiv.innerHTML = content;
+    chatArea.appendChild(msgDiv);
+    chatArea.scrollTop = chatArea.scrollHeight;
   }
 
-  // ── Listen Summary Logic ──
-  async function getSummary(btn, fullText) {
+  // ── Summarize and Speak ──
+  async function playSummary(btn, fullText) {
     if(btn.classList.contains('playing')) {
       window.speechSynthesis.cancel();
       btn.classList.remove('playing');
-      btn.innerHTML = '🔊 Listen Summary';
+      btn.innerHTML = "🔊 Listen Summary";
       return;
     }
 
-    btn.innerHTML = '⌛ Summarizing...';
+    btn.innerHTML = "⌛ සාරාංශ කරමින්...";
     
     try {
-      // Backend එකට flag එකක් යවනවා සාරාංශයක් ඉල්ලන්න
       const formData = new FormData();
       formData.append('question', fullText);
-      formData.append('is_summary_request', 'true');
-      formData.append('language', selectedLang);
+      formData.append('is_summary_request', 'true'); 
 
-      const res = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
+      const res = await fetch(`${API_URL}/solve`, { method: 'POST', body: formData });
       const data = await res.json();
-      
+
       if(data.status === 'success') {
-        speakText(data.answer, btn);
+        speak(data.answer, btn);
       }
     } catch (e) {
-      btn.innerHTML = '⚠️ Error';
-      setTimeout(() => btn.innerHTML = '🔊 Listen Summary', 2000);
+      btn.innerHTML = "⚠️ Error";
     }
   }
 
-  function speakText(text, btn) {
+  function speak(text, btn) {
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = (selectedLang === 'si') ? 'si-LK' : 'en-US';
-    utterance.rate = 0.9;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = (text.match(/[\u0D80-\u0DFF]/)) ? 'si-LK' : 'en-US';
+    utter.rate = 0.95;
 
-    utterance.onstart = () => {
+    utter.onstart = () => {
       btn.classList.add('playing');
-      btn.innerHTML = '⏹️ Stop Listening';
+      btn.innerHTML = "⏹️ Stop Summary";
     };
-    
-    utterance.onend = () => {
+    utter.onend = () => {
       btn.classList.remove('playing');
-      btn.innerHTML = '🔊 Listen Summary';
+      btn.innerHTML = "🔊 Listen Summary";
     };
 
-    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.speak(utter);
   }
+
+  document.getElementById('questionInput').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMsg();
+    }
+  });
 </script>
+
 </body>
 </html>
