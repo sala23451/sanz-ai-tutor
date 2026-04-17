@@ -3,297 +3,537 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sanz AI Tutor - Pro Edition</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Sanz AI Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --border: #2a2a3a;
-    --accent: #7c6af7;
-    --accent2: #c084fc;
-    --text: #e8e8f0;
-    --text2: #8888a8;
-    --danger: #f87171;
-    --success: #34d399;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+:root {
+  --bg:#EEF2FB; --surface:#FFFFFF; --primary:#1845C8; --primary-lt:#2E65F0;
+  --primary-dim:rgba(24,69,200,.08); --accent:#00BFA5; --danger:#EF4444;
+  --text-h:#0B1740; --text-p:#374263; --text-m:#8A9BBE; --border:#D5DFF5;
+  --sh-sm:0 2px 8px rgba(24,69,200,.07); --sh-md:0 6px 24px rgba(24,69,200,.11); --sh-lg:0 16px 48px rgba(24,69,200,.15);
+  --r-sm:10px; --r-md:16px; --r-lg:22px; --r-xl:30px; --sw:276px;
+  --c-pri:#16A34A; --c-sec:#1845C8; --c-al:#7C3AED;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-serif;background:var(--bg);color:var(--text-p);display:flex;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 
-  /* ── Sidebar ── */
-  .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 16px; gap: 6px; flex-shrink: 0; overflow-y: auto; }
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-thumb { background: var(--border); }
-  .logo { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 15px; font-weight: 700; font-size: 20px; }
-  .logo span { color: var(--accent2); }
-  
-  .subject-btn { background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 10px 14px; color: var(--text2); cursor: pointer; text-align: left; transition: 0.2s; font-size: 13.5px; display: flex; align-items: center; gap: 10px; }
-  .subject-btn:hover { background: var(--surface2); }
-  .subject-btn.active { background: var(--surface2); border-color: var(--accent); color: var(--accent2); }
+/* ── OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lc{background:#fff;border-radius:var(--r-xl);width:94%;max-width:480px;box-shadow:var(--sh-lg);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.lc-banner{background:linear-gradient(135deg,#1845C8 0%,#2E65F0 55%,#00BFA5 100%);padding:26px 30px 22px;color:#fff;position:relative;overflow:hidden;}
+.lc-banner::after{content:'🎓';font-size:110px;position:absolute;right:-8px;top:-18px;opacity:.12;pointer-events:none;}
+.lc-banner h1{font-size:22px;font-weight:800;} .lc-banner h1 span{opacity:.75;} .lc-banner p{font-size:12px;opacity:.8;margin-top:3px;}
+.lc-body{padding:24px 28px 28px;}
+.fg{margin-bottom:15px;}
+.fg label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-m);margin-bottom:6px;}
+.fg input{width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:14px;color:var(--text-h);outline:none;transition:.2s;}
+.fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
+.pills{display:flex;gap:8px;}
+.pill{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:transparent;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text-m);text-align:center;transition:.15s;}
+.pill:hover{border-color:var(--primary-lt);color:var(--primary);}
+.pill.active{border-color:var(--primary);background:var(--primary-dim);color:var(--primary);}
+.pill .pf{display:block;font-size:18px;margin-bottom:2px;}
+.ggrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.gb{aspect-ratio:1;border:1.5px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--text-m);transition:.15s;display:flex;align-items:center;justify-content:center;}
+.gb:hover{border-color:var(--primary-lt);color:var(--primary);}
+.gb[data-c="p"].active{border-color:var(--c-pri);background:rgba(22,163,74,.1);color:var(--c-pri);}
+.gb[data-c="s"].active{border-color:var(--c-sec);background:var(--primary-dim);color:var(--c-sec);}
+.gb[data-c="a"].active{border-color:var(--c-al);background:rgba(124,58,237,.08);color:var(--c-al);}
+.g-legend{display:flex;gap:12px;margin-top:7px;flex-wrap:wrap;}
+.gl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-m);font-weight:600;}
+.gd{width:8px;height:8px;border-radius:50%;}
+.login-btn{width:100%;padding:13px;margin-top:18px;background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(24,69,200,.28);transition:.15s;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(24,69,200,.38);}
 
-  /* ── Main ── */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; background: var(--surface); align-items: center; z-index: 10; }
-  .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; background-image: radial-gradient(circle at 50% 50%, #161622 0%, #0a0a0f 100%); }
-  
-  /* ── Messages ── */
-  .message { display: flex; gap: 12px; max-width: 85%; animation: msgIn 0.3s ease; }
-  @keyframes msgIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
-  .message.user { align-self: flex-end; flex-direction: row-reverse; }
-  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px; font-size: 14px; line-height: 1.6; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-  .message.user .msg-bubble { background: var(--accent); color: white; border: none; }
-  
-  /* ── Listen Button ── */
-  .listen-btn {
-    margin-top: 12px; background: rgba(124, 106, 247, 0.1); border: 1px solid var(--accent);
-    color: var(--accent2); padding: 7px 15px; border-radius: 20px; font-size: 12px;
-    cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-weight: 500;
-  }
-  .listen-btn:hover { background: var(--accent); color: white; }
-  .listen-btn.playing { border-color: var(--danger); color: var(--danger); background: rgba(248, 113, 113, 0.1); }
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;box-shadow:2px 0 12px rgba(24,69,200,.05);}
+.sb-hd{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-logo{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.sb-li{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1845C8,#2E65F0);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;}
+.sb-logo h2{font-size:16px;font-weight:800;color:var(--text-h);} .sb-logo h2 span{color:var(--primary);}
+.sb-meta{font-size:11px;color:var(--text-m);} .sb-meta b{color:var(--primary);}
+.sb-cat{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;margin-top:7px;border:1.5px solid;}
+.sb-cat.p{color:var(--c-pri);border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);}
+.sb-cat.s{color:var(--c-sec);border-color:rgba(24,69,200,.2);background:var(--primary-dim);}
+.sb-cat.a{color:var(--c-al);border-color:rgba(124,58,237,.2);background:rgba(124,58,237,.07);}
+/* Stream selector */
+.st-sel{padding:9px 11px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.st-lbl{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);margin-bottom:6px;padding-left:3px;}
+.st-btns{display:flex;flex-direction:column;gap:3px;}
+.st-btn{width:100%;background:transparent;border:1.5px solid transparent;border-radius:8px;padding:7px 9px;display:flex;align-items:center;gap:7px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;}
+.st-btn:hover{background:var(--primary-dim);}
+.st-btn.active{background:rgba(124,58,237,.08);border-color:var(--c-al);}
+.st-ico{width:26px;height:26px;border-radius:6px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.st-btn.active .st-ico{background:rgba(124,58,237,.15);}
+.st-nm{font-size:12px;font-weight:600;color:var(--text-h);} .st-btn.active .st-nm{color:var(--c-al);}
+.st-lc{font-size:10px;color:var(--text-m);}
+.sb-sec{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);padding:10px 14px 5px;flex-shrink:0;}
+.sb-nav{flex:1;overflow-y:auto;padding:0 9px 9px;}
+.sbj{width:100%;background:transparent;border:1.5px solid transparent;border-radius:var(--r-sm);padding:8px 9px;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;margin-bottom:2px;}
+.sbj-ic{width:30px;height:30px;border-radius:7px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:.15s;}
+.sbj-tx{flex:1;min-width:0;}
+.sbj-en{font-size:12px;font-weight:600;color:var(--text-h);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sbj-lc{font-size:10px;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sbj:hover{background:var(--primary-dim);}
+.sbj.active{background:var(--primary-dim);border-color:var(--primary);}
+.sbj.active .sbj-en{color:var(--primary);}
+.sbj.active .sbj-ic{background:var(--primary);}
+.sb-ft{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-m);text-align:center;flex-shrink:0;}
+.sb-ft b{color:var(--primary);}
 
-  /* ── Input Area ── */
-  .input-area { padding: 20px 24px; background: var(--surface); border-top: 1px solid var(--border); }
-  .input-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: center; padding: 8px 16px; gap: 12px; }
-  #questionInput { flex: 1; background: none; border: none; outline: none; color: var(--text); resize: none; font-family: inherit; font-size: 14px; padding: 8px 0; }
-  .icon-btn { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 20px; transition: 0.2s; display: flex; align-items: center; }
-  .icon-btn.recording { color: var(--danger); animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-  .send-btn { background: var(--accent); color: white; border: none; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-  .send-btn:hover { transform: scale(1.05); background: var(--accent2); }
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{padding:11px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-shrink:0;box-shadow:var(--sh-sm);}
+.tb-l{display:flex;align-items:center;gap:9px;}
+.tb-ic{width:33px;height:33px;border-radius:8px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.tb-nm{font-size:14px;font-weight:700;color:var(--text-h);}
+.tb-lc{font-size:10px;color:var(--text-m);}
+.tb-r{display:flex;gap:6px;align-items:center;}
+.tb-b{padding:4px 11px;border-radius:99px;font-size:10.5px;font-weight:700;border:1.5px solid var(--border);}
+.tb-b.bp{background:rgba(22,163,74,.08);color:var(--c-pri);border-color:rgba(22,163,74,.2);}
+.tb-b.bs{background:var(--primary-dim);color:var(--primary);border-color:rgba(24,69,200,.2);}
+.tb-b.ba{background:rgba(124,58,237,.08);color:var(--c-al);border-color:rgba(124,58,237,.2);}
+.tb-b.bl{background:rgba(0,191,165,.08);color:#007f6e;border-color:rgba(0,191,165,.2);}
 
-  /* ── Overlay ── */
-  .overlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-  .card { background: var(--surface); border: 1px solid var(--border); padding: 40px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-  .card input, .card select { width: 100%; padding: 14px; margin: 10px 0; background: var(--surface2); border: 1px solid var(--border); color: white; border-radius: 12px; outline: none; font-family: inherit; }
-  .primary-btn { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+/* ── CHAT ── */
+.chat-area{flex:1;overflow-y:auto;padding:22px 20px;display:flex;flex-direction:column;gap:18px;background:var(--bg);}
+.wc-wrap{margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:420px;text-align:center;}
+.wc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:30px 32px;box-shadow:var(--sh-sm);width:100%;}
+.wc-ico{font-size:50px;margin-bottom:11px;}
+.wc-card h2{font-size:19px;font-weight:800;color:var(--text-h);margin-bottom:7px;}
+.wc-card p{font-size:12.5px;color:var(--text-m);line-height:1.7;}
+.wc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;justify-content:center;}
+.wc-chip{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);border-radius:99px;padding:4px 11px;font-size:10.5px;font-weight:600;}
+/* Messages */
+.mw{display:flex;gap:8px;animation:msgIn .35s cubic-bezier(.16,1,.3,1);}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.mw.user{flex-direction:row-reverse;}
+.mav{width:31px;height:31px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;align-self:flex-start;margin-top:2px;}
+.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;box-shadow:0 3px 10px rgba(24,69,200,.2);}
+.mw.user .mav{background:linear-gradient(135deg,#0f3d28,#166534);color:#fff;}
+.mbody{display:flex;flex-direction:column;gap:5px;max-width:78%;min-width:0;}
+.mw.user .mbody{align-items:flex-end;}
+.mbub{padding:12px 16px;border-radius:var(--r-md);font-size:13.5px;line-height:1.78;}
+.mw.ai .mbub{background:var(--surface);color:var(--text-h);border:1px solid var(--border);border-top-left-radius:4px;box-shadow:var(--sh-sm);}
+.mw.user .mbub{background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border-top-right-radius:4px;box-shadow:0 4px 14px rgba(24,69,200,.22);}
+.mbub h1,.mbub h2,.mbub h3{color:var(--text-h);margin:10px 0 5px;font-weight:700;}
+.mbub h1{font-size:16px;} .mbub h2{font-size:15px;} .mbub h3{font-size:14px;}
+.mbub p{margin:4px 0;} .mbub ul,.mbub ol{padding-left:20px;margin:5px 0;} .mbub li{margin:3px 0;}
+.mbub strong{color:var(--primary);font-weight:700;}
+.mbub code{background:var(--primary-dim);color:var(--primary);padding:2px 6px;border-radius:4px;font-size:12px;}
+.mbub pre{background:#f0f4ff;border-radius:8px;padding:11px;overflow-x:auto;margin:8px 0;}
+.mbub pre code{background:none;padding:0;}
+.mbub blockquote{border-left:3px solid var(--primary);padding-left:11px;color:var(--text-m);margin:6px 0;}
+.mbub table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12.5px;}
+.mbub th,.mbub td{border:1px solid var(--border);padding:6px 9px;}
+.mbub th{background:var(--primary-dim);color:var(--primary);font-weight:700;}
+.mbub hr{border:none;border-top:1px solid var(--border);margin:9px 0;}
+.m-graph{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;box-shadow:var(--sh-sm);}
+.macts{display:flex;gap:5px;flex-wrap:wrap;}
+.mact{background:var(--primary-dim);border:1px solid var(--border);color:var(--primary);padding:4px 11px;border-radius:99px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;}
+.mact:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+/* Typing */
+.ty-w{display:flex;gap:8px;align-items:center;}
+.ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;box-shadow:var(--sh-sm);}
+.td{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;} .td:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
 
-  .graph-img { margin-top: 15px; border-radius: 12px; max-width: 100%; border: 1px solid var(--border); }
+/* ── INPUT ── */
+.input-area{padding:13px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;}
+.in-tools{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
+.it-tgl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-m);transition:.15s;user-select:none;font-family:inherit;}
+.it-tgl.active{background:var(--primary-dim);border-color:var(--primary);color:var(--primary);}
+.it-tgl .dot{width:6px;height:6px;border-radius:50%;background:var(--text-m);transition:.15s;}
+.it-tgl.active .dot{background:var(--primary);}
+.it-upl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-m);transition:.15s;}
+.it-upl:hover,.it-upl.hf{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
+#imgInp{display:none;}
+.ip-wrap{position:relative;display:inline-block;margin-bottom:8px;}
+.ip-img{height:58px;border-radius:9px;border:1.5px solid var(--border);object-fit:cover;}
+.ip-rm{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.in-box{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:2px solid var(--border);border-radius:var(--r-md);padding:9px 12px;transition:.2s;}
+.in-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
+#qIn{flex:1;background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;color:var(--text-h);resize:none;max-height:140px;min-height:22px;line-height:1.55;}
+#qIn::placeholder{color:var(--text-m);}
+.bic{width:35px;height:35px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-p);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;transition:.15s;}
+.bic:hover{border-color:var(--primary);color:var(--primary);}
+.bic.rec{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.07);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
+.bsend{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(24,69,200,.28);transition:.15s;}
+.bsend:hover{transform:scale(1.06);} .bsend:active{transform:scale(.95);} .bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+/* Toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:600;z-index:5000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(max-width:660px){.sidebar{display:none;}.chat-area{padding:13px 11px;}.topbar{padding:10px 12px;}.input-area{padding:10px;}.mbody{max-width:92%;}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="overlay" id="loginOverlay">
-  <div class="card">
-    <h2 style="margin-bottom: 10px;">Sanz <span>AI</span> Tutor</h2>
-    <p style="color: var(--text2); font-size: 13px; margin-bottom: 25px;">ඔබේ තොරතුරු ඇතුළත් කර ආරම්භ කරන්න</p>
-    <input type="text" id="userNameInput" placeholder="ඔයාගේ නම...">
-    <select id="userGradeInput">
-      <option value="6">Grade 6</option>
-      <option value="7">Grade 7</option>
-      <option value="8">Grade 8</option>
-      <option value="9">Grade 9</option>
-      <option value="10" selected>Grade 10</option>
-      <option value="11">Grade 11</option>
-    </select>
-    <button class="primary-btn" onclick="login()">ඉදිරියට යමු 🚀</button>
+  <div class="lc">
+    <div class="lc-banner">
+      <h1>🎓 Sanz <span>AI Tutor</span></h1>
+      <p>Sri Lanka's Smart Multi-Language Tutor &nbsp;•&nbsp; Grade 1–13</p>
+    </div>
+    <div class="lc-body">
+      <div class="fg">
+        <label>ඔබේ නම | பெயர் | Your Name</label>
+        <input type="text" id="nameInp" placeholder="e.g. Kasun / கவியா / Amali" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <div class="fg">
+        <label>භාෂාව | மொழி | Language</label>
+        <div class="pills">
+          <button class="pill active" onclick="pickL('si',this)"><span class="pf">🇱🇰</span>සිංහල</button>
+          <button class="pill" onclick="pickL('ta',this)"><span class="pf">🇱🇰</span>தமிழ்</button>
+          <button class="pill" onclick="pickL('en',this)"><span class="pf">🇬🇧</span>English</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label>ශ්‍රේණිය | வகுப்பு | Grade (1 – 13)</label>
+        <div class="ggrid" id="ggrid"></div>
+        <div class="g-legend">
+          <div class="gl"><div class="gd" style="background:var(--c-pri)"></div>Grade 1–5 (Primary)</div>
+          <div class="gl"><div class="gd" style="background:var(--c-sec)"></div>Grade 6–11 (Secondary)</div>
+          <div class="gl"><div class="gd" style="background:var(--c-al)"></div>Grade 12–13 (A/L)</div>
+        </div>
+      </div>
+      <button class="login-btn" onclick="login()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
+    </div>
   </div>
 </div>
 
-<div class="sidebar">
-  <div class="logo">🧠 Sanz <span>AI</span></div>
-  <p style="font-size: 11px; color: var(--text2); margin: 10px 12px; text-transform: uppercase; letter-spacing: 1px;">විෂයයන් තෝරන්න</p>
-  
-  <button class="subject-btn active" onclick="setSubject('Mathematics', this)">📐 Mathematics</button>
-  <button class="subject-btn" onclick="setSubject('Science', this)">🔬 Science</button>
-  <button class="subject-btn" onclick="setSubject('Geography', this)">🌍 Geography</button>
-  <button class="subject-btn" onclick="setSubject('ICT', this)">💻 ICT</button>
-  <button class="subject-btn" onclick="setSubject('Health', this)">🏥 Health & Physical</button>
-  <button class="subject-btn" onclick="setSubject('History', this)">🏛️ History</button>
-  <button class="subject-btn" onclick="setSubject('Civic Education', this)">⚖️ Civic Education</button>
-  <button class="subject-btn" onclick="setSubject('Sinhala', this)">📖 Sinhala Language</button>
-  <button class="subject-btn" onclick="setSubject('English', this)">🌐 English Language</button>
-
-  <div style="margin-top: auto; padding: 15px; font-size: 10px; color: var(--text2); text-align: center; border-top: 1px solid var(--border);">
-    Developed by <b>Sanz Queen</b><br>v2.0 Beta
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-hd">
+    <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
+    <div class="sb-meta" id="sbMeta">සාදරයෙන් පිළිගනිමු!</div>
+    <div class="sb-cat s" id="sbCat">📚 Secondary</div>
   </div>
-</div>
+  <div class="st-sel" id="stSel" style="display:none">
+    <div class="st-lbl">Stream | ධාරාව | ஓட்டம்</div>
+    <div class="st-btns" id="stBtns"></div>
+  </div>
+  <div class="sb-sec">SUBJECTS | විෂයයන් | பாடங்கள்</div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="sb-ft">Developed by <b>Sanz Queen</b> &nbsp;•&nbsp; v4.0</div>
+</aside>
 
+<!-- MAIN -->
 <div class="main">
-  <div class="header">
-    <div id="currentSubject" style="font-weight: 600; font-size: 15px;">📐 Mathematics</div>
-    <div id="displayName" style="font-size: 13px; font-weight: 500; color: var(--accent2); background: rgba(124,106,247,0.1); padding: 5px 12px; border-radius: 20px;"></div>
-  </div>
-  
-  <div class="chat-area" id="chatArea">
-    <div class="message ai">
-      <div class="msg-bubble">ආයුබෝවන්! මම Sanz AI. මම ඔයාගේ අධ්‍යාපන කටයුතු වලට උදව් කරන්න සූදානම්. ඕනෑම ප්‍රශ්නයක් අහන්න!</div>
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-ic" id="tbIc">📐</div>
+      <div><div class="tb-nm" id="tbNm">Mathematics / ගණිතය</div><div class="tb-lc" id="tbLc">கணிதம்</div></div>
+    </div>
+    <div class="tb-r">
+      <div class="tb-b bs" id="tbGb">Grade 6</div>
+      <div class="tb-b bl" id="tbLb">සිංහල</div>
     </div>
   </div>
-
+  <div class="chat-area" id="chatArea">
+    <div class="wc-wrap" id="wcCard">
+      <div class="wc-card">
+        <div class="wc-ico">🎓</div>
+        <h2 id="wcH">ආයුබෝවන්!</h2>
+        <p id="wcP">ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න</p>
+        <div class="wc-chips">
+          <span class="wc-chip">📖 Step-by-Step</span>
+          <span class="wc-chip">✅ Cross-Check</span>
+          <span class="wc-chip">📷 Image Upload</span>
+          <span class="wc-chip">🔊 Listen</span>
+          <span class="wc-chip">🎤 Voice Input</span>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="input-area">
-    <div class="input-box">
-      <textarea id="questionInput" placeholder="ඔබේ ප්‍රශ්නය මෙතන ලියන්න..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';"></textarea>
-      <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="දිගටම අසා සිටීමට">🎤</button>
-      <button class="send-btn" onclick="sendMsg()">➤</button>
+    <div id="ipWrap" class="ip-wrap" style="display:none">
+      <img id="ipImg" class="ip-img" src="" alt="">
+      <button class="ip-rm" onclick="rmImg()">✕</button>
+    </div>
+    <div class="in-tools">
+      <button class="it-tgl" id="ccTgl" onclick="toggleCC()"><div class="dot"></div><span id="ccLbl">✅ Cross-Check</span></button>
+      <label class="it-upl" id="uplLbl" for="imgInp">📷 Image</label>
+      <input type="file" id="imgInp" accept="image/*" onchange="onImgSel(event)">
+    </div>
+    <div class="in-box">
+      <textarea id="qIn" rows="1" placeholder="ප්‍රශ්නය ටයිප් කරන්න..." onkeydown="onKey(event)" oninput="aH(this)"></textarea>
+      <button class="bic" id="micBtn" onclick="toggleMic()">🎤</button>
+      <button class="bsend" id="sendBtn" onclick="sendMsg()">➤</button>
     </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
-  const API_URL = "https://sanz-ai-tutor.onrender.com"; 
-  let userName = "";
-  let userGrade = "10";
-  let currentSubject = "Mathematics";
-  let recognition = null;
-  let isRecording = false;
+/* ── SUBJECT DATA ── */
+const SBJ = {
+  primary:[
+    {id:'Environment',ic:'🌿',en:'Environment',     si:'පරිසරය',           ta:'சூழல்'},
+    {id:'Mathematics',ic:'📐',en:'Mathematics',      si:'ගණිතය',            ta:'கணிதம்'},
+    {id:'Sinhala',    ic:'📖',en:'Sinhala',          si:'සිංහල',            ta:'சிங்களம்'},
+    {id:'Tamil',      ic:'📜',en:'Tamil',            si:'දෙමළ',             ta:'தமிழ்'},
+    {id:'English',    ic:'🌐',en:'English',           si:'ඉංග්‍රීසි',         ta:'ஆங்கிலம்'},
+    {id:'Art',        ic:'🎨',en:'Art / Visual Art',  si:'චිත්‍ර',            ta:'கலை'},
+    {id:'Religion',   ic:'🙏',en:'Religion / Ethics', si:'ආගම',             ta:'சமயம்'},
+    {id:'Health',     ic:'💊',en:'Health Education',  si:'සෞඛ්‍ය',           ta:'உடல் நலம்'},
+  ],
+  secondary:[
+    {id:'Mathematics',ic:'📐',en:'Mathematics',        si:'ගණිතය',             ta:'கணிதம்'},
+    {id:'Science',    ic:'🔬',en:'Science',             si:'විද්‍යාව',           ta:'அறிவியல்'},
+    {id:'History',    ic:'🏛️',en:'History',             si:'ඉතිහාසය',           ta:'வரலாறு'},
+    {id:'Geography',  ic:'🌍',en:'Geography',           si:'භූගෝල විද්‍යාව',     ta:'புவியியல்'},
+    {id:'ICT',        ic:'💻',en:'ICT',                 si:'තොරතුරු තාක්ෂණය',   ta:'தகவல் தொழில்நுட்பம்'},
+    {id:'Civic',      ic:'⚖️',en:'Civic Education',     si:'පුරවැසි අධ්‍යාපනය', ta:'குடியியல் கல்வி'},
+    {id:'Sinhala',    ic:'📖',en:'Sinhala',             si:'සිංහල',             ta:'சிங்களம்'},
+    {id:'Tamil',      ic:'📜',en:'Tamil',               si:'දෙමළ',              ta:'தமிழ்'},
+    {id:'English',    ic:'🌐',en:'English',             si:'ඉංග්‍රීසි',          ta:'ஆங்கிலம்'},
+    {id:'Commerce',   ic:'📊',en:'Commerce',            si:'වාණිජ විද්‍යාව',    ta:'வணிகவியல்'},
+    {id:'Health',     ic:'💊',en:'Health & P.E.',       si:'සෞඛ්‍ය අධ්‍යාපනය',  ta:'உடல் கல்வி'},
+    {id:'Music',      ic:'🎵',en:'Music',               si:'සංගීතය',            ta:'இசை'},
+    {id:'Drama',      ic:'🎭',en:'Drama',               si:'නාට්‍ය',             ta:'நாடகம்'},
+  ],
+  alStreams:[
+    {id:'bio',  ic:'🧬',en:'Biology Stream',    si:'ජීව ධාරාව',    ta:'உயிரியல் நெடல்', sbj:[
+      {id:'Biology',   ic:'🧬',en:'Biology',           si:'ජීව විද්‍යාව',    ta:'உயிரியல்'},
+      {id:'Chemistry', ic:'⚗️',en:'Chemistry',         si:'රසායන විද්‍යාව', ta:'வேதியியல்'},
+      {id:'Physics',   ic:'⚡',en:'Physics',            si:'භෞතික විද්‍යාව', ta:'இயற்பியல்'},
+    ]},
+    {id:'maths',ic:'➕',en:'Maths Stream',      si:'ගණිත ධාරාව',   ta:'கணித நெடல்', sbj:[
+      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',  si:'සංයුක්ත ගණිතය',     ta:'இணைந்த கணிதம்'},
+      {id:'Physics',      ic:'⚡',en:'Physics',          si:'භෞතික විද්‍යාව',    ta:'இயற்பியல்'},
+      {id:'Chemistry',    ic:'⚗️',en:'Chemistry',        si:'රසායන විද්‍යාව',   ta:'வேதியியல்'},
+      {id:'ICT',          ic:'💻',en:'ICT',              si:'තොරතුරු තාක්ෂණය',  ta:'தகவல் தொழில்நுட்பம்'},
+    ]},
+    {id:'commerce',ic:'💼',en:'Commerce Stream', si:'වාණිජ ධාරාව',  ta:'வணிக நெடல்', sbj:[
+      {id:'Economics',      ic:'📈',en:'Economics',       si:'ආර්ථික විද්‍යාව',  ta:'பொருளாதாரம்'},
+      {id:'BusinessStudies',ic:'🏢',en:'Business Studies', si:'ව්‍යාපාර අධ්‍යයනය',ta:'வணிக கல்வி'},
+      {id:'Accounting',     ic:'🧾',en:'Accounting',      si:'ගිණුම්කරණය',       ta:'கணக்கியல்'},
+      {id:'Statistics',     ic:'📊',en:'Statistics',      si:'සංඛ්‍යාන',          ta:'புள்ளியியல்'},
+    ]},
+    {id:'tech',ic:'🔧',en:'Technology Stream',  si:'තාක්ෂණ ධාරාව', ta:'தொழில்நுட்ப நெடல்', sbj:[
+      {id:'EngineeringTech',ic:'⚙️',en:'Engineering Tech.',  si:'ඉංජිනේරු තාක්ෂණය',      ta:'பொறியியல் தொழில்நுட்பம்'},
+      {id:'ScienceTech',    ic:'🔬',en:'Science for Tech.',   si:'තාක්ෂණය සඳහා විද්‍යාව', ta:'தொழில்நுட்பத்திற்கான அறிவியல்'},
+      {id:'ICT',            ic:'💻',en:'ICT',                 si:'තොරතුරු තාක්ෂණය',        ta:'தகவல் தொழில்நுட்பம்'},
+      {id:'Agriculture',    ic:'🌾',en:'Agriculture & Food',  si:'කෘෂිකර්මය',               ta:'விவசாயம்'},
+    ]},
+    {id:'art',ic:'🎨',en:'Arts Stream',        si:'කලා ධාරාව',    ta:'கலை நெடல்', sbj:[
+      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍යය',ta:'சிங்கள இலக்கியம்'},
+      {id:'Geography', ic:'🌍',en:'Geography',         si:'භූගෝල විද්‍යාව', ta:'புவியியல்'},
+      {id:'Civic',     ic:'⚖️',en:'Civic Education',   si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
+      {id:'Logic',     ic:'🧩',en:'Logic & Sci. Method',si:'තර්කශාස්ත්‍රය',   ta:'தர்க்கவியல்'},
+      {id:'Art',       ic:'🖼️',en:'Art',                si:'චිත්‍ර',           ta:'கலை'},
+      {id:'Dancing',   ic:'💃',en:'Dancing',            si:'නර්තනය',          ta:'நடனம்'},
+      {id:'Music',     ic:'🎵',en:'Music',              si:'සංගීතය',          ta:'இசை'},
+      {id:'Drama',     ic:'🎭',en:'Drama & Theatre',    si:'නාට්‍ය',           ta:'நாடகம்'},
+    ]},
+    {id:'lang',ic:'🌐',en:'Languages Stream',  si:'භාෂා ධාරාව',   ta:'மொழி நெடல்', sbj:[
+      {id:'Sinhala',ic:'📖',en:'Sinhala',        si:'සිංහල',       ta:'சிங்களம்'},
+      {id:'Tamil',  ic:'📜',en:'Tamil',          si:'දෙමළ',        ta:'தமிழ்'},
+      {id:'English',ic:'🌐',en:'English',        si:'ඉංග්‍රීසි',    ta:'ஆங்கிலம்'},
+      {id:'Pali',   ic:'📿',en:'Pali / Sanskrit',si:'පාලි',        ta:'பாலி'},
+      {id:'Hindi',  ic:'🇮🇳',en:'Hindi',          si:'හින්දි',      ta:'இந்தி'},
+      {id:'Arabic', ic:'☪️', en:'Arabic',         si:'අරාබි',      ta:'அரபு'},
+      {id:'French', ic:'🇫🇷',en:'French',         si:'ප්‍රංශ',      ta:'பிரஞ்சு'},
+    ]},
+  ],
+  alCommon:[
+    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',si2:'பொது ஆங்கிலம்',ta:'பொது ஆங்கிலம்'},
+    {id:'GenIT',     ic:'💻',en:'General IT',     si:'සාමාන්‍ය IT',       ta:'பொது தகவல் தொழில்நுட்பம்'},
+  ]
+};
 
-  function login() {
-    const name = document.getElementById('userNameInput').value.trim();
-    if(!name) { alert("කරුණාකර නම ඇතුළත් කරන්න!"); return; }
-    userName = name;
-    userGrade = document.getElementById('userGradeInput').value;
-    document.getElementById('displayName').innerText = "Student: " + userName;
-    document.getElementById('loginOverlay').style.display = 'none';
+const LM = {
+  si:{lbl:'සිංහල', ph:'ප්‍රශ්නය ටයිප් කරන්න...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 ඇසීමට', copy:'📋 Copy', copied:'Copied ✓', empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?', wch:'ආයුබෝවන්!', wcp:'ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න', sp:'si-LK',
+    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස Sanz AI Tutor වෙත සාදරයෙන් පිළිගනිමු. ඕනෑ ඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න!`},
+  ta:{lbl:'தமிழ்', ph:'கேள்வியை உள்ளிடுக...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 கேட்க', copy:'📋 நகலெடு', copied:'நகலெடுத்தது ✓', empty:'கேள்வியை உள்ளிடவும்!', wch:'வணக்கம்!', wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்', sp:'ta-IN',
+    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக Sanz AI Tutor-க்கு வரவேற்கிறோம். எந்த **பாடத்தை** பற்றியும் கேளுங்கள்!`},
+  en:{lbl:'English',ph:'Type your question...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 Listen', copy:'📋 Copy', copied:'Copied ✓', empty:'Please type a question!', wch:'Welcome!', wcp:'Type your question or click 🎤 to speak', sp:'en-US',
+    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to Sanz AI Tutor as a Grade ${g} student. Feel free to ask about any **subject**!`},
+};
+
+const API='https://sanz-ai-tutor.onrender.com';
+let S={name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',cc:false,rec:false,loading:false,selL:'si',selG:6};
+
+/* ── GRADE GRID INIT ── */
+(function(){
+  const g=document.getElementById('ggrid');
+  for(let i=1;i<=13;i++){
+    const c=i<=5?'p':i<=11?'s':'a';
+    const b=document.createElement('button');
+    b.className='gb';b.dataset.c=c;b.textContent=i;
+    b.onclick=()=>{S.selG=i;document.querySelectorAll('.gb').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+    if(i===6)b.classList.add('active');
+    g.appendChild(b);
   }
+})();
 
-  function setSubject(subj, btn) {
-    currentSubject = subj;
-    document.getElementById('currentSubject').innerText = btn.innerText;
-    document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+function pickL(l,el){S.selL=l;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
 
-  // ── Manual Continuous Listening ──
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechSDK = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechSDK();
-    recognition.continuous = true; 
-    recognition.interimResults = true;
-    recognition.lang = 'si-LK'; 
+/* ── LOGIN ── */
+function login(){
+  const nm=document.getElementById('nameInp').value.trim();
+  if(!nm){showToast('නමක් ලිවීමට අමතකද? | Please enter your name');return;}
+  S.name=nm;S.lang=S.selL;S.grade=S.selG;
+  S.cat=S.grade<=5?'primary':S.grade<=11?'secondary':'al';
+  const lm=LM[S.lang];
+  const catL={primary:`Grade ${S.grade} · Primary`,secondary:`Grade ${S.grade} · O/L`,al:`Grade ${S.grade} · A/L`};
+  const catCls={primary:'bp',secondary:'bs',al:'ba'};
+  const sbCatCls={primary:'p',secondary:'s',al:'a'};
+  document.getElementById('tbGb').textContent=catL[S.cat];
+  document.getElementById('tbGb').className=`tb-b ${catCls[S.cat]}`;
+  document.getElementById('tbLb').textContent=lm.lbl;
+  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
+  const sc=document.getElementById('sbCat');
+  sc.className=`sb-cat ${sbCatCls[S.cat]}`;sc.textContent=catL[S.cat];
+  document.getElementById('wcH').textContent=lm.wch;
+  document.getElementById('wcP').textContent=lm.wcp;
+  document.getElementById('qIn').placeholder=lm.ph;
+  buildSidebar();
+  document.getElementById('loginOverlay').style.display='none';
+  setTimeout(()=>addAI(lm.greet(S.name,S.grade)),320);
+}
 
-    recognition.onresult = (event) => {
-      let result = "";
-      for (let i = 0; i < event.results.length; i++) {
-        result += event.results[i][0].transcript;
-      }
-      document.getElementById('questionInput').value = result;
+/* ── SIDEBAR ── */
+function buildSidebar(){
+  const stSel=document.getElementById('stSel');
+  if(S.cat==='al'){stSel.style.display='block';buildStreams();buildSubjs(getALSubjs(S.alStream));}
+  else{stSel.style.display='none';buildSubjs(SBJ[S.cat]);}
+}
+function buildStreams(){
+  const c=document.getElementById('stBtns');c.innerHTML='';
+  SBJ.alStreams.forEach(st=>{
+    const b=document.createElement('button');
+    b.className='st-btn'+(st.id===S.alStream?' active':'');
+    b.innerHTML=`<div class="st-ico">${st.ic}</div><div><div class="st-nm">${st[S.lang]||st.en}</div><div class="st-lc">${st.en}</div></div>`;
+    b.onclick=()=>{S.alStream=st.id;buildStreams();buildSubjs(getALSubjs(st.id));};
+    c.appendChild(b);
+  });
+}
+function getALSubjs(sid){const st=SBJ.alStreams.find(s=>s.id===sid);return[...(st?st.sbj:[]),...SBJ.alCommon];}
+function buildSubjs(list){
+  const nav=document.getElementById('sbNav');nav.innerHTML='';
+  list.forEach((s,i)=>{
+    const b=document.createElement('button');b.className='sbj'+(i===0?' active':'');
+    const lc=S.lang==='ta'?s.ta:S.lang==='si'?s.si:s.en;
+    b.innerHTML=`<div class="sbj-ic">${s.ic}</div><div class="sbj-tx"><div class="sbj-en">${s.en}</div><div class="sbj-lc">${lc}</div></div>`;
+    b.onclick=()=>{
+      S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
+      document.querySelectorAll('.sbj').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+      document.getElementById('tbIc').textContent=s.ic;
+      document.getElementById('tbNm').textContent=`${s.en} / ${s.si}`;
+      document.getElementById('tbLc').textContent=s.ta||s.si;
     };
-
-    recognition.onend = () => {
-      if(isRecording) recognition.start(); 
-    };
-  }
-
-  function toggleVoice() {
-    const btn = document.getElementById('voiceBtn');
-    if (!isRecording) {
-      recognition.start();
-      isRecording = true;
-      btn.classList.add('recording');
-      btn.innerText = "⏹️";
-    } else {
-      isRecording = false;
-      recognition.stop();
-      btn.classList.remove('recording');
-      btn.innerText = "🎤";
-    }
-  }
-
-  async function sendMsg() {
-    const input = document.getElementById('questionInput');
-    const q = input.value.trim();
-    if(!q) return;
-
-    addMessage('user', q);
-    input.value = "";
-    input.style.height = 'auto';
-
-    const formData = new FormData();
-    formData.append('name', userName);
-    formData.append('grade', userGrade);
-    formData.append('subject', currentSubject);
-    formData.append('question', q);
-    formData.append('language', 'si');
-
-    try {
-      const res = await fetch(`${API_URL}/solve`, { method: 'POST', body: formData });
-      const data = await res.json();
-
-      if(data.status === 'success') {
-        addMessage('ai', data.answer, data.graph_url);
-      } else {
-        addMessage('ai', "Error: " + data.message);
-      }
-    } catch (e) {
-      addMessage('ai', "Backend connection failed. Please check your URL.");
-    }
-  }
-
-  function addMessage(role, text, graphUrl = null) {
-    const chatArea = document.getElementById('chatArea');
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `message ${role}`;
-    
-    let content = `<div class="msg-bubble">${text.replace(/\n/g, '<br>')}`;
-    
-    if(graphUrl) {
-      content += `<br><img src="${graphUrl}" class="graph-img">`;
-    }
-
-    if(role === 'ai') {
-      content += `<br><button class="listen-btn" onclick="playSummary(this, '${text.replace(/'/g, "\\'")}')">🔊 Listen Summary</button>`;
-    }
-
-    content += `</div>`;
-    msgDiv.innerHTML = content;
-    chatArea.appendChild(msgDiv);
-    chatArea.scrollTop = chatArea.scrollHeight;
-  }
-
-  // ── Summarize and Speak ──
-  async function playSummary(btn, fullText) {
-    if(btn.classList.contains('playing')) {
-      window.speechSynthesis.cancel();
-      btn.classList.remove('playing');
-      btn.innerHTML = "🔊 Listen Summary";
-      return;
-    }
-
-    btn.innerHTML = "⌛ සාරාංශ කරමින්...";
-    
-    try {
-      const formData = new FormData();
-      formData.append('question', fullText);
-      formData.append('is_summary_request', 'true'); 
-
-      const res = await fetch(`${API_URL}/solve`, { method: 'POST', body: formData });
-      const data = await res.json();
-
-      if(data.status === 'success') {
-        speak(data.answer, btn);
-      }
-    } catch (e) {
-      btn.innerHTML = "⚠️ Error";
-    }
-  }
-
-  function speak(text, btn) {
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = (text.match(/[\u0D80-\u0DFF]/)) ? 'si-LK' : 'en-US';
-    utter.rate = 0.95;
-
-    utter.onstart = () => {
-      btn.classList.add('playing');
-      btn.innerHTML = "⏹️ Stop Summary";
-    };
-    utter.onend = () => {
-      btn.classList.remove('playing');
-      btn.innerHTML = "🔊 Listen Summary";
-    };
-
-    window.speechSynthesis.speak(utter);
-  }
-
-  document.getElementById('questionInput').addEventListener('keypress', (e) => {
-    if(e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMsg();
+    nav.appendChild(b);
+    if(i===0){S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
+      document.getElementById('tbIc').textContent=s.ic;
+      document.getElementById('tbNm').textContent=`${s.en} / ${s.si}`;
+      document.getElementById('tbLc').textContent=s.ta||s.si;
     }
   });
-</script>
+}
 
+/* ── TOOLS ── */
+function toggleCC(){S.cc=!S.cc;const e=document.getElementById('ccTgl');const lm=LM[S.lang];e.classList.toggle('active',S.cc);document.getElementById('ccLbl').textContent=S.cc?lm.ccon:lm.ccoff;}
+function onImgSel(e){const f=e.target.files[0];if(!f)return;document.getElementById('ipImg').src=URL.createObjectURL(f);document.getElementById('ipWrap').style.display='inline-block';document.getElementById('uplLbl').classList.add('hf');}
+function rmImg(){document.getElementById('imgInp').value='';document.getElementById('ipWrap').style.display='none';document.getElementById('uplLbl').classList.remove('hf');}
+
+/* ── VOICE ── */
+let recog=null;
+if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog=new SR();recog.continuous=true;recog.interimResults=true;
+  recog.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;const ta=document.getElementById('qIn');ta.value=t;aH(ta);};
+  recog.onend=()=>{if(S.rec)recog.start();};
+}
+function toggleMic(){
+  if(!recog){showToast('Voice not supported in this browser');return;}
+  const b=document.getElementById('micBtn');
+  if(S.rec){recog.stop();S.rec=false;b.textContent='🎤';b.classList.remove('rec');}
+  else{recog.lang=LM[S.lang].sp;recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');
+    showToast(S.lang==='si'?'🎤 සවන් දෙමින්...':S.lang==='ta'?'🎤 கேட்கிறேன்...':'🎤 Listening...');}
+}
+function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=LM[S.lang].sp;u.rate=.93;window.speechSynthesis.speak(u);}
+
+/* ── SEND ── */
+async function sendMsg(){
+  const inp=document.getElementById('qIn');const q=inp.value.trim();
+  if(!q){showToast(LM[S.lang].empty);return;}if(S.loading)return;
+  const wc=document.getElementById('wcCard');if(wc)wc.remove();
+  addUser(q);inp.value='';aH(inp);
+  const imgFile=document.getElementById('imgInp').files[0]||null;
+  rmImg();showTyp();setLoad(true);
+  try{
+    const fd=new FormData();
+    fd.append('name',S.name);fd.append('grade',S.grade);fd.append('subject',S.subject);
+    fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck',S.cc?'true':'false');
+    if(imgFile)fd.append('image',imgFile);
+    const res=await fetch(`${API}/solve`,{method:'POST',body:fd});
+    const d=await res.json();hideTyp();setLoad(false);
+    if(d.status==='banned')addAI(d.answer||'⛔ Blocked.');
+    else if(d.status==='success')addAI(d.answer,d.graph_url);
+    else addAI('⚠️ '+(d.message||'Error'));
+  }catch(e){hideTyp();setLoad(false);
+    addAI({si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි විය.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect to server.'}[S.lang]);}
+}
+
+/* ── MESSAGES ── */
+function addUser(txt){
+  const c=document.getElementById('chatArea'),w=document.createElement('div');
+  w.className='mw user';
+  w.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,#0f3d28,#166534);color:#fff;">👤</div><div class="mbody"><div class="mbub">${esc(txt)}</div></div>`;
+  c.appendChild(w);se();
+}
+function addAI(md,graph){
+  const c=document.getElementById('chatArea'),w=document.createElement('div');
+  w.className='mw ai';const lm=LM[S.lang];const raw=md||'';
+  const gr=graph?`<img src="${graph}" class="m-graph" alt="Graph">`:'';
+  const safe=raw.replace(/\\/g,'\\\\').replace(/`/g,"'");
+  w.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div>
+    <div class="mbody"><div class="mbub">${parseMD(raw)}${gr}</div>
+    <div class="macts">
+      <button class="mact" onclick="speak(this.closest('.mbody').querySelector('.mbub').innerText)">${lm.listen}</button>
+      <button class="mact" onclick="cpyMsg(this,\`${safe}\`)">${lm.copy}</button>
+    </div></div>`;
+  c.appendChild(w);se();
+}
+let typEl=null;
+function showTyp(){hideTyp();const c=document.getElementById('chatArea');typEl=document.createElement('div');typEl.id='typEl';typEl.className='ty-w';
+  typEl.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div><div class="ty-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  c.appendChild(typEl);se();}
+function hideTyp(){const e=document.getElementById('typEl');if(e)e.remove();typEl=null;}
+
+/* ── UTILS ── */
+function setLoad(v){S.loading=v;document.getElementById('sendBtn').disabled=v;}
+function se(){const c=document.getElementById('chatArea');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight);}
+function aH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cpyMsg(btn,txt){navigator.clipboard.writeText(txt).then(()=>{const o=btn.innerHTML;btn.innerHTML=LM[S.lang].copied;setTimeout(()=>btn.innerHTML=o,2000);});}
+function showToast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+
+/* ── MARKDOWN PARSER ── */
+function parseMD(md){
+  if(!md)return'';let h=md;
+  h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
+  h=h.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/^[-*] (.+)$/gm,'<li>$1</li>');h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  h=h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
+  h=h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
+  h=h.replace(/^---+$/gm,'<hr>');
+  h=h.replace(/\n\n+/g,'</p><p>');h=h.replace(/\n/g,'<br>');h='<p>'+h+'</p>';
+  h=h.replace(/<p>\s*<\/p>/g,'');
+  ['pre','h1','h2','h3','ul','hr','blockquote'].forEach(t=>{h=h.replace(new RegExp(`<p>(<${t}>)`,'g'),'$1');h=h.replace(new RegExp(`(</${t}>)<\\/p>`,'g'),'$1');});
+  return h;
+}
+</script>
 </body>
 </html>
