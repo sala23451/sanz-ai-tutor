@@ -1,151 +1,275 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanz AI Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Browser indicator එකේ UI එක සැඟවීමට සහ recording වෙලාවට අනවශ්‍ය දේ පෙන්වීම වැළැක්වීමට */
-  .voice-visualizer, .recording-dot { display: none !important; }
-  
-  /* Voice Summary Button එකට අදාළ style */
-  .voice-output-btn {
-    background: rgba(124, 106, 247, 0.1);
-    border: 1px solid var(--accent);
-    color: var(--accent2);
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    cursor: pointer;
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: fit-content;
-    transition: all 0.2s;
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #c084fc;
+    --accent3: #38bdf8;
+    --text: #e8e8f0;
+    --text2: #8888a8;
+    --success: #34d399;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --glow: rgba(124, 106, 247, 0.15);
   }
-  .voice-output-btn:hover { background: var(--accent); color: white; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+  /* ── Overlays ── */
+  .name-overlay, .admin-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; backdrop-filter: blur(8px);
+  }
+  .name-card, .admin-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px; max-width: 420px; width: 90%;
+    text-align: center; display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 0 60px var(--glow);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 16px; gap: 8px; flex-shrink: 0; }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 8px; }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 18px; font-weight: 700; }
+  .logo-text span { color: var(--accent2); }
+  
+  .new-chat-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; padding: 12px 16px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-bottom: 8px; }
+  .subject-btn { background: transparent; border: 1px solid transparent; border-radius: 10px; padding: 10px 14px; color: var(--text2); cursor: pointer; text-align: left; transition: 0.2s; }
+  .subject-btn.active { background: var(--surface2); border-color: var(--accent); color: var(--accent2); }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
+  .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  
+  /* ── Messages ── */
+  .message { display: flex; gap: 12px; max-width: 800px; animation: msgIn 0.3s ease; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .message.user { flex-direction: row-reverse; align-self: flex-end; }
+  .msg-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ai-avatar { background: var(--accent); }
+  .user-avatar { background: var(--accent3); }
+  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; font-size: 14px; line-height: 1.7; position: relative; }
+  
+  /* ── Listen Button ── */
+  .listen-btn {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+    background: rgba(124, 106, 247, 0.1); border: 1px solid var(--accent);
+    color: var(--accent2); padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; cursor: pointer; transition: 0.2s;
+  }
+  .listen-btn:hover { background: var(--accent); color: white; }
+  .listen-btn.playing { border-color: var(--danger); color: var(--danger); }
+
+  /* ── Input ── */
+  .input-area { padding: 16px 24px 20px; background: var(--surface); border-top: 1px solid var(--border); }
+  .input-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px; }
+  #questionInput { flex: 1; background: none; border: none; outline: none; color: var(--text); resize: none; max-height: 120px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .icon-btn.recording { background: var(--danger); color: white; border: none; }
+  .send-btn { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: white; cursor: pointer; }
+
+  /* Misc */
+  .field-label { font-size: 11px; color: var(--text2); text-align: left; margin-bottom: 4px; text-transform: uppercase; }
+  .name-input, .grade-select-overlay, .pass-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; }
+  .lang-btns { display: flex; gap: 8px; margin-bottom: 15px; }
+  .lang-btn { flex: 1; padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text2); cursor: pointer; }
+  .lang-btn.active { border-color: var(--accent); color: var(--accent2); }
+  .start-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
 </style>
+</head>
+<body>
+
+<div class="name-overlay" id="nameOverlay">
+  <div class="name-card">
+    <h2>ආයුබෝවන්! <span>Sanz AI</span></h2>
+    <div class="lang-btns">
+      <button class="lang-btn active" onclick="selectLang('si', this)">🇱🇰 සිංහල</button>
+      <button class="lang-btn" onclick="selectLang('en', this)">🇬🇧 English</button>
+    </div>
+    <input class="name-input" id="nameInput" placeholder="ඔයාගේ නම...">
+    <select class="grade-select-overlay" id="gradeInputOverlay">
+      <option value="6">Grade 6</option><option value="7">Grade 7</option>
+      <option value="8">Grade 8</option><option value="9">Grade 9</option>
+      <option value="10" selected>Grade 10</option><option value="11">Grade 11</option>
+    </select>
+    <input class="pass-input" id="userPassInput" type="password" placeholder="Password (sanz2024)">
+    <button class="start-btn" onclick="startChat()">පටන් ගමු! 🚀</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="logo"><div class="logo-icon">🎓</div><div class="logo-text">Sanz <span>AI</span></div></div>
+  <button class="new-chat-btn" onclick="location.reload()"><span>✨</span> New Chat</button>
+  <button class="subject-btn active">📐 Mathematics</button>
+  <button class="subject-btn">🔬 Science</button>
+  <button class="subject-btn">📖 Sinhala</button>
+  <div style="margin-top: auto; font-size: 11px; color: var(--text2); text-align: center;">Made by <b>Sanz Queen</b></div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div id="subjectLabel">📐 Mathematics</div>
+    <div id="userName">...</div>
+  </div>
+  <div class="chat-area" id="chatArea"></div>
+  <div class="input-area">
+    <div class="input-box">
+      <textarea id="questionInput" placeholder="Write your question..." rows="1"></textarea>
+      <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
+      <button class="send-btn" onclick="sendQuestion()">➤</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // ... (කලින් තිබූ Config සහ State කොටස් එලෙසම තබා ගන්න) ...
+  const BACKEND = 'https://sanz-ai-tutor.onrender.com';
+  const PASS = 'sanz2024';
+  let userName = '', userGrade = '10', selectedLang = 'si';
+  let recognition = null, isRecording = false;
 
-  let isUserStopped = false; // User manually stop කළාදැයි බලන්න
+  function selectLang(lang, btn) {
+    selectedLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
-  // ══ Voice Logic (Manual Stop & Continuous) ══
+  function startChat() {
+    const name = document.getElementById('nameInput').value.trim();
+    const pass = document.getElementById('userPassInput').value;
+    if(!name || pass !== PASS) { alert("Check Name or Password!"); return; }
+    userName = name;
+    userGrade = document.getElementById('gradeInputOverlay').value;
+    document.getElementById('userName').textContent = "👋 " + userName;
+    document.getElementById('nameOverlay').style.display = 'none';
+  }
+
+  // ── Continuous Listening (Manual Off) ──
   function toggleVoice() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      showToast('⚠️ Voice not supported!'); return;
+    const SpeechSDK = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!recognition) {
+      recognition = new SpeechSDK();
+      recognition.lang = (selectedLang === 'si') ? 'si-LK' : 'en-US';
+      recognition.continuous = true; // මේකෙන් තමයි නතර වෙන්නේ නැතුව දිගටම අහන් ඉන්නේ
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[e.results.length - 1][0].transcript;
+        document.getElementById('questionInput').value += transcript;
+      };
     }
 
     if (isRecording) {
-      isUserStopped = true;
       recognition.stop();
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceBtn').innerHTML = '🎤';
+    } else {
+      recognition.start();
+      isRecording = true;
+      document.getElementById('voiceBtn').classList.add('recording');
+      document.getElementById('voiceBtn').innerHTML = '⏹️';
+    }
+  }
+
+  async function sendQuestion() {
+    const q = document.getElementById('questionInput').value.trim();
+    if(!q) return;
+    addMessage('user', q);
+    document.getElementById('questionInput').value = '';
+
+    const formData = new FormData();
+    formData.append('question', q);
+    formData.append('name', userName);
+    formData.append('grade', userGrade);
+    formData.append('language', selectedLang);
+
+    try {
+      const res = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
+      const data = await res.json();
+      if(data.status === 'success') {
+        addMessage('ai', data.answer);
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  function addMessage(role, text) {
+    const area = document.getElementById('chatArea');
+    const msg = document.createElement('div');
+    msg.className = `message ${role}`;
+    
+    const avatar = role === 'ai' ? '🧠' : '👤';
+    const avatarClass = role === 'ai' ? 'ai-avatar' : 'user-avatar';
+
+    msg.innerHTML = `
+      <div class="msg-avatar ${avatarClass}">${avatar}</div>
+      <div class="msg-bubble">
+        <div>${text.replace(/\n/g, '<br>')}</div>
+        ${role === 'ai' ? `<button class="listen-btn" onclick="getSummary(this, '${text.replace(/'/g, "\\'")}')">🔊 Listen Summary</button>` : ''}
+      </div>
+    `;
+    area.appendChild(msg);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  // ── Listen Summary Logic ──
+  async function getSummary(btn, fullText) {
+    if(btn.classList.contains('playing')) {
+      window.speechSynthesis.cancel();
+      btn.classList.remove('playing');
+      btn.innerHTML = '🔊 Listen Summary';
       return;
     }
 
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    recognition.lang = LANG[selectedLang].voiceLang;
-    recognition.continuous = true; // මේක නිසා ඉබේ නතර වෙන්නේ නැහැ
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-      isRecording = true;
-      isUserStopped = false;
-      document.getElementById('voiceBtn').classList.add('recording');
-      document.getElementById('voiceBtn').textContent = '⏹️';
-    };
-
-    recognition.onresult = e => {
-      let finalTranscript = '';
-      for (let i = e.resultIndex; i < e.results.length; ++i) {
-        if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
-      }
-      if(finalTranscript) {
-        document.getElementById('questionInput').value += finalTranscript;
-        autoResize(document.getElementById('questionInput'));
-      }
-    };
-
-    recognition.onend = () => {
-      // User stop කරේ නැත්නම්, network error එකකදී වුණත් ආයේ start කරනවා
-      if (!isUserStopped) {
-        recognition.start();
-      } else {
-        isRecording = false;
-        document.getElementById('voiceBtn').classList.remove('recording');
-        document.getElementById('voiceBtn').textContent = '🎤';
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech Error: ", event.error);
-      if(event.error !== 'no-speech') {
-        isRecording = false;
-        document.getElementById('voiceBtn').classList.remove('recording');
-        document.getElementById('voiceBtn').textContent = '🎤';
-      }
-    };
+    btn.innerHTML = '⌛ Summarizing...';
     
-    recognition.start();
-  }
-
-  // ══ Smart Voice Summary Output ══
-  async function speakSummary(text, msgBubbleElement) {
     try {
-      // Button එක "Loading" තත්වයට පත් කිරීම
-      const btn = msgBubbleElement.querySelector('.voice-output-btn');
-      const originalHTML = btn.innerHTML;
-      btn.innerHTML = '⌛ Summarizing...';
+      // Backend එකට flag එකක් යවනවා සාරාංශයක් ඉල්ලන්න
+      const formData = new FormData();
+      formData.append('question', fullText);
+      formData.append('is_summary_request', 'true');
+      formData.append('language', selectedLang);
 
-      // Backend එකට යවනවා සාරාංශයක් ඉල්ලලා
-      const res = await fetch(`${BACKEND}/solve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: `පහත උත්තරයේ කෙටි සාරාංශයක් හඬ පාලන පද්ධතියකට ගැලපෙන ලෙස වාක්‍ය දෙකකින් ලබා දෙන්න: ${text}`,
-          name: userName,
-          grade: userGrade,
-          subject: 'General',
-          language: selectedLang,
-          is_summary_request: true // backend එකේ logic එකට flag එකක්
-        })
-      });
-
+      const res = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
       const data = await res.json();
-      btn.innerHTML = originalHTML;
-
-      // Browser TTS පාවිච්චි කරලා සාරාංශය කියවීම
-      const utterance = new SpeechSynthesisUtterance(data.answer);
-      utterance.lang = LANG[selectedLang].voiceLang;
-      utterance.rate = 0.9; // ටිකක් හෙමින් කියවන්න
-      window.speechSynthesis.speak(utterance);
-
+      
+      if(data.status === 'success') {
+        speakText(data.answer, btn);
+      }
     } catch (e) {
-      showToast('⚠️ Voice output failed!');
-      console.error(e);
+      btn.innerHTML = '⚠️ Error';
+      setTimeout(() => btn.innerHTML = '🔊 Listen Summary', 2000);
     }
   }
 
-  // ══ Message එකක් එකතු කරන විට Voice Button එක එකතු කිරීම ══
-  function addMessage(type, text, graphUrl) {
-    const area = document.getElementById('chatArea');
-    const msg = document.createElement('div');
-    msg.className = `message ${type}`;
-    
-    let html = `
-      <div class="msg-avatar ${type}-avatar">${type==='ai'?'🧠':'👤'}</div>
-      <div class="msg-bubble">
-        <div class="msg-text">${text}</div>
-    `;
+  function speakText(text, btn) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = (selectedLang === 'si') ? 'si-LK' : 'en-US';
+    utterance.rate = 0.9;
 
-    // AI message එකක් නම් Voice Summary Button එක එකතු කරනවා
-    if (type === 'ai') {
-      html += `<button class="voice-output-btn" onclick="speakSummary(\`${text.replace(/`/g, "'")}\`, this.parentElement)">🔊 Listen Summary</button>`;
-    }
-
-    if (graphUrl) html += `<img src="${graphUrl}" class="graph-img">`;
-    html += `</div>`;
+    utterance.onstart = () => {
+      btn.classList.add('playing');
+      btn.innerHTML = '⏹️ Stop Listening';
+    };
     
-    msg.innerHTML = html;
-    area.appendChild(msg);
-    area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+    utterance.onend = () => {
+      btn.classList.remove('playing');
+      btn.innerHTML = '🔊 Listen Summary';
+    };
+
+    window.speechSynthesis.speak(utterance);
   }
-
-  // ... (ඉතිරි මුල් කේතය එලෙසම තබා ගන්න) ...
 </script>
+</body>
+</html>
