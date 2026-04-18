@@ -19,11 +19,28 @@ html,body{height:100%;overflow:hidden;}
 body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-serif;background:var(--bg);color:var(--text-p);display:flex;}
 ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 
-/* ── OVERLAY ── */
-.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;animation:fadeIn .3s ease;}
+/* ═══ LANGUAGE SCREEN ═══ */
+#langScreen{position:fixed;inset:0;z-index:6000;background:linear-gradient(135deg,#0B1740 0%,#1845C8 55%,#00BFA5 100%);display:flex;align-items:center;justify-content:center;}
+.ls-bubbles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.ls-bub{position:absolute;border-radius:50%;background:rgba(255,255,255,.06);animation:lsFloat linear infinite;}
+@keyframes lsFloat{0%{transform:translateY(110vh)}100%{transform:translateY(-120px)}}
+.ls-card{position:relative;z-index:1;background:rgba(255,255,255,.13);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.22);border-radius:28px;padding:40px 36px 36px;width:94%;max-width:400px;text-align:center;animation:slideUp .5s cubic-bezier(.16,1,.3,1);}
+.ls-logo{font-size:52px;margin-bottom:10px;}
+.ls-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;}
+.ls-title span{opacity:.7;}
+.ls-sub{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:28px;line-height:1.6;}
+.ls-btns{display:flex;flex-direction:column;gap:12px;}
+.ls-btn{padding:16px 20px;border:1.5px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;text-align:left;}
+.ls-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);transform:translateX(4px);}
+.ls-flag{font-size:24px;width:36px;text-align:center;}
+.ls-name{flex:1;}
+.ls-native{font-size:12px;opacity:.65;display:block;}
+
+/* ═══ LOGIN OVERLAY ═══ */
+.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.lc{background:#fff;border-radius:var(--r-xl);width:94%;max-width:480px;box-shadow:var(--sh-lg);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;}
 @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.lc{background:#fff;border-radius:var(--r-xl);width:94%;max-width:500px;box-shadow:var(--sh-lg);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;max-height:94vh;overflow-y:auto;}
 .lc-banner{background:linear-gradient(135deg,#1845C8 0%,#2E65F0 55%,#00BFA5 100%);padding:26px 30px 22px;color:#fff;position:relative;overflow:hidden;}
 .lc-banner::after{content:'🎓';font-size:110px;position:absolute;right:-8px;top:-18px;opacity:.12;pointer-events:none;}
 .lc-banner h1{font-size:22px;font-weight:800;} .lc-banner h1 span{opacity:.75;} .lc-banner p{font-size:12px;opacity:.8;margin-top:3px;}
@@ -32,24 +49,70 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .fg label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-m);margin-bottom:6px;}
 .fg input{width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:14px;color:var(--text-h);outline:none;transition:.2s;}
 .fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
-.pills{display:flex;gap:8px;}
-.pill{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:transparent;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--text-m);text-align:center;transition:.15s;}
-.pill:hover{border-color:var(--primary-lt);color:var(--primary);}
-.pill.active{border-color:var(--primary);background:var(--primary-dim);color:var(--primary);}
-.pill .pf{display:block;font-size:18px;margin-bottom:2px;}
-.ggrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-.gb{aspect-ratio:1;border:1.5px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--text-m);transition:.15s;display:flex;align-items:center;justify-content:center;}
-.gb:hover{border-color:var(--primary-lt);color:var(--primary);}
-.gb[data-c="p"].active{border-color:var(--c-pri);background:rgba(22,163,74,.1);color:var(--c-pri);}
-.gb[data-c="s"].active{border-color:var(--c-sec);background:var(--primary-dim);color:var(--c-sec);}
-.gb[data-c="a"].active{border-color:var(--c-al);background:rgba(124,58,237,.08);color:var(--c-al);}
-.g-legend{display:flex;gap:12px;margin-top:7px;flex-wrap:wrap;}
+.fg input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+
+/* special banner */
+.special-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;border-radius:var(--r-sm);padding:10px 14px;margin-bottom:14px;display:none;animation:slideUp .3s ease;font-size:13px;color:#92400e;font-weight:600;text-align:center;line-height:1.5;}
+.special-banner.show{display:block;}
+
+/* password */
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:42px;}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-m);padding:4px;}
+.pw-err{font-size:11px;color:var(--danger);margin-top:5px;display:none;font-weight:600;}
+.pw-err.show{display:block;}
+
+/* grade slider */
+.grade-slider-wrap{margin-bottom:18px;}
+.gs-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.gs-tab{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:transparent;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:var(--text-m);text-align:center;transition:.15s;}
+.gs-tab.ap{border-color:var(--c-pri);background:rgba(22,163,74,.08);color:var(--c-pri);}
+.gs-tab.as{border-color:var(--c-sec);background:var(--primary-dim);color:var(--c-sec);}
+.gs-tab.aa{border-color:var(--c-al);background:rgba(124,58,237,.08);color:var(--c-al);}
+.gs-panel{display:none;padding:4px 0 8px;}
+.gs-panel.show{display:block;}
+.grade-val{text-align:center;font-size:24px;font-weight:800;margin-bottom:2px;}
+.gv-p{color:var(--c-pri);} .gv-s{color:var(--c-sec);} .gv-a{color:var(--c-al);}
+.grade-lbl{font-size:10px;text-align:center;color:var(--text-m);font-weight:600;letter-spacing:.4px;margin-bottom:10px;}
+.grade-slider{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;outline:none;cursor:pointer;}
+.p-sl{background:var(--c-pri);} .s-sl{background:var(--c-sec);} .a-sl{background:var(--c-al);}
+.grade-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;}
+.p-sl::-webkit-slider-thumb{background:var(--c-pri);}
+.s-sl::-webkit-slider-thumb{background:var(--c-sec);}
+.a-sl::-webkit-slider-thumb{background:var(--c-al);}
+.g-legend{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;}
 .gl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-m);font-weight:600;}
 .gd{width:8px;height:8px;border-radius:50%;}
-.login-btn{width:100%;padding:13px;margin-top:18px;background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(24,69,200,.28);transition:.15s;}
+
+.login-btn{width:100%;padding:13px;margin-top:8px;background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(24,69,200,.28);transition:.15s;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(24,69,200,.38);}
 
-/* ── SIDEBAR ── */
+/* ═══ ADMIN DASHBOARD ═══ */
+#adminOverlay{position:fixed;inset:0;background:rgba(7,14,46,.85);backdrop-filter:blur(18px);z-index:9000;display:none;align-items:center;justify-content:center;}
+#adminOverlay.show{display:flex;animation:fadeIn .3s ease;}
+.adm-card{background:#fff;border-radius:24px;width:94%;max-width:560px;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;max-height:88vh;display:flex;flex-direction:column;}
+.adm-hd{background:linear-gradient(135deg,#0B1740,#1845C8);padding:22px 26px;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+.adm-hd h2{font-size:18px;font-weight:800;} .adm-hd p{font-size:11px;opacity:.65;margin-top:2px;}
+.adm-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.adm-body{padding:22px 26px;overflow-y:auto;flex:1;}
+.adm-sec{margin-bottom:22px;}
+.adm-sec-title{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.adm-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+.adm-stat{background:var(--bg);border-radius:12px;padding:14px;text-align:center;}
+.adm-stat .num{font-size:26px;font-weight:800;color:var(--primary);}
+.adm-stat .lbl{font-size:10px;color:var(--text-m);font-weight:600;margin-top:2px;}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;margin-bottom:8px;}
+.u-ava{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.u-info{flex:1;} .u-name{font-size:13px;font-weight:700;color:var(--text-h);} .u-role{font-size:10px;color:var(--text-m);}
+.u-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.u-badge.admin{background:rgba(124,58,237,.1);color:var(--c-al);border:1px solid rgba(124,58,237,.2);}
+.u-badge.user{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);}
+.adm-log{background:var(--bg);border-radius:10px;padding:14px;font-size:12px;color:var(--text-p);max-height:140px;overflow-y:auto;line-height:1.8;}
+.log-entry{padding:2px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;}
+.log-time{color:var(--text-m);font-size:11px;flex-shrink:0;}
+.adm-hint{font-size:11px;color:var(--text-m);text-align:center;padding:10px;background:rgba(24,69,200,.04);border-radius:8px;}
+
+/* ═══ SIDEBAR ═══ */
 .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;box-shadow:2px 0 12px rgba(24,69,200,.05);}
 .sb-hd{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .sb-logo{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
@@ -60,7 +123,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .sb-cat.p{color:var(--c-pri);border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);}
 .sb-cat.s{color:var(--c-sec);border-color:rgba(24,69,200,.2);background:var(--primary-dim);}
 .sb-cat.a{color:var(--c-al);border-color:rgba(124,58,237,.2);background:rgba(124,58,237,.07);}
-/* Stream selector */
 .st-sel{padding:9px 11px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .st-lbl{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);margin-bottom:6px;padding-left:3px;}
 .st-btns{display:flex;flex-direction:column;gap:3px;}
@@ -85,7 +147,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .sb-ft{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-m);text-align:center;flex-shrink:0;}
 .sb-ft b{color:var(--primary);}
 
-/* ── MAIN ── */
+/* ═══ MAIN ═══ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .topbar{padding:11px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-shrink:0;box-shadow:var(--sh-sm);}
 .tb-l{display:flex;align-items:center;gap:9px;}
@@ -99,7 +161,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .tb-b.ba{background:rgba(124,58,237,.08);color:var(--c-al);border-color:rgba(124,58,237,.2);}
 .tb-b.bl{background:rgba(0,191,165,.08);color:#007f6e;border-color:rgba(0,191,165,.2);}
 
-/* ── CHAT ── */
+/* ═══ CHAT ═══ */
 .chat-area{flex:1;overflow-y:auto;padding:22px 20px;display:flex;flex-direction:column;gap:18px;background:var(--bg);}
 .wc-wrap{margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:420px;text-align:center;}
 .wc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:30px 32px;box-shadow:var(--sh-sm);width:100%;}
@@ -108,7 +170,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .wc-card p{font-size:12.5px;color:var(--text-m);line-height:1.7;}
 .wc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;justify-content:center;}
 .wc-chip{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);border-radius:99px;padding:4px 11px;font-size:10.5px;font-weight:600;}
-/* Messages */
 .mw{display:flex;gap:8px;animation:msgIn .35s cubic-bezier(.16,1,.3,1);}
 @keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .mw.user{flex-direction:row-reverse;}
@@ -136,20 +197,15 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .macts{display:flex;gap:5px;flex-wrap:wrap;}
 .mact{background:var(--primary-dim);border:1px solid var(--border);color:var(--primary);padding:4px 11px;border-radius:99px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;}
 .mact:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
-/* Typing */
 .ty-w{display:flex;gap:8px;align-items:center;}
 .ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;box-shadow:var(--sh-sm);}
 .td{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:tdot 1.2s infinite;}
 .td:nth-child(2){animation-delay:.2s;} .td:nth-child(3){animation-delay:.4s;}
 @keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
 
-/* ── INPUT ── */
+/* ═══ INPUT ═══ */
 .input-area{padding:13px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;}
 .in-tools{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
-.it-tgl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-m);transition:.15s;user-select:none;font-family:inherit;}
-.it-tgl.active{background:var(--primary-dim);border-color:var(--primary);color:var(--primary);}
-.it-tgl .dot{width:6px;height:6px;border-radius:50%;background:var(--text-m);transition:.15s;}
-.it-tgl.active .dot{background:var(--primary);}
 .it-upl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-m);transition:.15s;}
 .it-upl:hover,.it-upl.hf{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
 #imgInp{display:none;}
@@ -166,49 +222,133 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
 .bsend{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(24,69,200,.28);transition:.15s;}
 .bsend:hover{transform:scale(1.06);} .bsend:active{transform:scale(.95);} .bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
-/* Toast */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:600;z-index:5000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 @media(max-width:660px){.sidebar{display:none;}.chat-area{padding:13px 11px;}.topbar{padding:10px 12px;}.input-area{padding:10px;}.mbody{max-width:92%;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="overlay" id="loginOverlay">
+<!-- ══ LANGUAGE SELECTION ══ -->
+<div id="langScreen">
+  <div class="ls-bubbles" id="lsBubbles"></div>
+  <div class="ls-card">
+    <div class="ls-logo">🎓</div>
+    <div class="ls-title">Sanz <span>AI Tutor</span></div>
+    <div class="ls-sub">Sri Lanka's Smart Tutor · Grade 1–13<br>ඔබේ භාෂාව තෝරන්න &nbsp;|&nbsp; உங்கள் மொழியை தேர்வு செய்யுங்கள்</div>
+    <div class="ls-btns">
+      <button class="ls-btn" onclick="chooseLang('si')">
+        <span class="ls-flag">🇱🇰</span>
+        <span class="ls-name">සිංහල<span class="ls-native">Sinhala</span></span>
+      </button>
+      <button class="ls-btn" onclick="chooseLang('ta')">
+        <span class="ls-flag">🇱🇰</span>
+        <span class="ls-name">தமிழ்<span class="ls-native">Tamil</span></span>
+      </button>
+      <button class="ls-btn" onclick="chooseLang('en')">
+        <span class="ls-flag">🇬🇧</span>
+        <span class="ls-name">English<span class="ls-native">English</span></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOGIN OVERLAY ══ -->
+<div class="overlay" id="loginOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
       <h1>🎓 Sanz <span>AI Tutor</span></h1>
       <p>Sri Lanka's Smart Multi-Language Tutor &nbsp;•&nbsp; Grade 1–13</p>
     </div>
     <div class="lc-body">
+      <div class="special-banner" id="specialBanner">⭐</div>
       <div class="fg">
-        <label>ඔබේ නම | பெயர் | Your Name</label>
-        <input type="text" id="nameInp" placeholder="e.g. Kasun / கவியா / Amali" onkeydown="if(event.key==='Enter')login()">
+        <label id="lblName">ඔබේ නම</label>
+        <input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" oninput="onNameType()" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()">
       </div>
       <div class="fg">
-        <label>භාෂාව | மொழி | Language</label>
-        <div class="pills">
-          <button class="pill active" onclick="pickL('si',this)"><span class="pf">🇱🇰</span>සිංහල</button>
-          <button class="pill" onclick="pickL('ta',this)"><span class="pf">🇱🇰</span>தமிழ்</button>
-          <button class="pill" onclick="pickL('en',this)"><span class="pf">🇬🇧</span>English</button>
+        <label id="lblPass">මුරපදය</label>
+        <div class="pw-wrap">
+          <input type="password" id="passInp" placeholder="••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
+          <button class="pw-eye" onclick="toggleEye()">👁</button>
         </div>
+        <div class="pw-err" id="pwErr">❌ වැරදි මුරපදයකි.</div>
       </div>
-      <div class="fg">
-        <label>ශ්‍රේණිය | வகுப்பு | Grade (1 – 13)</label>
-        <div class="ggrid" id="ggrid"></div>
+      <div class="grade-slider-wrap">
+        <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය</label></div>
+        <div class="gs-tabs">
+          <button class="gs-tab ap" id="tab-p" onclick="switchGrp('p')">Grade 1–5</button>
+          <button class="gs-tab" id="tab-s" onclick="switchGrp('s')">Grade 6–11</button>
+          <button class="gs-tab" id="tab-a" onclick="switchGrp('a')">Grade 12–13</button>
+        </div>
+        <div class="gs-panel show" id="panel-p">
+          <div class="grade-val gv-p" id="val-p">Grade 3</div>
+          <div class="grade-lbl" id="lbl-p">Primary</div>
+          <input type="range" min="1" max="5" value="3" step="1" class="grade-slider p-sl" id="sl-p" oninput="onSlide('p',this.value)">
+        </div>
+        <div class="gs-panel" id="panel-s">
+          <div class="grade-val gv-s" id="val-s">Grade 8</div>
+          <div class="grade-lbl" id="lbl-s">Secondary / O/L</div>
+          <input type="range" min="6" max="11" value="8" step="1" class="grade-slider s-sl" id="sl-s" oninput="onSlide('s',this.value)">
+        </div>
+        <div class="gs-panel" id="panel-a">
+          <div class="grade-val gv-a" id="val-a">Grade 12</div>
+          <div class="grade-lbl" id="lbl-a">Advanced Level</div>
+          <input type="range" min="12" max="13" value="12" step="1" class="grade-slider a-sl" id="sl-a" oninput="onSlide('a',this.value)">
+        </div>
         <div class="g-legend">
-          <div class="gl"><div class="gd" style="background:var(--c-pri)"></div>Grade 1–5 (Primary)</div>
-          <div class="gl"><div class="gd" style="background:var(--c-sec)"></div>Grade 6–11 (Secondary)</div>
-          <div class="gl"><div class="gd" style="background:var(--c-al)"></div>Grade 12–13 (A/L)</div>
+          <div class="gl"><div class="gd" style="background:var(--c-pri)"></div>Primary (1–5)</div>
+          <div class="gl"><div class="gd" style="background:var(--c-sec)"></div>Secondary (6–11)</div>
+          <div class="gl"><div class="gd" style="background:var(--c-al)"></div>A/L (12–13)</div>
         </div>
       </div>
-      <button class="login-btn" onclick="login()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
+      <button class="login-btn" id="loginBtn" onclick="tryLogin()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
     </div>
   </div>
 </div>
 
-<!-- SIDEBAR -->
+<!-- ══ ADMIN DASHBOARD ══ -->
+<div id="adminOverlay">
+  <div class="adm-card">
+    <div class="adm-hd">
+      <div><h2>⚙️ Admin Dashboard</h2><p>Sanz AI Tutor &nbsp;·&nbsp; System Control</p></div>
+      <button class="adm-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="adm-body">
+      <div class="adm-sec">
+        <div class="adm-sec-title">System Overview</div>
+        <div class="adm-stat-grid">
+          <div class="adm-stat"><div class="num" id="admSessions">0</div><div class="lbl">Sessions</div></div>
+          <div class="adm-stat"><div class="num" id="admMsgs">0</div><div class="lbl">Messages</div></div>
+          <div class="adm-stat"><div class="num" id="admGrade">—</div><div class="lbl">Grade</div></div>
+        </div>
+      </div>
+      <div class="adm-sec">
+        <div class="adm-sec-title">Registered Users</div>
+        <div class="user-row">
+          <div class="u-ava" style="background:rgba(124,58,237,.12);">👑</div>
+          <div class="u-info"><div class="u-name">sanduni</div><div class="u-role">System Administrator</div></div>
+          <span class="u-badge admin">Admin</span>
+        </div>
+        <div class="user-row">
+          <div class="u-ava" style="background:var(--primary-dim);">🎓</div>
+          <div class="u-info"><div class="u-name">therire</div><div class="u-role">Student User</div></div>
+          <span class="u-badge user">User</span>
+        </div>
+      </div>
+      <div class="adm-sec">
+        <div class="adm-sec-title">Activity Log</div>
+        <div class="adm-log" id="admLog">
+          <div class="log-entry"><span class="log-time">--:--</span><span>System ready.</span></div>
+        </div>
+      </div>
+      <div class="adm-hint">🔐 Ctrl + Shift + F2 &nbsp;×&nbsp; 5 times to open</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="sb-hd">
     <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
@@ -216,15 +356,15 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
     <div class="sb-cat s" id="sbCat">📚 Secondary</div>
   </div>
   <div class="st-sel" id="stSel" style="display:none">
-    <div class="st-lbl">Stream | ධාරාව | ஓட்டம்</div>
+    <div class="st-lbl" id="stLbl">Stream | ධාරාව | ஓட்டம்</div>
     <div class="st-btns" id="stBtns"></div>
   </div>
-  <div class="sb-sec">SUBJECTS | විෂයයන් | பாடங்கள்</div>
+  <div class="sb-sec" id="sbSecLbl">SUBJECTS</div>
   <nav class="sb-nav" id="sbNav"></nav>
-  <div class="sb-ft">Developed by <b>Sanz Queen</b> &nbsp;•&nbsp; v4.0</div>
+  <div class="sb-ft">Developed by <b>Sanz Queen</b> &nbsp;•&nbsp; v5.0</div>
 </aside>
 
-<!-- MAIN -->
+<!-- ══ MAIN ══ -->
 <div class="main">
   <div class="topbar">
     <div class="tb-l">
@@ -244,7 +384,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
         <p id="wcP">ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න</p>
         <div class="wc-chips">
           <span class="wc-chip">📖 Step-by-Step</span>
-          <span class="wc-chip">✅ Cross-Check</span>
           <span class="wc-chip">📷 Image Upload</span>
           <span class="wc-chip">🔊 Listen</span>
           <span class="wc-chip">🎤 Voice Input</span>
@@ -258,7 +397,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <button class="ip-rm" onclick="rmImg()">✕</button>
     </div>
     <div class="in-tools">
-      <button class="it-tgl" id="ccTgl" onclick="toggleCC()"><div class="dot"></div><span id="ccLbl">✅ Cross-Check</span></button>
       <label class="it-upl" id="uplLbl" for="imgInp">📷 Image</label>
       <input type="file" id="imgInp" accept="image/*" onchange="onImgSel(event)">
     </div>
@@ -272,135 +410,335 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ── SUBJECT DATA ── */
-const SBJ = {
-  primary:[
-    {id:'Environment',ic:'🌿',en:'Environment',     si:'පරිසරය',           ta:'சூழல்'},
-    {id:'Mathematics',ic:'📐',en:'Mathematics',      si:'ගණිතය',            ta:'கணிதம்'},
-    {id:'Sinhala',    ic:'📖',en:'Sinhala',          si:'සිංහල',            ta:'சிங்களம்'},
-    {id:'Tamil',      ic:'📜',en:'Tamil',            si:'දෙමළ',             ta:'தமிழ்'},
-    {id:'English',    ic:'🌐',en:'English',           si:'ඉංග්‍රීසි',         ta:'ஆங்கிலம்'},
-    {id:'Art',        ic:'🎨',en:'Art / Visual Art',  si:'චිත්‍ර',            ta:'கலை'},
-    {id:'Religion',   ic:'🙏',en:'Religion / Ethics', si:'ආගම',             ta:'சமயம்'},
-    {id:'Health',     ic:'💊',en:'Health Education',  si:'සෞඛ්‍ය',           ta:'உடல் நலம்'},
-  ],
-  secondary:[
-    {id:'Mathematics',ic:'📐',en:'Mathematics',        si:'ගණිතය',             ta:'கணிதம்'},
-    {id:'Science',    ic:'🔬',en:'Science',             si:'විද්‍යාව',           ta:'அறிவியல்'},
-    {id:'History',    ic:'🏛️',en:'History',             si:'ඉතිහාසය',           ta:'வரலாறு'},
-    {id:'Geography',  ic:'🌍',en:'Geography',           si:'භූගෝල විද්‍යාව',     ta:'புவியியல்'},
-    {id:'ICT',        ic:'💻',en:'ICT',                 si:'තොරතුරු තාක්ෂණය',   ta:'தகவல் தொழில்நுட்பம்'},
-    {id:'Civic',      ic:'⚖️',en:'Civic Education',     si:'පුරවැසි අධ්‍යාපනය', ta:'குடியியல் கல்வி'},
-    {id:'Sinhala',    ic:'📖',en:'Sinhala',             si:'සිංහල',             ta:'சிங்களம்'},
-    {id:'Tamil',      ic:'📜',en:'Tamil',               si:'දෙමළ',              ta:'தமிழ்'},
-    {id:'English',    ic:'🌐',en:'English',             si:'ඉංග්‍රීසි',          ta:'ஆங்கிலம்'},
-    {id:'Commerce',   ic:'📊',en:'Commerce',            si:'වාණිජ විද්‍යාව',    ta:'வணிகவியல்'},
-    {id:'Health',     ic:'💊',en:'Health & P.E.',       si:'සෞඛ්‍ය අධ්‍යාපනය',  ta:'உடல் கல்வி'},
-    {id:'Music',      ic:'🎵',en:'Music',               si:'සංගීතය',            ta:'இசை'},
-    {id:'Drama',      ic:'🎭',en:'Drama',               si:'නාට්‍ය',             ta:'நாடகம்'},
-  ],
-  alStreams:[
-    {id:'bio',  ic:'🧬',en:'Biology Stream',    si:'ජීව ධාරාව',    ta:'உயிரியல் நெடல்', sbj:[
-      {id:'Biology',   ic:'🧬',en:'Biology',           si:'ජීව විද්‍යාව',    ta:'உயிரியல்'},
-      {id:'Chemistry', ic:'⚗️',en:'Chemistry',         si:'රසායන විද්‍යාව', ta:'வேதியியல்'},
-      {id:'Physics',   ic:'⚡',en:'Physics',            si:'භෞතික විද්‍යාව', ta:'இயற்பியல்'},
-    ]},
-    {id:'maths',ic:'➕',en:'Maths Stream',      si:'ගණිත ධාරාව',   ta:'கணித நெடல்', sbj:[
-      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',  si:'සංයුක්ත ගණිතය',     ta:'இணைந்த கணிதம்'},
-      {id:'Physics',      ic:'⚡',en:'Physics',          si:'භෞතික විද්‍යාව',    ta:'இயற்பியல்'},
-      {id:'Chemistry',    ic:'⚗️',en:'Chemistry',        si:'රසායන විද්‍යාව',   ta:'வேதியியல்'},
-      {id:'ICT',          ic:'💻',en:'ICT',              si:'තොරතුරු තාක්ෂණය',  ta:'தகவல் தொழில்நுட்பம்'},
-    ]},
-    {id:'commerce',ic:'💼',en:'Commerce Stream', si:'වාණිජ ධාරාව',  ta:'வணிக நெடல்', sbj:[
-      {id:'Economics',      ic:'📈',en:'Economics',       si:'ආර්ථික විද්‍යාව',  ta:'பொருளாதாரம்'},
-      {id:'BusinessStudies',ic:'🏢',en:'Business Studies', si:'ව්‍යාපාර අධ්‍යයනය',ta:'வணிக கல்வி'},
-      {id:'Accounting',     ic:'🧾',en:'Accounting',      si:'ගිණුම්කරණය',       ta:'கணக்கியல்'},
-      {id:'Statistics',     ic:'📊',en:'Statistics',      si:'සංඛ්‍යාන',          ta:'புள்ளியியல்'},
-    ]},
-    {id:'tech',ic:'🔧',en:'Technology Stream',  si:'තාක්ෂණ ධාරාව', ta:'தொழில்நுட்ப நெடல்', sbj:[
-      {id:'EngineeringTech',ic:'⚙️',en:'Engineering Tech.',  si:'ඉංජිනේරු තාක්ෂණය',      ta:'பொறியியல் தொழில்நுட்பம்'},
-      {id:'ScienceTech',    ic:'🔬',en:'Science for Tech.',   si:'තාක්ෂණය සඳහා විද්‍යාව', ta:'தொழில்நுட்பத்திற்கான அறிவியல்'},
-      {id:'ICT',            ic:'💻',en:'ICT',                 si:'තොරතුරු තාක්ෂණය',        ta:'தகவல் தொழில்நுட்பம்'},
-      {id:'Agriculture',    ic:'🌾',en:'Agriculture & Food',  si:'කෘෂිකර්මය',               ta:'விவசாயம்'},
-    ]},
-    {id:'art',ic:'🎨',en:'Arts Stream',        si:'කලා ධාරාව',    ta:'கலை நெடல்', sbj:[
-      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍යය',ta:'சிங்கள இலக்கியம்'},
-      {id:'Geography', ic:'🌍',en:'Geography',         si:'භූගෝල විද්‍යාව', ta:'புவியியல்'},
-      {id:'Civic',     ic:'⚖️',en:'Civic Education',   si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
-      {id:'Logic',     ic:'🧩',en:'Logic & Sci. Method',si:'තර්කශාස්ත්‍රය',   ta:'தர்க்கவியல்'},
-      {id:'Art',       ic:'🖼️',en:'Art',                si:'චිත්‍ර',           ta:'கலை'},
-      {id:'Dancing',   ic:'💃',en:'Dancing',            si:'නර්තනය',          ta:'நடனம்'},
-      {id:'Music',     ic:'🎵',en:'Music',              si:'සංගීතය',          ta:'இசை'},
-      {id:'Drama',     ic:'🎭',en:'Drama & Theatre',    si:'නාට්‍ය',           ta:'நாடகம்'},
-    ]},
-    {id:'lang',ic:'🌐',en:'Languages Stream',  si:'භාෂා ධාරාව',   ta:'மொழி நெடல்', sbj:[
-      {id:'Sinhala',ic:'📖',en:'Sinhala',        si:'සිංහල',       ta:'சிங்களம்'},
-      {id:'Tamil',  ic:'📜',en:'Tamil',          si:'දෙමළ',        ta:'தமிழ்'},
-      {id:'English',ic:'🌐',en:'English',        si:'ඉංග්‍රීසි',    ta:'ஆங்கிலம்'},
-      {id:'Pali',   ic:'📿',en:'Pali / Sanskrit',si:'පාලි',        ta:'பாலி'},
-      {id:'Hindi',  ic:'🇮🇳',en:'Hindi',          si:'හින්දි',      ta:'இந்தி'},
-      {id:'Arabic', ic:'☪️', en:'Arabic',         si:'අරාබි',      ta:'அரபு'},
-      {id:'French', ic:'🇫🇷',en:'French',         si:'ප්‍රංශ',      ta:'பிரஞ்சு'},
-    ]},
-  ],
-  alCommon:[
-    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',si2:'பொது ஆங்கிலம்',ta:'பொது ஆங்கிலம்'},
-    {id:'GenIT',     ic:'💻',en:'General IT',     si:'සාමාන්‍ය IT',       ta:'பொது தகவல் தொழில்நுட்பம்'},
-  ]
+/* ══════════════════════════════════════
+   USERS
+══════════════════════════════════════ */
+const USERS = {
+  sanduni:{ pass:'momsanzdad2001#', role:'admin' },
+  therire:{ pass:'sanz2024',        role:'user'  }
 };
 
-const LM = {
-  si:{lbl:'සිංහල', ph:'ප්‍රශ්නය ටයිප් කරන්න...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 ඇසීමට', copy:'📋 Copy', copied:'Copied ✓', empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?', wch:'ආයුබෝවන්!', wcp:'ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න', sp:'si-LK',
-    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස Sanz AI Tutor වෙත සාදරයෙන් පිළිගනිමු. ඕනෑ ඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න!`},
-  ta:{lbl:'தமிழ்', ph:'கேள்வியை உள்ளிடுக...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 கேட்க', copy:'📋 நகலெடு', copied:'நகலெடுத்தது ✓', empty:'கேள்வியை உள்ளிடவும்!', wch:'வணக்கம்!', wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்', sp:'ta-IN',
-    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக Sanz AI Tutor-க்கு வரவேற்கிறோம். எந்த **பாடத்தை** பற்றியும் கேளுங்கள்!`},
-  en:{lbl:'English',ph:'Type your question...', ccon:'✅ Cross-Check (on)', ccoff:'✅ Cross-Check', listen:'🔊 Listen', copy:'📋 Copy', copied:'Copied ✓', empty:'Please type a question!', wch:'Welcome!', wcp:'Type your question or click 🎤 to speak', sp:'en-US',
-    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to Sanz AI Tutor as a Grade ${g} student. Feel free to ask about any **subject**!`},
+const SPECIAL = {
+  sanduni:{
+    si:'💝 ආදරණීය Sanduni! ඔයා නැතිව Sanz AI Tutor ගෙදරක් නෙවෙයි! 🌸✨',
+    ta:'💝 அன்பான Sanduni! நீங்கள் இல்லாமல் Sanz AI Tutor முழுமையடையாது! 🌸✨',
+    en:"💝 Welcome back Sanduni! You're the heart of this whole platform! 🌸✨"
+  },
+  therire:{
+    si:'🌟 ආදරණීය Therire! ඔයා ආවා! අද කොයි විෂය ඉගෙනගන්නද? 😊💪',
+    ta:'🌟 அன்பான Therire! வந்தீர்கள்! இன்று எந்த பாடம் படிக்கவா? 😊💪',
+    en:'🌟 Hey Therire! So great to see you! What shall we learn today? 😊💪'
+  },
+  sanz:{
+    si:'✨ "Sanz" — ඒ නම ඇහෙනකොටම හිත ලස්සන වෙනවා! 💙',
+    ta:'✨ "Sanz" — இந்தப் பெயர் கேட்கும்போதே மனம் மகிழ்கிறது! 💙',
+    en:'✨ "Sanz" — that name makes everything brighter! 💙'
+  },
+  hansika:{
+    si:'🌺 ආදරණීය Hansika! ඔයාගේ ලස්සන හිනාව සියල්ල ලස්සන කරනවා! 🌺',
+    ta:'🌺 அன்பான Hansika! உங்கள் அழகான புன்னகை எல்லாவற்றையும் அழகாக்குகிறது! 🌺',
+    en:'🌺 Hey Hansika! Your beautiful smile lights up everything! 🌺'
+  },
+  kumarasiri:{
+    si:'🦁 Kumarasiri! ඔයාගේ ඉගෙනීමේ උද්‍යෝගය ගෙනෙව් ඉදිරියට! 💪',
+    ta:'🦁 Kumarasiri! உங்கள் கற்றல் ஆர்வம் தொடர்ந்து செல்லட்டும்! 💪',
+    en:'🦁 Kumarasiri! Keep that great learning spirit going! 💪'
+  }
 };
 
-const API='https://sanz-ai-tutor.onrender.com';
-let S={name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',cc:false,rec:false,loading:false,selL:'si',selG:6};
+/* ══════════════════════════════════════
+   UI TEXT (language-locked after selection)
+══════════════════════════════════════ */
+const UI = {
+  si:{
+    lblName:'ඔබේ නම', lblPass:'මුරපදය', lblGrade:'ශ්‍රේණිය',
+    loginBtn:'ඉගෙනීම ආරම්භ කරන්න 🚀',
+    pwErr:'❌ වැරදි මුරපදයකි. නැවත උත්සාහ කරන්න.',
+    noUser:'⚠️ මෙම නම හඳුනාගත නොහැකිය.',
+    emptyName:'නමක් ඇතුළත් කරන්න!',
+    ph:'ප්‍රශ්නය ටයිප් කරන්න...', wch:'ආයුබෝවන්!',
+    wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',
+    listen:'🔊 ඇසීමට', copy:'📋 Copy', copied:'Copied ✓',
+    empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?', sp:'si-LK',
+    subjects:'විෂයයන්', streamLbl:'ධාරාව',
+    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
+    langLabel:'සිංහල',
+    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස Sanz AI Tutor වෙත සාදරයෙන් පිළිගනිමු. ඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න!`
+  },
+  ta:{
+    lblName:'உங்கள் பெயர்', lblPass:'கடவுச்சொல்', lblGrade:'வகுப்பு',
+    loginBtn:'கற்றலை தொடங்குங்கள் 🚀',
+    pwErr:'❌ தவறான கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.',
+    noUser:'⚠️ இந்தப் பெயர் அடையாளம் காணப்படவில்லை.',
+    emptyName:'பெயரை உள்ளிடுங்கள்!',
+    ph:'கேள்வியை உள்ளிடுக...', wch:'வணக்கம்!',
+    wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',
+    listen:'🔊 கேட்க', copy:'📋 நகலெடு', copied:'நகலெடுத்தது ✓',
+    empty:'கேள்வியை உள்ளிடவும்!', sp:'ta-IN',
+    subjects:'பாடங்கள்', streamLbl:'ஓட்டம்',
+    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
+    langLabel:'தமிழ்',
+    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக Sanz AI Tutor-க்கு வரவேற்கிறோம். எந்த **பாடத்தை** பற்றியும் கேளுங்கள்!`
+  },
+  en:{
+    lblName:'Your Name', lblPass:'Password', lblGrade:'Grade',
+    loginBtn:'Start Learning 🚀',
+    pwErr:'❌ Incorrect password. Please try again.',
+    noUser:'⚠️ This name is not recognised.',
+    emptyName:'Please enter your name!',
+    ph:'Type your question...', wch:'Welcome!',
+    wcp:'Type your question or click 🎤 to speak',
+    listen:'🔊 Listen', copy:'📋 Copy', copied:'Copied ✓',
+    empty:'Please type a question!', sp:'en-US',
+    subjects:'SUBJECTS', streamLbl:'Stream',
+    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
+    langLabel:'English',
+    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to Sanz AI Tutor as a Grade ${g} student. Feel free to ask about any **subject**!`
+  }
+};
 
-/* ── GRADE GRID INIT ── */
+let chosenLang = null;
+let currentGrp = 'p';
+let currentGrade = 3;
+let sessionCount = 0, msgCount = 0;
+let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
+
+/* ══ LANGUAGE BUBBLES ══ */
 (function(){
-  const g=document.getElementById('ggrid');
-  for(let i=1;i<=13;i++){
-    const c=i<=5?'p':i<=11?'s':'a';
-    const b=document.createElement('button');
-    b.className='gb';b.dataset.c=c;b.textContent=i;
-    b.onclick=()=>{S.selG=i;document.querySelectorAll('.gb').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
-    if(i===6)b.classList.add('active');
-    g.appendChild(b);
+  const c=document.getElementById('lsBubbles');
+  for(let i=0;i<18;i++){
+    const b=document.createElement('div');b.className='ls-bub';
+    const sz=30+Math.random()*120;
+    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*10}s;animation-delay:${Math.random()*8}s;`;
+    c.appendChild(b);
   }
 })();
 
-function pickL(l,el){S.selL=l;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
-
-/* ── LOGIN ── */
-function login(){
-  const nm=document.getElementById('nameInp').value.trim();
-  if(!nm){showToast('නමක් ලිවීමට අමතකද? | Please enter your name');return;}
-  S.name=nm;S.lang=S.selL;S.grade=S.selG;
-  S.cat=S.grade<=5?'primary':S.grade<=11?'secondary':'al';
-  const lm=LM[S.lang];
-  const catL={primary:`Grade ${S.grade} · Primary`,secondary:`Grade ${S.grade} · O/L`,al:`Grade ${S.grade} · A/L`};
-  const catCls={primary:'bp',secondary:'bs',al:'ba'};
-  const sbCatCls={primary:'p',secondary:'s',al:'a'};
-  document.getElementById('tbGb').textContent=catL[S.cat];
-  document.getElementById('tbGb').className=`tb-b ${catCls[S.cat]}`;
-  document.getElementById('tbLb').textContent=lm.lbl;
-  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-  const sc=document.getElementById('sbCat');
-  sc.className=`sb-cat ${sbCatCls[S.cat]}`;sc.textContent=catL[S.cat];
-  document.getElementById('wcH').textContent=lm.wch;
-  document.getElementById('wcP').textContent=lm.wcp;
-  document.getElementById('qIn').placeholder=lm.ph;
-  buildSidebar();
-  document.getElementById('loginOverlay').style.display='none';
-  setTimeout(()=>addAI(lm.greet(S.name,S.grade)),320);
+/* ══ CHOOSE LANGUAGE ══ */
+function chooseLang(lang){
+  chosenLang=lang;
+  document.getElementById('langScreen').style.display='none';
+  document.getElementById('loginOverlay').style.display='flex';
+  const t=UI[lang];
+  document.getElementById('lblName').textContent=t.lblName;
+  document.getElementById('lblPass').textContent=t.lblPass;
+  document.getElementById('lblGrade').textContent=t.lblGrade;
+  document.getElementById('loginBtn').textContent=t.loginBtn;
+  document.getElementById('nameInp').placeholder=lang==='si'?'e.g. Kasun / Amali':lang==='ta'?'e.g. கவியா / கார்த்திக்':'e.g. Kasun / Amali';
+  document.getElementById('lbl-p').textContent=t.grLbl.p;
+  document.getElementById('lbl-s').textContent=t.grLbl.s;
+  document.getElementById('lbl-a').textContent=t.grLbl.a;
+  document.getElementById('sbSecLbl').textContent=t.subjects;
+  document.getElementById('wcH').textContent=t.wch;
+  document.getElementById('wcP').textContent=t.wcp;
+  document.getElementById('qIn').placeholder=t.ph;
+  document.getElementById('tbLb').textContent=t.langLabel;
 }
 
-/* ── SIDEBAR ── */
+/* ══ GRADE SLIDER ══ */
+function switchGrp(g){
+  currentGrp=g;
+  ['p','s','a'].forEach(x=>{
+    const tab=document.getElementById('tab-'+x);
+    tab.className='gs-tab'+(x===g?' a'+x:'');
+    document.getElementById('panel-'+x).className='gs-panel'+(x===g?' show':'');
+  });
+  currentGrade=parseInt(document.getElementById('sl-'+g).value);
+}
+function onSlide(g,v){
+  currentGrade=parseInt(v);
+  document.getElementById('val-'+g).textContent='Grade '+v;
+}
+
+/* ══ NAME TYPE → SPECIAL BANNER ══ */
+function onNameType(){
+  const nm=document.getElementById('nameInp').value.trim().toLowerCase();
+  const lang=chosenLang||'si';
+  const banner=document.getElementById('specialBanner');
+  document.getElementById('pwErr').classList.remove('show');
+  document.getElementById('passInp').classList.remove('err');
+  document.getElementById('nameInp').classList.remove('err');
+  let msg=null;
+  if(SPECIAL[nm]) msg=SPECIAL[nm][lang];
+  else { for(const k in SPECIAL){ if(nm.length>=3&&(nm.includes(k)||k.includes(nm))){ msg=SPECIAL[k][lang];break; } } }
+  if(msg){banner.textContent=msg;banner.classList.add('show');}
+  else banner.classList.remove('show');
+}
+
+/* ══ PASSWORD EYE ══ */
+function toggleEye(){
+  const inp=document.getElementById('passInp');
+  const eye=document.querySelector('.pw-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁';}
+}
+
+/* ══ LOGIN ══ */
+function tryLogin(){
+  const nm=document.getElementById('nameInp').value.trim().toLowerCase();
+  const pw=document.getElementById('passInp').value;
+  const lang=chosenLang||'si';
+  const t=UI[lang];
+  if(!nm){showToast(t.emptyName);return;}
+  const user=USERS[nm];
+  if(!user){
+    document.getElementById('pwErr').textContent=t.noUser;
+    document.getElementById('pwErr').classList.add('show');
+    document.getElementById('nameInp').classList.add('err');
+    return;
+  }
+  if(pw!==user.pass){
+    document.getElementById('pwErr').textContent=t.pwErr;
+    document.getElementById('pwErr').classList.add('show');
+    document.getElementById('passInp').classList.add('err');
+    document.getElementById('passInp').style.animation='shake .4s ease';
+    setTimeout(()=>document.getElementById('passInp').style.animation='',500);
+    return;
+  }
+  // success
+  document.getElementById('pwErr').classList.remove('show');
+  document.getElementById('passInp').classList.remove('err');
+  document.getElementById('nameInp').classList.remove('err');
+  S.name=nm; S.lang=lang; S.grade=currentGrade;
+  S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
+  const catL=t.catL(S.grade);
+  const catCls=t.catCls(S.grade);
+  const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
+  document.getElementById('tbGb').textContent=catL;
+  document.getElementById('tbGb').className='tb-b '+catCls;
+  document.getElementById('tbLb').textContent=t.langLabel;
+  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
+  const sc=document.getElementById('sbCat');
+  sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
+  document.getElementById('wcH').textContent=t.wch;
+  document.getElementById('wcP').textContent=t.wcp;
+  document.getElementById('qIn').placeholder=t.ph;
+  buildSidebar();
+  document.getElementById('loginOverlay').style.display='none';
+  sessionCount++;
+  addLog(`"${nm}" logged in → Grade ${S.grade} · ${lang}`);
+  document.getElementById('admSessions').textContent=sessionCount;
+  document.getElementById('admGrade').textContent=S.grade;
+  setTimeout(()=>{
+    const sp=SPECIAL[nm];
+    const greeting=t.greet(nm,S.grade);
+    addAI(sp ? sp[lang]+'\n\n'+greeting : greeting);
+  },320);
+}
+
+/* ══ ADMIN — Ctrl+Shift+F2 × 5 ══ */
+let f2n=0, f2t=null;
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){
+    e.preventDefault();
+    f2n++;clearTimeout(f2t);
+    f2t=setTimeout(()=>f2n=0,4000);
+    if(f2n>=5){f2n=0;openAdmin();}
+    else showToast('🔐 Admin: '+f2n+'/5');
+  }
+});
+function openAdmin(){
+  document.getElementById('admMsgs').textContent=msgCount;
+  document.getElementById('admSessions').textContent=sessionCount;
+  document.getElementById('admGrade').textContent=S.grade||'—';
+  document.getElementById('adminOverlay').classList.add('show');
+}
+function closeAdmin(){document.getElementById('adminOverlay').classList.remove('show');}
+function addLog(msg){
+  const log=document.getElementById('admLog');
+  const now=new Date();
+  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const d=document.createElement('div');d.className='log-entry';
+  d.innerHTML=`<span class="log-time">${t}</span><span>${msg}</span>`;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+
+/* ══ SUBJECT DATA ══ */
+const SBJ={
+  primary:[
+    {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'சூழல்'},
+    {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
+    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
+    {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
+    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
+    {id:'Art',ic:'🎨',en:'Art / Visual Art',si:'චිත්‍ර',ta:'கலை'},
+    {id:'Religion',ic:'🙏',en:'Religion / Ethics',si:'ආගම',ta:'சமயம்'},
+    {id:'Health',ic:'💊',en:'Health Education',si:'සෞඛ්‍ය',ta:'உடல் நலம்'},
+  ],
+  secondary:[
+    {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
+    {id:'Science',ic:'🔬',en:'Science',si:'විද්‍යාව',ta:'அறிவியல்'},
+    {id:'History',ic:'🏛️',en:'History',si:'ඉතිහාසය',ta:'வரலாறு'},
+    {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල විද්‍යාව',ta:'புவியியல்'},
+    {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
+    {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
+    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
+    {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
+    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
+    {id:'Commerce',ic:'📊',en:'Commerce',si:'වාණිජ විද්‍යාව',ta:'வணிகவியல்'},
+    {id:'Health',ic:'💊',en:'Health & P.E.',si:'සෞඛ්‍ය අධ්‍යාපනය',ta:'உடல் கல்வி'},
+    {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
+    {id:'Drama',ic:'🎭',en:'Drama',si:'නාට්‍ය',ta:'நாடகம்'},
+  ],
+  alStreams:[
+    {id:'bio',ic:'🧬',en:'Biology Stream',si:'ජීව ධාරාව',ta:'உயிரியல் நெடல்',sbj:[
+      {id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},
+      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන විද්‍යාව',ta:'வேதியியல்'},
+      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික විද්‍යාව',ta:'இயற்பியல்'},
+    ]},
+    {id:'maths',ic:'➕',en:'Maths Stream',si:'ගණිත ධාරාව',ta:'கணித நெடல்',sbj:[
+      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත ගණිතය',ta:'இணைந்த கணிதம்'},
+      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික විද්‍යාව',ta:'இயற்பியல்'},
+      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන විද්‍යාව',ta:'வேதியியல்'},
+      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
+    ]},
+    {id:'commerce',ic:'💼',en:'Commerce Stream',si:'වාණිජ ධාරාව',ta:'வணிக நெடல்',sbj:[
+      {id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික විද්‍යාව',ta:'பொருளாதாரம்'},
+      {id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර අධ්‍යයනය',ta:'வணிக கல்வி'},
+      {id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්කරණය',ta:'கணக்கியல்'},
+      {id:'Statistics',ic:'📊',en:'Statistics',si:'සංඛ්‍යාන',ta:'புள்ளியியல்'},
+    ]},
+    {id:'tech',ic:'🔧',en:'Technology Stream',si:'තාක්ෂණ ධාරාව',ta:'தொழில்நுட்ப நெடல்',sbj:[
+      {id:'EngineeringTech',ic:'⚙️',en:'Engineering Tech.',si:'ඉංජිනේරු තාක්ෂණය',ta:'பொறியியல் தொழில்நுட்பம்'},
+      {id:'ScienceTech',ic:'🔬',en:'Science for Tech.',si:'තාක්ෂණය සඳහා විද්‍යාව',ta:'தொழில்நுட்பத்திற்கான அறிவியல்'},
+      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
+      {id:'Agriculture',ic:'🌾',en:'Agriculture & Food',si:'කෘෂිකර්මය',ta:'விவசாயம்'},
+    ]},
+    {id:'art',ic:'🎨',en:'Arts Stream',si:'කලා ධාරාව',ta:'கலை நெடல்',sbj:[
+      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍යය',ta:'சிங்கள இலக்கியம்'},
+      {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල විද්‍යාව',ta:'புவியியல்'},
+      {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
+      {id:'Logic',ic:'🧩',en:'Logic & Sci. Method',si:'තර්කශාස්ත්‍රය',ta:'தர்க்கவியல்'},
+      {id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},
+      {id:'Dancing',ic:'💃',en:'Dancing',si:'නර්තනය',ta:'நடனம்'},
+      {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
+      {id:'Drama',ic:'🎭',en:'Drama & Theatre',si:'නාට්‍ය',ta:'நாடகம்'},
+    ]},
+    {id:'lang',ic:'🌐',en:'Languages Stream',si:'භාෂා ධාරාව',ta:'மொழி நெடல்',sbj:[
+      {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
+      {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
+      {id:'English',ic:'🌐',en:'English',si:'ඉංග்‍රීසி',ta:'ஆங்கிலம்'},
+      {id:'Pali',ic:'📿',en:'Pali / Sanskrit',si:'පාලි',ta:'பாலி'},
+      {id:'Hindi',ic:'🇮🇳',en:'Hindi',si:'හින්දි',ta:'இந்தி'},
+      {id:'Arabic',ic:'☪️',en:'Arabic',si:'අරාබි',ta:'அரபு'},
+      {id:'French',ic:'🇫🇷',en:'French',si:'ප්‍රංශ',ta:'பிரஞ்சு'},
+    ]},
+  ],
+  alCommon:[
+    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
+    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது தகவல் தொழில்நுட்பம்'},
+  ]
+};
+
+const API='https://sanz-ai-tutor.onrender.com';
+
+/* ══ SIDEBAR ══ */
 function buildSidebar(){
   const stSel=document.getElementById('stSel');
   if(S.cat==='al'){stSel.style.display='block';buildStreams();buildSubjs(getALSubjs(S.alStream));}
@@ -439,12 +777,11 @@ function buildSubjs(list){
   });
 }
 
-/* ── TOOLS ── */
-function toggleCC(){S.cc=!S.cc;const e=document.getElementById('ccTgl');const lm=LM[S.lang];e.classList.toggle('active',S.cc);document.getElementById('ccLbl').textContent=S.cc?lm.ccon:lm.ccoff;}
+/* ══ IMAGE ══ */
 function onImgSel(e){const f=e.target.files[0];if(!f)return;document.getElementById('ipImg').src=URL.createObjectURL(f);document.getElementById('ipWrap').style.display='inline-block';document.getElementById('uplLbl').classList.add('hf');}
 function rmImg(){document.getElementById('imgInp').value='';document.getElementById('ipWrap').style.display='none';document.getElementById('uplLbl').classList.remove('hf');}
 
-/* ── VOICE ── */
+/* ══ VOICE ══ */
 let recog=null;
 if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -453,26 +790,29 @@ if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
   recog.onend=()=>{if(S.rec)recog.start();};
 }
 function toggleMic(){
-  if(!recog){showToast('Voice not supported in this browser');return;}
+  if(!recog){showToast('Voice not supported');return;}
   const b=document.getElementById('micBtn');
   if(S.rec){recog.stop();S.rec=false;b.textContent='🎤';b.classList.remove('rec');}
-  else{recog.lang=LM[S.lang].sp;recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');
+  else{recog.lang=UI[S.lang||'si'].sp;recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');
     showToast(S.lang==='si'?'🎤 සවන් දෙමින්...':S.lang==='ta'?'🎤 கேட்கிறேன்...':'🎤 Listening...');}
 }
-function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=LM[S.lang].sp;u.rate=.93;window.speechSynthesis.speak(u);}
+function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=UI[S.lang||'si'].sp;u.rate=.93;window.speechSynthesis.speak(u);}
 
-/* ── SEND ── */
+/* ══ SEND ══ */
 async function sendMsg(){
   const inp=document.getElementById('qIn');const q=inp.value.trim();
-  if(!q){showToast(LM[S.lang].empty);return;}if(S.loading)return;
+  const t=UI[S.lang||'si'];
+  if(!q){showToast(t.empty);return;}if(S.loading)return;
   const wc=document.getElementById('wcCard');if(wc)wc.remove();
   addUser(q);inp.value='';aH(inp);
   const imgFile=document.getElementById('imgInp').files[0]||null;
   rmImg();showTyp();setLoad(true);
+  msgCount++;addLog(`Msg #${msgCount} by "${S.name}": "${q.substring(0,35)}"`);
+  document.getElementById('admMsgs').textContent=msgCount;
   try{
     const fd=new FormData();
     fd.append('name',S.name);fd.append('grade',S.grade);fd.append('subject',S.subject);
-    fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck',S.cc?'true':'false');
+    fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck','false');
     if(imgFile)fd.append('image',imgFile);
     const res=await fetch(`${API}/solve`,{method:'POST',body:fd});
     const d=await res.json();hideTyp();setLoad(false);
@@ -480,10 +820,10 @@ async function sendMsg(){
     else if(d.status==='success')addAI(d.answer,d.graph_url);
     else addAI('⚠️ '+(d.message||'Error'));
   }catch(e){hideTyp();setLoad(false);
-    addAI({si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි විය.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect to server.'}[S.lang]);}
+    addAI({si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි විය.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect to server.'}[S.lang||'si']);}
 }
 
-/* ── MESSAGES ── */
+/* ══ MESSAGES ══ */
 function addUser(txt){
   const c=document.getElementById('chatArea'),w=document.createElement('div');
   w.className='mw user';
@@ -492,14 +832,14 @@ function addUser(txt){
 }
 function addAI(md,graph){
   const c=document.getElementById('chatArea'),w=document.createElement('div');
-  w.className='mw ai';const lm=LM[S.lang];const raw=md||'';
+  w.className='mw ai';const t=UI[S.lang||'si'];const raw=md||'';
   const gr=graph?`<img src="${graph}" class="m-graph" alt="Graph">`:'';
   const safe=raw.replace(/\\/g,'\\\\').replace(/`/g,"'");
   w.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div>
     <div class="mbody"><div class="mbub">${parseMD(raw)}${gr}</div>
     <div class="macts">
-      <button class="mact" onclick="speak(this.closest('.mbody').querySelector('.mbub').innerText)">${lm.listen}</button>
-      <button class="mact" onclick="cpyMsg(this,\`${safe}\`)">${lm.copy}</button>
+      <button class="mact" onclick="speak(this.closest('.mbody').querySelector('.mbub').innerText)">${t.listen}</button>
+      <button class="mact" onclick="cpyMsg(this,\`${safe}\`)">${t.copy}</button>
     </div></div>`;
   c.appendChild(w);se();
 }
@@ -509,16 +849,16 @@ function showTyp(){hideTyp();const c=document.getElementById('chatArea');typEl=d
   c.appendChild(typEl);se();}
 function hideTyp(){const e=document.getElementById('typEl');if(e)e.remove();typEl=null;}
 
-/* ── UTILS ── */
+/* ══ UTILS ══ */
 function setLoad(v){S.loading=v;document.getElementById('sendBtn').disabled=v;}
 function se(){const c=document.getElementById('chatArea');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight);}
 function aH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function cpyMsg(btn,txt){navigator.clipboard.writeText(txt).then(()=>{const o=btn.innerHTML;btn.innerHTML=LM[S.lang].copied;setTimeout(()=>btn.innerHTML=o,2000);});}
+function cpyMsg(btn,txt){navigator.clipboard.writeText(txt).then(()=>{const o=btn.innerHTML;btn.innerHTML=UI[S.lang||'si'].copied;setTimeout(()=>btn.innerHTML=o,2000);});}
 function showToast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
 
-/* ── MARKDOWN PARSER ── */
+/* ══ MARKDOWN ══ */
 function parseMD(md){
   if(!md)return'';let h=md;
   h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
