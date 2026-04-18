@@ -51,9 +51,29 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
 .fg input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
 
-/* special banner */
-.special-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;border-radius:var(--r-sm);padding:10px 14px;margin-bottom:14px;display:none;animation:slideUp .3s ease;font-size:13px;color:#92400e;font-weight:600;text-align:center;line-height:1.5;}
-.special-banner.show{display:block;}
+/* ── CREATOR BANNER ── */
+.creator-banner{
+  display:none;margin-bottom:14px;
+  border-radius:var(--r-md);padding:14px 16px;
+  animation:slideUp .35s cubic-bezier(.16,1,.3,1);
+  font-size:13px;font-weight:600;line-height:1.6;
+  text-align:center;position:relative;overflow:hidden;
+}
+.creator-banner.show{display:block;}
+.creator-banner.type-sanz{
+  background:linear-gradient(135deg,#0B1740,#1845C8);
+  color:#fff;border:none;
+}
+.creator-banner.type-sanz::before{
+  content:'✨';font-size:60px;position:absolute;right:-8px;top:-12px;opacity:.15;pointer-events:none;
+}
+.creator-banner.type-sanduni{
+  background:linear-gradient(135deg,#7C3AED,#a855f7);
+  color:#fff;border:none;
+}
+.creator-banner.type-sanduni::before{
+  content:'👑';font-size:60px;position:absolute;right:-8px;top:-12px;opacity:.2;pointer-events:none;
+}
 
 /* password */
 .pw-wrap{position:relative;}
@@ -262,7 +282,9 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <p>Sri Lanka's Smart Multi-Language Tutor &nbsp;•&nbsp; Grade 1–13</p>
     </div>
     <div class="lc-body">
-      <div class="special-banner" id="specialBanner">⭐</div>
+      <!-- Creator banner — shows only for sanz/sanzai/sanduni -->
+      <div class="creator-banner" id="creatorBanner"></div>
+
       <div class="fg">
         <label id="lblName">ඔබේ නම</label>
         <input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" oninput="onNameType()" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()">
@@ -308,7 +330,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- ══ ADMIN DASHBOARD ══ -->
+<!-- ══ ADMIN DASHBOARD (quick panel) ══ -->
 <div id="adminOverlay">
   <div class="adm-card">
     <div class="adm-hd">
@@ -333,7 +355,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
         </div>
         <div class="user-row">
           <div class="u-ava" style="background:var(--primary-dim);">🎓</div>
-          <div class="u-info"><div class="u-name">therire</div><div class="u-role">Student User</div></div>
+          <div class="u-info"><div class="u-name">hansika</div><div class="u-role">Student User</div></div>
           <span class="u-badge user">User</span>
         </div>
       </div>
@@ -414,40 +436,34 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
    USERS
 ══════════════════════════════════════ */
 const USERS = {
-  sanduni:{ pass:'momsanzdad2001#', role:'admin' },
-  therire:{ pass:'sanz2024',        role:'user'  }
+  sanduni: { pass:'momsanzdad2001#', role:'admin' },
+  hansika: { pass:'sanz2024',        role:'user'  }
 };
 
-const SPECIAL = {
-  sanduni:{
-    si:'💝 ආදරණීය Sanduni! ඔයා නැතිව Sanz AI Tutor ගෙදරක් නෙවෙයි! 🌸✨',
-    ta:'💝 அன்பான Sanduni! நீங்கள் இல்லாமல் Sanz AI Tutor முழுமையடையாது! 🌸✨',
-    en:"💝 Welcome back Sanduni! You're the heart of this whole platform! 🌸✨"
+/* ══════════════════════════════════════
+   CREATOR MESSAGES
+   Shown when typing "sanz", "sanzai", or "sanduni"
+══════════════════════════════════════ */
+const CREATOR_MSGS = {
+  sanz: {
+    si: '✨ "Sanz" — ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI Tutor හදපු ලස්සන නමයි! Sanduni ගේ හදවතෙන් හදාපු ජීවමාන platform! 💙🎓',
+    ta: '✨ "Sanz" — Sanduni அவர்களின் இதயத்தால் உருவாக்கப்பட்ட இலங்கையின் சிறந்த AI Tutor! 💙🎓',
+    en: '✨ "Sanz" — Built from the heart by Sanduni, the soul behind Sri Lanka\'s smartest AI Tutor! 💙🎓'
   },
-  therire:{
-    si:'🌟 ආදරණීය Therire! ඔයා ආවා! අද කොයි විෂය ඉගෙනගන්නද? 😊💪',
-    ta:'🌟 அன்பான Therire! வந்தீர்கள்! இன்று எந்த பாடம் படிக்கவா? 😊💪',
-    en:'🌟 Hey Therire! So great to see you! What shall we learn today? 😊💪'
+  sanzai: {
+    si: '🤖💙 Sanz AI Tutor — Sanduni ගේ ප්‍රේමය, දැනුම සහ කැපවීමෙන් ලෝකයට දීපු ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI Tutor! 🇱🇰✨',
+    ta: '🤖💙 Sanz AI Tutor — Sanduni-ஆல் அன்பு, அறிவு,헌신ம் கொண்டு உலகிற்கு வழங்கப்பட்ட இலங்கையின் சிறந்த AI Tutor! 🇱🇰✨',
+    en: '🤖💙 Sanz AI Tutor — Crafted with love, knowledge & dedication by Sanduni. Sri Lanka\'s proudest AI achievement! 🇱🇰✨'
   },
-  sanz:{
-    si:'✨ "Sanz" — ඒ නම ඇහෙනකොටම හිත ලස්සන වෙනවා! 💙',
-    ta:'✨ "Sanz" — இந்தப் பெயர் கேட்கும்போதே மனம் மகிழ்கிறது! 💙',
-    en:'✨ "Sanz" — that name makes everything brighter! 💙'
-  },
-  hansika:{
-    si:'🌺 ආදරණීය Hansika! ඔයාගේ ලස්සන හිනාව සියල්ල ලස්සන කරනවා! 🌺',
-    ta:'🌺 அன்பான Hansika! உங்கள் அழகான புன்னகை எல்லாவற்றையும் அழகாக்குகிறது! 🌺',
-    en:'🌺 Hey Hansika! Your beautiful smile lights up everything! 🌺'
-  },
-  kumarasiri:{
-    si:'🦁 Kumarasiri! ඔයාගේ ඉගෙනීමේ උද්‍යෝගය ගෙනෙව් ඉදිරියට! 💪',
-    ta:'🦁 Kumarasiri! உங்கள் கற்றல் ஆர்வம் தொடர்ந்து செல்லட்டும்! 💪',
-    en:'🦁 Kumarasiri! Keep that great learning spirit going! 💪'
+  sanduni: {
+    si: '👑💜 Sanduni — Sanz AI Tutor ගේ නිර්මාතෘවරිය! ඔබේ දැක්ම, ශ්‍රමය සහ ප්‍රේමය නිසා දහස් දරුවන්ගේ ඉගෙනීම ලස්සන වුණා! 🌸🎓',
+    ta: '👑💜 Sanduni — Sanz AI Tutor-இன் படைப்பாளி! உங்கள் தொவனம், உழைப்பு, அன்பு ஆயிரக்கணக்கான குழந்தைகளை கற்பிக்கிறது! 🌸🎓',
+    en: '👑💜 Sanduni — The creator of Sanz AI Tutor! Your vision, hard work & love is now shaping thousands of young minds! 🌸🎓'
   }
 };
 
 /* ══════════════════════════════════════
-   UI TEXT (language-locked after selection)
+   UI TEXT
 ══════════════════════════════════════ */
 const UI = {
   si:{
@@ -556,19 +572,40 @@ function onSlide(g,v){
   document.getElementById('val-'+g).textContent='Grade '+v;
 }
 
-/* ══ NAME TYPE → SPECIAL BANNER ══ */
+/* ══ NAME TYPE → CREATOR BANNER ══
+   Only triggers for: sanz, sanzai, sanduni
+══ */
 function onNameType(){
-  const nm=document.getElementById('nameInp').value.trim().toLowerCase();
-  const lang=chosenLang||'si';
-  const banner=document.getElementById('specialBanner');
+  const nm = document.getElementById('nameInp').value.trim().toLowerCase();
+  const lang = chosenLang || 'si';
+  const banner = document.getElementById('creatorBanner');
+
+  // Clear error states
   document.getElementById('pwErr').classList.remove('show');
   document.getElementById('passInp').classList.remove('err');
   document.getElementById('nameInp').classList.remove('err');
-  let msg=null;
-  if(SPECIAL[nm]) msg=SPECIAL[nm][lang];
-  else { for(const k in SPECIAL){ if(nm.length>=3&&(nm.includes(k)||k.includes(nm))){ msg=SPECIAL[k][lang];break; } } }
-  if(msg){banner.textContent=msg;banner.classList.add('show');}
-  else banner.classList.remove('show');
+
+  // Check for creator keywords
+  let matched = null;
+  let bannerType = '';
+
+  if(nm === 'sanduni' || nm.startsWith('sanduni')){
+    matched = CREATOR_MSGS.sanduni[lang];
+    bannerType = 'type-sanduni';
+  } else if(nm === 'sanzai' || nm.includes('sanzai')){
+    matched = CREATOR_MSGS.sanzai[lang];
+    bannerType = 'type-sanz';
+  } else if(nm === 'sanz' || nm.startsWith('sanz')){
+    matched = CREATOR_MSGS.sanz[lang];
+    bannerType = 'type-sanz';
+  }
+
+  if(matched){
+    banner.textContent = matched;
+    banner.className = 'creator-banner show ' + bannerType;
+  } else {
+    banner.className = 'creator-banner';
+  }
 }
 
 /* ══ PASSWORD EYE ══ */
@@ -625,11 +662,7 @@ function tryLogin(){
   addLog(`"${nm}" logged in → Grade ${S.grade} · ${lang}`);
   document.getElementById('admSessions').textContent=sessionCount;
   document.getElementById('admGrade').textContent=S.grade;
-  setTimeout(()=>{
-    const sp=SPECIAL[nm];
-    const greeting=t.greet(nm,S.grade);
-    addAI(sp ? sp[lang]+'\n\n'+greeting : greeting);
-  },320);
+  setTimeout(()=>{ addAI(t.greet(nm,S.grade)); }, 320);
 }
 
 /* ══ ADMIN — Ctrl+Shift+F2 × 5 ══ */
@@ -680,7 +713,7 @@ const SBJ={
     {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
     {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
     {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
+    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසி',ta:'ஆங்கிலம்'},
     {id:'Commerce',ic:'📊',en:'Commerce',si:'වාණිජ විද්‍යාව',ta:'வணிகவியல்'},
     {id:'Health',ic:'💊',en:'Health & P.E.',si:'සෞඛ්‍ය අධ්‍යාපනය',ta:'உடல் கல்வி'},
     {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
@@ -723,7 +756,7 @@ const SBJ={
     {id:'lang',ic:'🌐',en:'Languages Stream',si:'භාෂා ධාරාව',ta:'மொழி நெடல்',sbj:[
       {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
       {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-      {id:'English',ic:'🌐',en:'English',si:'ඉංග்‍රීසி',ta:'ஆங்கிலம்'},
+      {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
       {id:'Pali',ic:'📿',en:'Pali / Sanskrit',si:'පාලි',ta:'பாலி'},
       {id:'Hindi',ic:'🇮🇳',en:'Hindi',si:'හින්දි',ta:'இந்தி'},
       {id:'Arabic',ic:'☪️',en:'Arabic',si:'අරාබි',ta:'அரபு'},
