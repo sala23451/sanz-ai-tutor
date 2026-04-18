@@ -4,909 +4,754 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanz AI Tutor</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#EEF2FB; --surface:#FFFFFF; --primary:#1845C8; --primary-lt:#2E65F0;
-  --primary-dim:rgba(24,69,200,.08); --accent:#00BFA5; --danger:#EF4444;
-  --text-h:#0B1740; --text-p:#374263; --text-m:#8A9BBE; --border:#D5DFF5;
-  --sh-sm:0 2px 8px rgba(24,69,200,.07); --sh-md:0 6px 24px rgba(24,69,200,.11); --sh-lg:0 16px 48px rgba(24,69,200,.15);
-  --r-sm:10px; --r-md:16px; --r-lg:22px; --r-xl:30px; --sw:276px;
-  --c-pri:#16A34A; --c-sec:#1845C8; --c-al:#7C3AED;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-serif;background:var(--bg);color:var(--text-p);display:flex;}
-::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #c084fc;
+    --accent3: #38bdf8;
+    --text: #e8e8f0;
+    --text2: #8888a8;
+    --success: #34d399;
+    --danger: #f87171;
+    --warning: #fbbf24;
+    --glow: rgba(124, 106, 247, 0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
-/* ═══ LANGUAGE SCREEN ═══ */
-#langScreen{position:fixed;inset:0;z-index:6000;background:linear-gradient(135deg,#0B1740 0%,#1845C8 55%,#00BFA5 100%);display:flex;align-items:center;justify-content:center;}
-.ls-bubbles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
-.ls-bub{position:absolute;border-radius:50%;background:rgba(255,255,255,.06);animation:lsFloat linear infinite;}
-@keyframes lsFloat{0%{transform:translateY(110vh)}100%{transform:translateY(-120px)}}
-.ls-card{position:relative;z-index:1;background:rgba(255,255,255,.13);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.22);border-radius:28px;padding:40px 36px 36px;width:94%;max-width:400px;text-align:center;animation:slideUp .5s cubic-bezier(.16,1,.3,1);}
-.ls-logo{font-size:52px;margin-bottom:10px;}
-.ls-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;}
-.ls-title span{opacity:.7;}
-.ls-sub{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:28px;line-height:1.6;}
-.ls-btns{display:flex;flex-direction:column;gap:12px;}
-.ls-btn{padding:16px 20px;border:1.5px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;text-align:left;}
-.ls-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);transform:translateX(4px);}
-.ls-flag{font-size:24px;width:36px;text-align:center;}
-.ls-name{flex:1;}
-.ls-native{font-size:12px;opacity:.65;display:block;}
+  /* ── Name/Login Overlay ── */
+  .name-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; backdrop-filter: blur(8px);
+  }
+  .name-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px; max-width: 420px; width: 90%;
+    text-align: center; display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 0 60px var(--glow);
+  }
+  .name-card h2 { font-size: 24px; }
+  .name-card h2 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .name-card p { color: var(--text2); font-size: 13px; line-height: 1.6; }
 
-/* ═══ LOGIN OVERLAY ═══ */
-.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-.lc{background:#fff;border-radius:var(--r-xl);width:94%;max-width:500px;box-shadow:var(--sh-lg);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;max-height:94vh;overflow-y:auto;}
-.lc-banner{background:linear-gradient(135deg,#1845C8 0%,#2E65F0 55%,#00BFA5 100%);padding:26px 30px 22px;color:#fff;position:relative;overflow:hidden;}
-.lc-banner::after{content:'🎓';font-size:110px;position:absolute;right:-8px;top:-18px;opacity:.12;pointer-events:none;}
-.lc-banner h1{font-size:22px;font-weight:800;} .lc-banner h1 span{opacity:.75;} .lc-banner p{font-size:12px;opacity:.8;margin-top:3px;}
-.lc-body{padding:24px 28px 28px;}
-.fg{margin-bottom:15px;}
-.fg label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-m);margin-bottom:6px;}
-.fg input{width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:14px;color:var(--text-h);outline:none;transition:.2s;}
-.fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
-.fg input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+  .field-label { font-size: 11px; color: var(--text2); text-align: left; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* ── CREATOR BANNER ── */
-.creator-banner{
-  display:none;margin-bottom:14px;
-  border-radius:var(--r-md);padding:14px 16px;
-  animation:slideUp .35s cubic-bezier(.16,1,.3,1);
-  font-size:13px;font-weight:600;line-height:1.6;
-  text-align:center;position:relative;overflow:hidden;
-}
-.creator-banner.show{display:block;}
-.creator-banner.type-sanz{
-  background:linear-gradient(135deg,#0B1740,#1845C8);
-  color:#fff;border:none;
-}
-.creator-banner.type-sanz::before{
-  content:'✨';font-size:60px;position:absolute;right:-8px;top:-12px;opacity:.15;pointer-events:none;
-}
-.creator-banner.type-sanduni{
-  background:linear-gradient(135deg,#7C3AED,#a855f7);
-  color:#fff;border:none;
-}
-.creator-banner.type-sanduni::before{
-  content:'👑';font-size:60px;position:absolute;right:-8px;top:-12px;opacity:.2;pointer-events:none;
-}
+  .name-input, .lang-select, .grade-select-overlay, .pass-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 13px 16px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 14px;
+    outline: none; width: 100%; transition: border-color 0.2s;
+  }
+  .name-input:focus, .pass-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+  .lang-select:focus, .grade-select-overlay:focus { border-color: var(--accent); }
 
-/* password */
-.pw-wrap{position:relative;}
-.pw-wrap input{padding-right:42px;}
-.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-m);padding:4px;}
-.pw-err{font-size:11px;color:var(--danger);margin-top:5px;display:none;font-weight:600;}
-.pw-err.show{display:block;}
+  /* Language flag buttons */
+  .lang-btns { display: flex; gap: 8px; }
+  .lang-btn {
+    flex: 1; padding: 12px 8px;
+    background: var(--surface2); border: 2px solid var(--border);
+    border-radius: 12px; color: var(--text2); font-family: 'Sora', sans-serif;
+    font-size: 13px; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .lang-btn:hover { border-color: var(--accent); color: var(--text); }
+  .lang-btn.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,106,247,0.1); }
+  .lang-btn .flag { font-size: 20px; display: block; margin-bottom: 4px; }
 
-/* grade slider */
-.grade-slider-wrap{margin-bottom:18px;}
-.gs-tabs{display:flex;gap:6px;margin-bottom:12px;}
-.gs-tab{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:transparent;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:var(--text-m);text-align:center;transition:.15s;}
-.gs-tab.ap{border-color:var(--c-pri);background:rgba(22,163,74,.08);color:var(--c-pri);}
-.gs-tab.as{border-color:var(--c-sec);background:var(--primary-dim);color:var(--c-sec);}
-.gs-tab.aa{border-color:var(--c-al);background:rgba(124,58,237,.08);color:var(--c-al);}
-.gs-panel{display:none;padding:4px 0 8px;}
-.gs-panel.show{display:block;}
-.grade-val{text-align:center;font-size:24px;font-weight:800;margin-bottom:2px;}
-.gv-p{color:var(--c-pri);} .gv-s{color:var(--c-sec);} .gv-a{color:var(--c-al);}
-.grade-lbl{font-size:10px;text-align:center;color:var(--text-m);font-weight:600;letter-spacing:.4px;margin-bottom:10px;}
-.grade-slider{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;outline:none;cursor:pointer;}
-.p-sl{background:var(--c-pri);} .s-sl{background:var(--c-sec);} .a-sl{background:var(--c-al);}
-.grade-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;}
-.p-sl::-webkit-slider-thumb{background:var(--c-pri);}
-.s-sl::-webkit-slider-thumb{background:var(--c-sec);}
-.a-sl::-webkit-slider-thumb{background:var(--c-al);}
-.g-legend{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;}
-.gl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-m);font-weight:600;}
-.gd{width:8px;height:8px;border-radius:50%;}
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; padding: 14px;
+    color: white; font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px var(--glow);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,247,0.4); }
 
-.login-btn{width:100%;padding:13px;margin-top:8px;background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(24,69,200,.28);transition:.15s;}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(24,69,200,.38);}
+  .login-error { color: var(--danger); font-size: 12px; display: none; padding: 8px; background: rgba(248,113,113,0.1); border-radius: 8px; border: 1px solid rgba(248,113,113,0.3); }
 
-/* ═══ ADMIN DASHBOARD ═══ */
-#adminOverlay{position:fixed;inset:0;background:rgba(7,14,46,.85);backdrop-filter:blur(18px);z-index:9000;display:none;align-items:center;justify-content:center;}
-#adminOverlay.show{display:flex;animation:fadeIn .3s ease;}
-.adm-card{background:#fff;border-radius:24px;width:94%;max-width:560px;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;max-height:88vh;display:flex;flex-direction:column;}
-.adm-hd{background:linear-gradient(135deg,#0B1740,#1845C8);padding:22px 26px;color:#fff;display:flex;align-items:center;justify-content:space-between;}
-.adm-hd h2{font-size:18px;font-weight:800;} .adm-hd p{font-size:11px;opacity:.65;margin-top:2px;}
-.adm-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
-.adm-body{padding:22px 26px;overflow-y:auto;flex:1;}
-.adm-sec{margin-bottom:22px;}
-.adm-sec-title{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.adm-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
-.adm-stat{background:var(--bg);border-radius:12px;padding:14px;text-align:center;}
-.adm-stat .num{font-size:26px;font-weight:800;color:var(--primary);}
-.adm-stat .lbl{font-size:10px;color:var(--text-m);font-weight:600;margin-top:2px;}
-.user-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;margin-bottom:8px;}
-.u-ava{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.u-info{flex:1;} .u-name{font-size:13px;font-weight:700;color:var(--text-h);} .u-role{font-size:10px;color:var(--text-m);}
-.u-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
-.u-badge.admin{background:rgba(124,58,237,.1);color:var(--c-al);border:1px solid rgba(124,58,237,.2);}
-.u-badge.user{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);}
-.adm-log{background:var(--bg);border-radius:10px;padding:14px;font-size:12px;color:var(--text-p);max-height:140px;overflow-y:auto;line-height:1.8;}
-.log-entry{padding:2px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;}
-.log-time{color:var(--text-m);font-size:11px;flex-shrink:0;}
-.adm-hint{font-size:11px;color:var(--text-m);text-align:center;padding:10px;background:rgba(24,69,200,.04);border-radius:8px;}
+  /* ── Admin Modal (Ctrl+F2) ── */
+  .admin-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    display: none; align-items: center; justify-content: center;
+    z-index: 500; backdrop-filter: blur(12px);
+  }
+  .admin-overlay.open { display: flex; }
+  .admin-card {
+    background: #0f0f0f; border: 1px solid #333;
+    border-radius: 20px; padding: 40px; max-width: 380px; width: 90%;
+    text-align: center; display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 0 80px rgba(255,255,255,0.05);
+  }
+  .admin-card h2 { font-size: 20px; font-weight: 300; letter-spacing: 2px; color: #fff; }
+  .admin-input {
+    background: #000; border: 1px solid #333;
+    border-radius: 10px; padding: 13px 16px;
+    color: white; font-family: 'Sora', sans-serif; font-size: 14px;
+    outline: none; width: 100%; transition: border-color 0.2s;
+  }
+  .admin-input:focus { border-color: #fff; }
+  .admin-btn {
+    padding: 13px; background: white; color: black;
+    border: none; border-radius: 10px; font-weight: 700;
+    font-family: 'Sora', sans-serif; font-size: 14px; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .admin-btn:hover { opacity: 0.9; }
+  .admin-close { background: none; border: none; color: #666; font-size: 12px; cursor: pointer; margin-top: 4px; }
+  .admin-error { color: #ff4d4d; font-size: 12px; display: none; }
 
-/* ═══ SIDEBAR ═══ */
-.sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;box-shadow:2px 0 12px rgba(24,69,200,.05);}
-.sb-hd{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.sb-logo{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.sb-li{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1845C8,#2E65F0);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;}
-.sb-logo h2{font-size:16px;font-weight:800;color:var(--text-h);} .sb-logo h2 span{color:var(--primary);}
-.sb-meta{font-size:11px;color:var(--text-m);} .sb-meta b{color:var(--primary);}
-.sb-cat{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;margin-top:7px;border:1.5px solid;}
-.sb-cat.p{color:var(--c-pri);border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);}
-.sb-cat.s{color:var(--c-sec);border-color:rgba(24,69,200,.2);background:var(--primary-dim);}
-.sb-cat.a{color:var(--c-al);border-color:rgba(124,58,237,.2);background:rgba(124,58,237,.07);}
-.st-sel{padding:9px 11px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.st-lbl{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);margin-bottom:6px;padding-left:3px;}
-.st-btns{display:flex;flex-direction:column;gap:3px;}
-.st-btn{width:100%;background:transparent;border:1.5px solid transparent;border-radius:8px;padding:7px 9px;display:flex;align-items:center;gap:7px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;}
-.st-btn:hover{background:var(--primary-dim);}
-.st-btn.active{background:rgba(124,58,237,.08);border-color:var(--c-al);}
-.st-ico{width:26px;height:26px;border-radius:6px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.st-btn.active .st-ico{background:rgba(124,58,237,.15);}
-.st-nm{font-size:12px;font-weight:600;color:var(--text-h);} .st-btn.active .st-nm{color:var(--c-al);}
-.st-lc{font-size:10px;color:var(--text-m);}
-.sb-sec{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);padding:10px 14px 5px;flex-shrink:0;}
-.sb-nav{flex:1;overflow-y:auto;padding:0 9px 9px;}
-.sbj{width:100%;background:transparent;border:1.5px solid transparent;border-radius:var(--r-sm);padding:8px 9px;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;margin-bottom:2px;}
-.sbj-ic{width:30px;height:30px;border-radius:7px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:.15s;}
-.sbj-tx{flex:1;min-width:0;}
-.sbj-en{font-size:12px;font-weight:600;color:var(--text-h);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sbj-lc{font-size:10px;color:var(--text-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sbj:hover{background:var(--primary-dim);}
-.sbj.active{background:var(--primary-dim);border-color:var(--primary);}
-.sbj.active .sbj-en{color:var(--primary);}
-.sbj.active .sbj-ic{background:var(--primary);}
-.sb-ft{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-m);text-align:center;flex-shrink:0;}
-.sb-ft b{color:var(--primary);}
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px; background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 20px 16px; gap: 8px; flex-shrink: 0;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 8px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 0 20px var(--glow);
+  }
+  .logo-text { font-size: 18px; font-weight: 700; }
+  .logo-text span { color: var(--accent2); }
+  .new-chat-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; padding: 12px 16px;
+    color: white; font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s; margin-bottom: 8px;
+    box-shadow: 0 4px 20px var(--glow);
+  }
+  .new-chat-btn:hover { transform: translateY(-1px); }
+  .sidebar-label {
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px 4px;
+  }
+  .subject-btn {
+    background: transparent; border: 1px solid transparent;
+    border-radius: 10px; padding: 10px 14px;
+    color: var(--text2); font-family: 'Sora', sans-serif;
+    font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s; text-align: left;
+  }
+  .subject-btn:hover, .subject-btn.active { background: var(--surface2); border-color: var(--border); color: var(--text); }
+  .subject-btn.active { border-color: var(--accent); color: var(--accent2); }
+  .lang-indicator {
+    margin-top: 12px; padding: 10px 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 12px; color: var(--text2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar-footer {
+    margin-top: auto; padding: 12px; border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text2); text-align: center; line-height: 1.6;
+  }
+  .sidebar-footer strong { color: var(--accent2); }
 
-/* ═══ MAIN ═══ */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
-.topbar{padding:11px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-shrink:0;box-shadow:var(--sh-sm);}
-.tb-l{display:flex;align-items:center;gap:9px;}
-.tb-ic{width:33px;height:33px;border-radius:8px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:15px;}
-.tb-nm{font-size:14px;font-weight:700;color:var(--text-h);}
-.tb-lc{font-size:10px;color:var(--text-m);}
-.tb-r{display:flex;gap:6px;align-items:center;}
-.tb-b{padding:4px 11px;border-radius:99px;font-size:10.5px;font-weight:700;border:1.5px solid var(--border);}
-.tb-b.bp{background:rgba(22,163,74,.08);color:var(--c-pri);border-color:rgba(22,163,74,.2);}
-.tb-b.bs{background:var(--primary-dim);color:var(--primary);border-color:rgba(24,69,200,.2);}
-.tb-b.ba{background:rgba(124,58,237,.08);color:var(--c-al);border-color:rgba(124,58,237,.2);}
-.tb-b.bl{background:rgba(0,191,165,.08);color:#007f6e;border-color:rgba(0,191,165,.2);}
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .header {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .grade-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 13px; cursor: pointer; outline: none;
+  }
+  .status-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 12px; font-size: 12px;
+  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* ═══ CHAT ═══ */
-.chat-area{flex:1;overflow-y:auto;padding:22px 20px;display:flex;flex-direction:column;gap:18px;background:var(--bg);}
-.wc-wrap{margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:420px;text-align:center;}
-.wc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:30px 32px;box-shadow:var(--sh-sm);width:100%;}
-.wc-ico{font-size:50px;margin-bottom:11px;}
-.wc-card h2{font-size:19px;font-weight:800;color:var(--text-h);margin-bottom:7px;}
-.wc-card p{font-size:12.5px;color:var(--text-m);line-height:1.7;}
-.wc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;justify-content:center;}
-.wc-chip{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);border-radius:99px;padding:4px 11px;font-size:10.5px;font-weight:600;}
-.mw{display:flex;gap:8px;animation:msgIn .35s cubic-bezier(.16,1,.3,1);}
-@keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.mw.user{flex-direction:row-reverse;}
-.mav{width:31px;height:31px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;align-self:flex-start;margin-top:2px;}
-.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;box-shadow:0 3px 10px rgba(24,69,200,.2);}
-.mw.user .mav{background:linear-gradient(135deg,#0f3d28,#166534);color:#fff;}
-.mbody{display:flex;flex-direction:column;gap:5px;max-width:78%;min-width:0;}
-.mw.user .mbody{align-items:flex-end;}
-.mbub{padding:12px 16px;border-radius:var(--r-md);font-size:13.5px;line-height:1.78;}
-.mw.ai .mbub{background:var(--surface);color:var(--text-h);border:1px solid var(--border);border-top-left-radius:4px;box-shadow:var(--sh-sm);}
-.mw.user .mbub{background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border-top-right-radius:4px;box-shadow:0 4px 14px rgba(24,69,200,.22);}
-.mbub h1,.mbub h2,.mbub h3{color:var(--text-h);margin:10px 0 5px;font-weight:700;}
-.mbub h1{font-size:16px;} .mbub h2{font-size:15px;} .mbub h3{font-size:14px;}
-.mbub p{margin:4px 0;} .mbub ul,.mbub ol{padding-left:20px;margin:5px 0;} .mbub li{margin:3px 0;}
-.mbub strong{color:var(--primary);font-weight:700;}
-.mbub code{background:var(--primary-dim);color:var(--primary);padding:2px 6px;border-radius:4px;font-size:12px;}
-.mbub pre{background:#f0f4ff;border-radius:8px;padding:11px;overflow-x:auto;margin:8px 0;}
-.mbub pre code{background:none;padding:0;}
-.mbub blockquote{border-left:3px solid var(--primary);padding-left:11px;color:var(--text-m);margin:6px 0;}
-.mbub table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12.5px;}
-.mbub th,.mbub td{border:1px solid var(--border);padding:6px 9px;}
-.mbub th{background:var(--primary-dim);color:var(--primary);font-weight:700;}
-.mbub hr{border:none;border-top:1px solid var(--border);margin:9px 0;}
-.m-graph{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;box-shadow:var(--sh-sm);}
-.macts{display:flex;gap:5px;flex-wrap:wrap;}
-.mact{background:var(--primary-dim);border:1px solid var(--border);color:var(--primary);padding:4px 11px;border-radius:99px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;}
-.mact:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
-.ty-w{display:flex;gap:8px;align-items:center;}
-.ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;box-shadow:var(--sh-sm);}
-.td{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:tdot 1.2s infinite;}
-.td:nth-child(2){animation-delay:.2s;} .td:nth-child(3){animation-delay:.4s;}
-@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+  /* ── Chat ── */
+  .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .welcome { text-align: center; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .welcome-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; box-shadow: 0 0 40px var(--glow);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .welcome h2 { font-size: 28px; font-weight: 700; }
+  .welcome h2 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .welcome p { color: var(--text2); font-size: 15px; max-width: 400px; line-height: 1.6; }
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .quick-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 8px 16px;
+    color: var(--text2); font-family: 'Sora', sans-serif; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .message { display: flex; gap: 12px; max-width: 800px; animation: msgIn 0.3s ease; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .message.user { flex-direction: row-reverse; align-self: flex-end; }
+  .msg-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .ai-avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+  .user-avatar { background: linear-gradient(135deg, var(--accent3), #0ea5e9); }
+  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; font-size: 14px; line-height: 1.7; max-width: 600px; }
+  .message.user .msg-bubble { background: linear-gradient(135deg, rgba(124,106,247,0.2), rgba(192,132,252,0.1)); border-color: rgba(124,106,247,0.3); }
+  .msg-meta { font-size: 11px; color: var(--text2); margin-top: 6px; display: flex; gap: 8px; align-items: center; }
+  .verified-badge { background: rgba(52,211,153,0.15); color: var(--success); padding: 2px 8px; border-radius: 20px; font-size: 10px; }
+  .rag-badge { background: rgba(56,189,248,0.15); color: var(--accent3); padding: 2px 8px; border-radius: 20px; font-size: 10px; }
+  .graph-img { margin-top: 12px; border-radius: 12px; max-width: 100%; border: 1px solid var(--border); }
+  .typing { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+  .typing span { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .special-msg { background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(192,132,252,0.05)); border: 1px solid rgba(124,106,247,0.3); border-radius: 16px; padding: 20px; text-align: center; line-height: 1.8; font-size: 14px; max-width: 600px; }
+  .banned-msg { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); color: var(--danger); }
 
-/* ═══ INPUT ═══ */
-.input-area{padding:13px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;}
-.in-tools{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
-.it-upl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-m);transition:.15s;}
-.it-upl:hover,.it-upl.hf{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
-#imgInp{display:none;}
-.ip-wrap{position:relative;display:inline-block;margin-bottom:8px;}
-.ip-img{height:58px;border-radius:9px;border:1.5px solid var(--border);object-fit:cover;}
-.ip-rm{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.in-box{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:2px solid var(--border);border-radius:var(--r-md);padding:9px 12px;transition:.2s;}
-.in-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
-#qIn{flex:1;background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;color:var(--text-h);resize:none;max-height:140px;min-height:22px;line-height:1.55;}
-#qIn::placeholder{color:var(--text-m);}
-.bic{width:35px;height:35px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-p);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;transition:.15s;}
-.bic:hover{border-color:var(--primary);color:var(--primary);}
-.bic.rec{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.07);animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
-.bsend{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(24,69,200,.28);transition:.15s;}
-.bsend:hover{transform:scale(1.06);} .bsend:active{transform:scale(.95);} .bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 18px;border-radius:99px;font-size:12.5px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-@media(max-width:660px){.sidebar{display:none;}.chat-area{padding:13px 11px;}.topbar{padding:10px 12px;}.input-area{padding:10px;}.mbody{max-width:92%;}}
+  /* ── Input ── */
+  .input-area { padding: 16px 24px 20px; background: var(--surface); border-top: 1px solid var(--border); }
+  .file-preview { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .file-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .file-chip button { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 14px; padding: 0; }
+  .file-chip img { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
+  .input-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; display: flex; align-items: flex-end; gap: 8px; padding: 12px 12px 12px 16px; transition: border-color 0.2s; }
+  .input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+  #questionInput { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'Sora', sans-serif; font-size: 14px; resize: none; max-height: 120px; line-height: 1.5; }
+  #questionInput::placeholder { color: var(--text2); }
+  .input-actions { display: flex; gap: 6px; align-items: center; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: transparent; border: 1px solid var(--border); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; }
+  .icon-btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent2); }
+  .icon-btn.recording { background: rgba(248,113,113,0.15); border-color: var(--danger); color: var(--danger); }
+  .send-btn { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 12px var(--glow); }
+  .send-btn:hover { transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .input-hint { font-size: 11px; color: var(--text2); margin-top: 8px; text-align: center; }
+  #imageInput, #fileInput { display: none; }
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; font-size: 13px; display: none; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .toast.show { display: block; animation: toastIn 0.3s ease; }
+  @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 </style>
 </head>
 <body>
 
-<!-- ══ LANGUAGE SELECTION ══ -->
-<div id="langScreen">
-  <div class="ls-bubbles" id="lsBubbles"></div>
-  <div class="ls-card">
-    <div class="ls-logo">🎓</div>
-    <div class="ls-title">Sanz <span>AI Tutor</span></div>
-    <div class="ls-sub">Sri Lanka's Smart Tutor · Grade 1–13<br>ඔබේ භාෂාව තෝරන්න &nbsp;|&nbsp; உங்கள் மொழியை தேர்வு செய்யுங்கள்</div>
-    <div class="ls-btns">
-      <button class="ls-btn" onclick="chooseLang('si')">
-        <span class="ls-flag">🇱🇰</span>
-        <span class="ls-name">සිංහල<span class="ls-native">Sinhala</span></span>
-      </button>
-      <button class="ls-btn" onclick="chooseLang('ta')">
-        <span class="ls-flag">🇱🇰</span>
-        <span class="ls-name">தமிழ்<span class="ls-native">Tamil</span></span>
-      </button>
-      <button class="ls-btn" onclick="chooseLang('en')">
-        <span class="ls-flag">🇬🇧</span>
-        <span class="ls-name">English<span class="ls-native">English</span></span>
-      </button>
+<!-- ══ User Login Overlay ══ -->
+<div class="name-overlay" id="nameOverlay">
+  <div class="name-card">
+    <div style="font-size:48px">👋</div>
+    <h2>ආයුබෝවන්! <span>Sanz AI</span> ට</h2>
+    <p>ඔයාගේ විස්තර දෙන්න — personalized ලෙස උදව් කරන්නම්!</p>
+
+    <!-- Language -->
+    <div>
+      <div class="field-label">භාෂාව / Language / மொழி</div>
+      <div class="lang-btns">
+        <button class="lang-btn active" id="langSI" onclick="selectLang('si', this)">
+          <span class="flag">🇱🇰</span>සිංහල
+        </button>
+        <button class="lang-btn" id="langEN" onclick="selectLang('en', this)">
+          <span class="flag">🇬🇧</span>English
+        </button>
+        <button class="lang-btn" id="langTA" onclick="selectLang('ta', this)">
+          <span class="flag">🇮🇳</span>தமிழ்
+        </button>
+      </div>
     </div>
+
+    <!-- Name -->
+    <div>
+      <div class="field-label" id="nameLabel">ඔයාගේ නම</div>
+      <input class="name-input" id="nameInput" placeholder="ඔයාගේ නම...">
+    </div>
+
+    <!-- Grade -->
+    <div>
+      <div class="field-label" id="gradeLabel">ශ්‍රේණිය</div>
+      <select class="grade-select-overlay" id="gradeInputOverlay" style="width:100%">
+        <option value="">ශ්‍රේණිය තෝරන්න</option>
+        <option value="6">6 ශ්‍රේණිය</option>
+        <option value="7">7 ශ්‍රේණිය</option>
+        <option value="8">8 ශ්‍රේණිය</option>
+        <option value="9">9 ශ්‍රේණිය</option>
+        <option value="10">10 ශ්‍රේණිය</option>
+        <option value="11">11 ශ්‍රේණිය</option>
+      </select>
+    </div>
+
+    <!-- Password -->
+    <div>
+      <div class="field-label" id="passLabel">Password</div>
+      <input class="pass-input" id="userPassInput" type="password" placeholder="••••••••">
+    </div>
+
+    <div class="login-error" id="loginError">❌ Password වැරදියි! නැවත try කරන්න.</div>
+    <button class="start-btn" onclick="startChat()" id="startBtn">පටන් ගමු! 🚀</button>
   </div>
 </div>
 
-<!-- ══ LOGIN OVERLAY ══ -->
-<div class="overlay" id="loginOverlay" style="display:none;">
-  <div class="lc">
-    <div class="lc-banner">
-      <h1>🎓 Sanz <span>AI Tutor</span></h1>
-      <p>Sri Lanka's Smart Multi-Language Tutor &nbsp;•&nbsp; Grade 1–13</p>
-    </div>
-    <div class="lc-body">
-      <!-- Creator banner — shows only for sanz/sanzai/sanduni -->
-      <div class="creator-banner" id="creatorBanner"></div>
-
-      <div class="fg">
-        <label id="lblName">ඔබේ නම</label>
-        <input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" oninput="onNameType()" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()">
-      </div>
-      <div class="fg">
-        <label id="lblPass">මුරපදය</label>
-        <div class="pw-wrap">
-          <input type="password" id="passInp" placeholder="••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
-          <button class="pw-eye" onclick="toggleEye()">👁</button>
-        </div>
-        <div class="pw-err" id="pwErr">❌ වැරදි මුරපදයකි.</div>
-      </div>
-      <div class="grade-slider-wrap">
-        <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය</label></div>
-        <div class="gs-tabs">
-          <button class="gs-tab ap" id="tab-p" onclick="switchGrp('p')">Grade 1–5</button>
-          <button class="gs-tab" id="tab-s" onclick="switchGrp('s')">Grade 6–11</button>
-          <button class="gs-tab" id="tab-a" onclick="switchGrp('a')">Grade 12–13</button>
-        </div>
-        <div class="gs-panel show" id="panel-p">
-          <div class="grade-val gv-p" id="val-p">Grade 3</div>
-          <div class="grade-lbl" id="lbl-p">Primary</div>
-          <input type="range" min="1" max="5" value="3" step="1" class="grade-slider p-sl" id="sl-p" oninput="onSlide('p',this.value)">
-        </div>
-        <div class="gs-panel" id="panel-s">
-          <div class="grade-val gv-s" id="val-s">Grade 8</div>
-          <div class="grade-lbl" id="lbl-s">Secondary / O/L</div>
-          <input type="range" min="6" max="11" value="8" step="1" class="grade-slider s-sl" id="sl-s" oninput="onSlide('s',this.value)">
-        </div>
-        <div class="gs-panel" id="panel-a">
-          <div class="grade-val gv-a" id="val-a">Grade 12</div>
-          <div class="grade-lbl" id="lbl-a">Advanced Level</div>
-          <input type="range" min="12" max="13" value="12" step="1" class="grade-slider a-sl" id="sl-a" oninput="onSlide('a',this.value)">
-        </div>
-        <div class="g-legend">
-          <div class="gl"><div class="gd" style="background:var(--c-pri)"></div>Primary (1–5)</div>
-          <div class="gl"><div class="gd" style="background:var(--c-sec)"></div>Secondary (6–11)</div>
-          <div class="gl"><div class="gd" style="background:var(--c-al)"></div>A/L (12–13)</div>
-        </div>
-      </div>
-      <button class="login-btn" id="loginBtn" onclick="tryLogin()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
-    </div>
+<!-- ══ Admin Login Modal (Ctrl+F2) ══ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-card">
+    <div style="font-size:40px">🛡️</div>
+    <h2>ADMIN ACCESS</h2>
+    <p style="color:#666; font-size:12px">Authorized Personnel Only</p>
+    <input class="admin-input" type="text" id="adminUser" placeholder="Username">
+    <input class="admin-input" type="password" id="adminPass" placeholder="Password">
+    <div class="admin-error" id="adminError">❌ Access Denied</div>
+    <button class="admin-btn" onclick="adminLogin()">Access Dashboard</button>
+    <button class="admin-close" onclick="closeAdmin()">✕ Cancel</button>
   </div>
 </div>
 
-<!-- ══ ADMIN DASHBOARD (quick panel) ══ -->
-<div id="adminOverlay">
-  <div class="adm-card">
-    <div class="adm-hd">
-      <div><h2>⚙️ Admin Dashboard</h2><p>Sanz AI Tutor &nbsp;·&nbsp; System Control</p></div>
-      <button class="adm-close" onclick="closeAdmin()">✕</button>
-    </div>
-    <div class="adm-body">
-      <div class="adm-sec">
-        <div class="adm-sec-title">System Overview</div>
-        <div class="adm-stat-grid">
-          <div class="adm-stat"><div class="num" id="admSessions">0</div><div class="lbl">Sessions</div></div>
-          <div class="adm-stat"><div class="num" id="admMsgs">0</div><div class="lbl">Messages</div></div>
-          <div class="adm-stat"><div class="num" id="admGrade">—</div><div class="lbl">Grade</div></div>
-        </div>
-      </div>
-      <div class="adm-sec">
-        <div class="adm-sec-title">Registered Users</div>
-        <div class="user-row">
-          <div class="u-ava" style="background:rgba(124,58,237,.12);">👑</div>
-          <div class="u-info"><div class="u-name">sanduni</div><div class="u-role">System Administrator</div></div>
-          <span class="u-badge admin">Admin</span>
-        </div>
-        <div class="user-row">
-          <div class="u-ava" style="background:var(--primary-dim);">🎓</div>
-          <div class="u-info"><div class="u-name">hansika</div><div class="u-role">Student User</div></div>
-          <span class="u-badge user">User</span>
-        </div>
-      </div>
-      <div class="adm-sec">
-        <div class="adm-sec-title">Activity Log</div>
-        <div class="adm-log" id="admLog">
-          <div class="log-entry"><span class="log-time">--:--</span><span>System ready.</span></div>
-        </div>
-      </div>
-      <div class="adm-hint">🔐 Ctrl + Shift + F2 &nbsp;×&nbsp; 5 times to open</div>
-    </div>
+<!-- ══ Sidebar ══ -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <div class="logo-text">Sanz <span>AI</span></div>
+  </div>
+
+  <button class="new-chat-btn" onclick="newChat()">
+    <span>✨</span> <span id="newChatText">නව සංවාදයක්</span>
+  </button>
+
+  <div class="sidebar-label" id="subjectsLabel">විෂයයන්</div>
+  <button class="subject-btn active" onclick="setSubject('ගණිතය', this)" id="subjMath">📐 <span>ගණිතය</span></button>
+  <button class="subject-btn" onclick="setSubject('විද්‍යාව', this)" id="subjSci">🔬 <span>විද්‍යාව</span></button>
+  <button class="subject-btn" onclick="setSubject('සිංහල', this)" id="subjSin">📖 <span>සිංහල</span></button>
+  <button class="subject-btn" onclick="setSubject('ඉංග්‍රීසි', this)" id="subjEng">🌐 <span>ඉංග්‍රීසි</span></button>
+  <button class="subject-btn" onclick="setSubject('ඉතිහාසය', this)" id="subjHis">🏛️ <span>ඉතිහාසය</span></button>
+  <button class="subject-btn" onclick="setSubject('භූගෝල විද්‍යාව', this)" id="subjGeo">🌍 <span>භූගෝල විද්‍යාව</span></button>
+  <button class="subject-btn" onclick="setSubject('ICT', this)" id="subjICT">💻 <span>ICT</span></button>
+
+  <!-- Language indicator -->
+  <div class="lang-indicator" id="langIndicator">
+    🌐 <span id="langText">භාෂාව: සිංහල</span>
+  </div>
+
+  <div class="sidebar-footer">
+    Made with 💜 by <strong>Sanz Queen</strong><br>
+    <span style="font-size:10px">AI Powered Education Platform</span>
   </div>
 </div>
 
-<!-- ══ SIDEBAR ══ -->
-<aside class="sidebar">
-  <div class="sb-hd">
-    <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
-    <div class="sb-meta" id="sbMeta">සාදරයෙන් පිළිගනිමු!</div>
-    <div class="sb-cat s" id="sbCat">📚 Secondary</div>
-  </div>
-  <div class="st-sel" id="stSel" style="display:none">
-    <div class="st-lbl" id="stLbl">Stream | ධාරාව | ஓட்டம்</div>
-    <div class="st-btns" id="stBtns"></div>
-  </div>
-  <div class="sb-sec" id="sbSecLbl">SUBJECTS</div>
-  <nav class="sb-nav" id="sbNav"></nav>
-  <div class="sb-ft">Developed by <b>Sanz Queen</b> &nbsp;•&nbsp; v5.0</div>
-</aside>
-
-<!-- ══ MAIN ══ -->
+<!-- ══ Main ══ -->
 <div class="main">
-  <div class="topbar">
-    <div class="tb-l">
-      <div class="tb-ic" id="tbIc">📐</div>
-      <div><div class="tb-nm" id="tbNm">Mathematics / ගණිතය</div><div class="tb-lc" id="tbLc">கணிதம்</div></div>
+  <div class="header">
+    <div class="header-left">
+      <span id="subjectLabel" style="font-weight:600; font-size:15px">📐 ගණිතය</span>
+      <select class="grade-select" id="gradeSelect">
+        <option value="6">6 ශ්‍රේණිය</option>
+        <option value="7">7 ශ්‍රේණිය</option>
+        <option value="8">8 ශ්‍රේණිය</option>
+        <option value="9">9 ශ්‍රේණිය</option>
+        <option value="10">10 ශ්‍රේණිය</option>
+        <option value="11">11 ශ්‍රේණිය</option>
+      </select>
     </div>
-    <div class="tb-r">
-      <div class="tb-b bs" id="tbGb">Grade 6</div>
-      <div class="tb-b bl" id="tbLb">සිංහල</div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span id="userName">...</span>
     </div>
   </div>
+
   <div class="chat-area" id="chatArea">
-    <div class="wc-wrap" id="wcCard">
-      <div class="wc-card">
-        <div class="wc-ico">🎓</div>
-        <h2 id="wcH">ආයුබෝවන්!</h2>
-        <p id="wcP">ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න</p>
-        <div class="wc-chips">
-          <span class="wc-chip">📖 Step-by-Step</span>
-          <span class="wc-chip">📷 Image Upload</span>
-          <span class="wc-chip">🔊 Listen</span>
-          <span class="wc-chip">🎤 Voice Input</span>
-        </div>
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">🎓</div>
+      <h2 id="welcomeTitle">හෙලෝ! <span>Sanz AI</span> ට ආයුබෝවන්!</h2>
+      <p id="welcomeDesc">ඔයාගේ ඕනෑම ප්‍රශ්නයක් අහන්න — text, voice, හෝ photo!</p>
+      <div class="quick-btns" id="quickBtns">
+        <button class="quick-btn" onclick="quickQ('2x² + 5x + 3 factor කරන්න')">📐 Math</button>
+        <button class="quick-btn" onclick="quickQ('photosynthesis explain කරන්න')">🔬 Science</button>
+        <button class="quick-btn" onclick="quickQ('essay writing tips')">📖 Language</button>
       </div>
     </div>
   </div>
+
   <div class="input-area">
-    <div id="ipWrap" class="ip-wrap" style="display:none">
-      <img id="ipImg" class="ip-img" src="" alt="">
-      <button class="ip-rm" onclick="rmImg()">✕</button>
+    <div class="file-preview" id="filePreview"></div>
+    <div class="input-box">
+      <textarea id="questionInput" placeholder="ඔයාගේ ප්‍රශ්නය මෙතට ලියන්න..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <div class="input-actions">
+        <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Image">🖼️</button>
+        <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice">🎤</button>
+        <button class="send-btn" id="sendBtn" onclick="sendQuestion()">➤</button>
+      </div>
     </div>
-    <div class="in-tools">
-      <label class="it-upl" id="uplLbl" for="imgInp">📷 Image</label>
-      <input type="file" id="imgInp" accept="image/*" onchange="onImgSel(event)">
-    </div>
-    <div class="in-box">
-      <textarea id="qIn" rows="1" placeholder="ප්‍රශ්නය ටයිප් කරන්න..." onkeydown="onKey(event)" oninput="aH(this)"></textarea>
-      <button class="bic" id="micBtn" onclick="toggleMic()">🎤</button>
-      <button class="bsend" id="sendBtn" onclick="sendMsg()">➤</button>
-    </div>
+    <div class="input-hint" id="inputHint">Enter = Send &nbsp;|&nbsp; Shift+Enter = New Line &nbsp;|&nbsp; 🎤 = Voice</div>
   </div>
 </div>
+
+<input type="file" id="imageInput" accept="image/*" onchange="handleFile(this)">
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════
-   USERS
-══════════════════════════════════════ */
-const USERS = {
-  sanduni: { pass:'momsanzdad2001#', role:'admin' },
-  hansika: { pass:'sanz2024',        role:'user'  }
-};
+  // ══ Config ══
+  const BACKEND = 'https://sanz-ai-tutor.onrender.com';
+  const USER_PASSWORD = 'sanz2024';       // ← User password — change this
+  const ADMIN_USER    = 'sanduni';         // ← Admin username
+  const ADMIN_PASS    = 'momsanzdad2001#'; // ← Admin password
 
-/* ══════════════════════════════════════
-   CREATOR MESSAGES
-   Shown when typing "sanz", "sanzai", or "sanduni"
-══════════════════════════════════════ */
-const CREATOR_MSGS = {
-  sanz: {
-    si: '✨ "Sanz" — ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI Tutor හදපු ලස්සන නමයි! Sanduni ගේ හදවතෙන් හදාපු ජීවමාන platform! 💙🎓',
-    ta: '✨ "Sanz" — Sanduni அவர்களின் இதயத்தால் உருவாக்கப்பட்ட இலங்கையின் சிறந்த AI Tutor! 💙🎓',
-    en: '✨ "Sanz" — Built from the heart by Sanduni, the soul behind Sri Lanka\'s smartest AI Tutor! 💙🎓'
-  },
-  sanzai: {
-    si: '🤖💙 Sanz AI Tutor — Sanduni ගේ ප්‍රේමය, දැනුම සහ කැපවීමෙන් ලෝකයට දීපු ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI Tutor! 🇱🇰✨',
-    ta: '🤖💙 Sanz AI Tutor — Sanduni-ஆல் அன்பு, அறிவு,헌신ம் கொண்டு உலகிற்கு வழங்கப்பட்ட இலங்கையின் சிறந்த AI Tutor! 🇱🇰✨',
-    en: '🤖💙 Sanz AI Tutor — Crafted with love, knowledge & dedication by Sanduni. Sri Lanka\'s proudest AI achievement! 🇱🇰✨'
-  },
-  sanduni: {
-    si: '👑💜 Sanduni — Sanz AI Tutor ගේ නිර්මාතෘවරිය! ඔබේ දැක්ම, ශ්‍රමය සහ ප්‍රේමය නිසා දහස් දරුවන්ගේ ඉගෙනීම ලස්සන වුණා! 🌸🎓',
-    ta: '👑💜 Sanduni — Sanz AI Tutor-இன் படைப்பாளி! உங்கள் தொவனம், உழைப்பு, அன்பு ஆயிரக்கணக்கான குழந்தைகளை கற்பிக்கிறது! 🌸🎓',
-    en: '👑💜 Sanduni — The creator of Sanz AI Tutor! Your vision, hard work & love is now shaping thousands of young minds! 🌸🎓'
-  }
-};
+  // ══ State ══
+  let userName = '', userGrade = '10', currentSubject = 'ගණිතය';
+  let selectedLang = 'si';
+  let selectedImage = null, recognition = null, isRecording = false;
 
-/* ══════════════════════════════════════
-   UI TEXT
-══════════════════════════════════════ */
-const UI = {
-  si:{
-    lblName:'ඔබේ නම', lblPass:'මුරපදය', lblGrade:'ශ්‍රේණිය',
-    loginBtn:'ඉගෙනීම ආරම්භ කරන්න 🚀',
-    pwErr:'❌ වැරදි මුරපදයකි. නැවත උත්සාහ කරන්න.',
-    noUser:'⚠️ මෙම නම හඳුනාගත නොහැකිය.',
-    emptyName:'නමක් ඇතුළත් කරන්න!',
-    ph:'ප්‍රශ්නය ටයිප් කරන්න...', wch:'ආයුබෝවන්!',
-    wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',
-    listen:'🔊 ඇසීමට', copy:'📋 Copy', copied:'Copied ✓',
-    empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?', sp:'si-LK',
-    subjects:'විෂයයන්', streamLbl:'ධාරාව',
-    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'සිංහල',
-    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස Sanz AI Tutor වෙත සාදරයෙන් පිළිගනිමු. ඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න!`
-  },
-  ta:{
-    lblName:'உங்கள் பெயர்', lblPass:'கடவுச்சொல்', lblGrade:'வகுப்பு',
-    loginBtn:'கற்றலை தொடங்குங்கள் 🚀',
-    pwErr:'❌ தவறான கடவுச்சொல். மீண்டும் முயற்சிக்கவும்.',
-    noUser:'⚠️ இந்தப் பெயர் அடையாளம் காணப்படவில்லை.',
-    emptyName:'பெயரை உள்ளிடுங்கள்!',
-    ph:'கேள்வியை உள்ளிடுக...', wch:'வணக்கம்!',
-    wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',
-    listen:'🔊 கேட்க', copy:'📋 நகலெடு', copied:'நகலெடுத்தது ✓',
-    empty:'கேள்வியை உள்ளிடவும்!', sp:'ta-IN',
-    subjects:'பாடங்கள்', streamLbl:'ஓட்டம்',
-    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'தமிழ்',
-    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக Sanz AI Tutor-க்கு வரவேற்கிறோம். எந்த **பாடத்தை** பற்றியும் கேளுங்கள்!`
-  },
-  en:{
-    lblName:'Your Name', lblPass:'Password', lblGrade:'Grade',
-    loginBtn:'Start Learning 🚀',
-    pwErr:'❌ Incorrect password. Please try again.',
-    noUser:'⚠️ This name is not recognised.',
-    emptyName:'Please enter your name!',
-    ph:'Type your question...', wch:'Welcome!',
-    wcp:'Type your question or click 🎤 to speak',
-    listen:'🔊 Listen', copy:'📋 Copy', copied:'Copied ✓',
-    empty:'Please type a question!', sp:'en-US',
-    subjects:'SUBJECTS', streamLbl:'Stream',
-    grLbl:{p:'Primary',s:'Secondary / O/L',a:'Advanced Level'},
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'English',
-    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to Sanz AI Tutor as a Grade ${g} student. Feel free to ask about any **subject**!`
-  }
-};
-
-let chosenLang = null;
-let currentGrp = 'p';
-let currentGrade = 3;
-let sessionCount = 0, msgCount = 0;
-let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
-
-/* ══ LANGUAGE BUBBLES ══ */
-(function(){
-  const c=document.getElementById('lsBubbles');
-  for(let i=0;i<18;i++){
-    const b=document.createElement('div');b.className='ls-bub';
-    const sz=30+Math.random()*120;
-    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*10}s;animation-delay:${Math.random()*8}s;`;
-    c.appendChild(b);
-  }
-})();
-
-/* ══ CHOOSE LANGUAGE ══ */
-function chooseLang(lang){
-  chosenLang=lang;
-  document.getElementById('langScreen').style.display='none';
-  document.getElementById('loginOverlay').style.display='flex';
-  const t=UI[lang];
-  document.getElementById('lblName').textContent=t.lblName;
-  document.getElementById('lblPass').textContent=t.lblPass;
-  document.getElementById('lblGrade').textContent=t.lblGrade;
-  document.getElementById('loginBtn').textContent=t.loginBtn;
-  document.getElementById('nameInp').placeholder=lang==='si'?'e.g. Kasun / Amali':lang==='ta'?'e.g. கவியா / கார்த்திக்':'e.g. Kasun / Amali';
-  document.getElementById('lbl-p').textContent=t.grLbl.p;
-  document.getElementById('lbl-s').textContent=t.grLbl.s;
-  document.getElementById('lbl-a').textContent=t.grLbl.a;
-  document.getElementById('sbSecLbl').textContent=t.subjects;
-  document.getElementById('wcH').textContent=t.wch;
-  document.getElementById('wcP').textContent=t.wcp;
-  document.getElementById('qIn').placeholder=t.ph;
-  document.getElementById('tbLb').textContent=t.langLabel;
-}
-
-/* ══ GRADE SLIDER ══ */
-function switchGrp(g){
-  currentGrp=g;
-  ['p','s','a'].forEach(x=>{
-    const tab=document.getElementById('tab-'+x);
-    tab.className='gs-tab'+(x===g?' a'+x:'');
-    document.getElementById('panel-'+x).className='gs-panel'+(x===g?' show':'');
-  });
-  currentGrade=parseInt(document.getElementById('sl-'+g).value);
-}
-function onSlide(g,v){
-  currentGrade=parseInt(v);
-  document.getElementById('val-'+g).textContent='Grade '+v;
-}
-
-/* ══ NAME TYPE → CREATOR BANNER ══
-   Only triggers for: sanz, sanzai, sanduni
-══ */
-function onNameType(){
-  const nm = document.getElementById('nameInp').value.trim().toLowerCase();
-  const lang = chosenLang || 'si';
-  const banner = document.getElementById('creatorBanner');
-
-  // Clear error states
-  document.getElementById('pwErr').classList.remove('show');
-  document.getElementById('passInp').classList.remove('err');
-  document.getElementById('nameInp').classList.remove('err');
-
-  // Check for creator keywords
-  let matched = null;
-  let bannerType = '';
-
-  if(nm === 'sanduni' || nm.startsWith('sanduni')){
-    matched = CREATOR_MSGS.sanduni[lang];
-    bannerType = 'type-sanduni';
-  } else if(nm === 'sanzai' || nm.includes('sanzai')){
-    matched = CREATOR_MSGS.sanzai[lang];
-    bannerType = 'type-sanz';
-  } else if(nm === 'sanz' || nm.startsWith('sanz')){
-    matched = CREATOR_MSGS.sanz[lang];
-    bannerType = 'type-sanz';
-  }
-
-  if(matched){
-    banner.textContent = matched;
-    banner.className = 'creator-banner show ' + bannerType;
-  } else {
-    banner.className = 'creator-banner';
-  }
-}
-
-/* ══ PASSWORD EYE ══ */
-function toggleEye(){
-  const inp=document.getElementById('passInp');
-  const eye=document.querySelector('.pw-eye');
-  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
-  else{inp.type='password';eye.textContent='👁';}
-}
-
-/* ══ LOGIN ══ */
-function tryLogin(){
-  const nm=document.getElementById('nameInp').value.trim().toLowerCase();
-  const pw=document.getElementById('passInp').value;
-  const lang=chosenLang||'si';
-  const t=UI[lang];
-  if(!nm){showToast(t.emptyName);return;}
-  const user=USERS[nm];
-  if(!user){
-    document.getElementById('pwErr').textContent=t.noUser;
-    document.getElementById('pwErr').classList.add('show');
-    document.getElementById('nameInp').classList.add('err');
-    return;
-  }
-  if(pw!==user.pass){
-    document.getElementById('pwErr').textContent=t.pwErr;
-    document.getElementById('pwErr').classList.add('show');
-    document.getElementById('passInp').classList.add('err');
-    document.getElementById('passInp').style.animation='shake .4s ease';
-    setTimeout(()=>document.getElementById('passInp').style.animation='',500);
-    return;
-  }
-  // success
-  document.getElementById('pwErr').classList.remove('show');
-  document.getElementById('passInp').classList.remove('err');
-  document.getElementById('nameInp').classList.remove('err');
-  S.name=nm; S.lang=lang; S.grade=currentGrade;
-  S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
-  const catL=t.catL(S.grade);
-  const catCls=t.catCls(S.grade);
-  const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
-  document.getElementById('tbGb').textContent=catL;
-  document.getElementById('tbGb').className='tb-b '+catCls;
-  document.getElementById('tbLb').textContent=t.langLabel;
-  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-  const sc=document.getElementById('sbCat');
-  sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
-  document.getElementById('wcH').textContent=t.wch;
-  document.getElementById('wcP').textContent=t.wcp;
-  document.getElementById('qIn').placeholder=t.ph;
-  buildSidebar();
-  document.getElementById('loginOverlay').style.display='none';
-  sessionCount++;
-  addLog(`"${nm}" logged in → Grade ${S.grade} · ${lang}`);
-  document.getElementById('admSessions').textContent=sessionCount;
-  document.getElementById('admGrade').textContent=S.grade;
-  setTimeout(()=>{ addAI(t.greet(nm,S.grade)); }, 320);
-}
-
-/* ══ ADMIN — Ctrl+Shift+F2 × 5 ══ */
-let f2n=0, f2t=null;
-document.addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){
-    e.preventDefault();
-    f2n++;clearTimeout(f2t);
-    f2t=setTimeout(()=>f2n=0,4000);
-    if(f2n>=5){f2n=0;openAdmin();}
-    else showToast('🔐 Admin: '+f2n+'/5');
-  }
-});
-function openAdmin(){
-  document.getElementById('admMsgs').textContent=msgCount;
-  document.getElementById('admSessions').textContent=sessionCount;
-  document.getElementById('admGrade').textContent=S.grade||'—';
-  document.getElementById('adminOverlay').classList.add('show');
-}
-function closeAdmin(){document.getElementById('adminOverlay').classList.remove('show');}
-function addLog(msg){
-  const log=document.getElementById('admLog');
-  const now=new Date();
-  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  const d=document.createElement('div');d.className='log-entry';
-  d.innerHTML=`<span class="log-time">${t}</span><span>${msg}</span>`;
-  log.appendChild(d);log.scrollTop=log.scrollHeight;
-}
-
-/* ══ SUBJECT DATA ══ */
-const SBJ={
-  primary:[
-    {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'சூழல்'},
-    {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
-    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
-    {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
-    {id:'Art',ic:'🎨',en:'Art / Visual Art',si:'චිත්‍ර',ta:'கலை'},
-    {id:'Religion',ic:'🙏',en:'Religion / Ethics',si:'ආගම',ta:'சமயம்'},
-    {id:'Health',ic:'💊',en:'Health Education',si:'සෞඛ්‍ය',ta:'உடல் நலம்'},
-  ],
-  secondary:[
-    {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
-    {id:'Science',ic:'🔬',en:'Science',si:'විද්‍යාව',ta:'அறிவியல்'},
-    {id:'History',ic:'🏛️',en:'History',si:'ඉතිහාසය',ta:'வரலாறு'},
-    {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල විද්‍යාව',ta:'புவியியல்'},
-    {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
-    {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
-    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
-    {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-    {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසி',ta:'ஆங்கிலம்'},
-    {id:'Commerce',ic:'📊',en:'Commerce',si:'වාණිජ විද්‍යාව',ta:'வணிகவியல்'},
-    {id:'Health',ic:'💊',en:'Health & P.E.',si:'සෞඛ්‍ය අධ්‍යාපනය',ta:'உடல் கல்வி'},
-    {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
-    {id:'Drama',ic:'🎭',en:'Drama',si:'නාට්‍ය',ta:'நாடகம்'},
-  ],
-  alStreams:[
-    {id:'bio',ic:'🧬',en:'Biology Stream',si:'ජීව ධාරාව',ta:'உயிரியல் நெடல்',sbj:[
-      {id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},
-      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන විද්‍යාව',ta:'வேதியியல்'},
-      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික විද්‍යාව',ta:'இயற்பியல்'},
-    ]},
-    {id:'maths',ic:'➕',en:'Maths Stream',si:'ගණිත ධාරාව',ta:'கணித நெடல்',sbj:[
-      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත ගණිතය',ta:'இணைந்த கணிதம்'},
-      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික විද්‍යාව',ta:'இயற்பியல்'},
-      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන විද්‍යාව',ta:'வேதியியல்'},
-      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
-    ]},
-    {id:'commerce',ic:'💼',en:'Commerce Stream',si:'වාණිජ ධාරාව',ta:'வணிக நெடல்',sbj:[
-      {id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික විද්‍යාව',ta:'பொருளாதாரம்'},
-      {id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර අධ්‍යයනය',ta:'வணிக கல்வி'},
-      {id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්කරණය',ta:'கணக்கியல்'},
-      {id:'Statistics',ic:'📊',en:'Statistics',si:'සංඛ්‍යාන',ta:'புள்ளியியல்'},
-    ]},
-    {id:'tech',ic:'🔧',en:'Technology Stream',si:'තාක්ෂණ ධාරාව',ta:'தொழில்நுட்ப நெடல்',sbj:[
-      {id:'EngineeringTech',ic:'⚙️',en:'Engineering Tech.',si:'ඉංජිනේරු තාක්ෂණය',ta:'பொறியியல் தொழில்நுட்பம்'},
-      {id:'ScienceTech',ic:'🔬',en:'Science for Tech.',si:'තාක්ෂණය සඳහා විද්‍යාව',ta:'தொழில்நுட்பத்திற்கான அறிவியல்'},
-      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු තාක්ෂණය',ta:'தகவல் தொழில்நுட்பம்'},
-      {id:'Agriculture',ic:'🌾',en:'Agriculture & Food',si:'කෘෂිකර්මය',ta:'விவசாயம்'},
-    ]},
-    {id:'art',ic:'🎨',en:'Arts Stream',si:'කලා ධාරාව',ta:'கலை நெடல்',sbj:[
-      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍යය',ta:'சிங்கள இலக்கியம்'},
-      {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල විද්‍යාව',ta:'புவியியல்'},
-      {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි අධ්‍යාපනය',ta:'குடியியல் கல்வி'},
-      {id:'Logic',ic:'🧩',en:'Logic & Sci. Method',si:'තර්කශාස්ත්‍රය',ta:'தர்க்கவியல்'},
-      {id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},
-      {id:'Dancing',ic:'💃',en:'Dancing',si:'නර්තනය',ta:'நடனம்'},
-      {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
-      {id:'Drama',ic:'🎭',en:'Drama & Theatre',si:'නාට්‍ය',ta:'நாடகம்'},
-    ]},
-    {id:'lang',ic:'🌐',en:'Languages Stream',si:'භාෂා ධාරාව',ta:'மொழி நெடல்',sbj:[
-      {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
-      {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-      {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
-      {id:'Pali',ic:'📿',en:'Pali / Sanskrit',si:'පාලි',ta:'பாலி'},
-      {id:'Hindi',ic:'🇮🇳',en:'Hindi',si:'හින්දි',ta:'இந்தி'},
-      {id:'Arabic',ic:'☪️',en:'Arabic',si:'අරාබි',ta:'அரபு'},
-      {id:'French',ic:'🇫🇷',en:'French',si:'ප්‍රංශ',ta:'பிரஞ்சு'},
-    ]},
-  ],
-  alCommon:[
-    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
-    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது தகவல் தொழில்நுட்பம்'},
-  ]
-};
-
-const API='https://sanz-ai-tutor.onrender.com';
-
-/* ══ SIDEBAR ══ */
-function buildSidebar(){
-  const stSel=document.getElementById('stSel');
-  if(S.cat==='al'){stSel.style.display='block';buildStreams();buildSubjs(getALSubjs(S.alStream));}
-  else{stSel.style.display='none';buildSubjs(SBJ[S.cat]);}
-}
-function buildStreams(){
-  const c=document.getElementById('stBtns');c.innerHTML='';
-  SBJ.alStreams.forEach(st=>{
-    const b=document.createElement('button');
-    b.className='st-btn'+(st.id===S.alStream?' active':'');
-    b.innerHTML=`<div class="st-ico">${st.ic}</div><div><div class="st-nm">${st[S.lang]||st.en}</div><div class="st-lc">${st.en}</div></div>`;
-    b.onclick=()=>{S.alStream=st.id;buildStreams();buildSubjs(getALSubjs(st.id));};
-    c.appendChild(b);
-  });
-}
-function getALSubjs(sid){const st=SBJ.alStreams.find(s=>s.id===sid);return[...(st?st.sbj:[]),...SBJ.alCommon];}
-function buildSubjs(list){
-  const nav=document.getElementById('sbNav');nav.innerHTML='';
-  list.forEach((s,i)=>{
-    const b=document.createElement('button');b.className='sbj'+(i===0?' active':'');
-    const lc=S.lang==='ta'?s.ta:S.lang==='si'?s.si:s.en;
-    b.innerHTML=`<div class="sbj-ic">${s.ic}</div><div class="sbj-tx"><div class="sbj-en">${s.en}</div><div class="sbj-lc">${lc}</div></div>`;
-    b.onclick=()=>{
-      S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
-      document.querySelectorAll('.sbj').forEach(x=>x.classList.remove('active'));b.classList.add('active');
-      document.getElementById('tbIc').textContent=s.ic;
-      document.getElementById('tbNm').textContent=`${s.en} / ${s.si}`;
-      document.getElementById('tbLc').textContent=s.ta||s.si;
-    };
-    nav.appendChild(b);
-    if(i===0){S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
-      document.getElementById('tbIc').textContent=s.ic;
-      document.getElementById('tbNm').textContent=`${s.en} / ${s.si}`;
-      document.getElementById('tbLc').textContent=s.ta||s.si;
+  // ══ Language Config ══
+  const LANG = {
+    si: {
+      name: 'සිංහල', flag: '🇱🇰',
+      namePlaceholder: 'ඔයාගේ නම...', nameLabel: 'ඔයාගේ නම',
+      gradeLabel: 'ශ්‍රේණිය', passLabel: 'Password',
+      startBtn: 'පටන් ගමු! 🚀', newChat: 'නව සංවාදයක්',
+      subjects: 'විෂයයන්',
+      subjectNames: ['ගණිතය','විද්‍යාව','සිංහල','ඉංග්‍රීසි','ඉතිහාසය','භූගෝල විද්‍යාව','ICT'],
+      welcomeTitle: 'හෙලෝ! <span>Sanz AI</span> ට ආයුබෝවන්!',
+      welcomeDesc: 'ඔයාගේ ඕනෑම ප්‍රශ්නයක් අහන්න — text, voice, හෝ photo!',
+      placeholder: 'ඔයාගේ ප්‍රශ්නය මෙතට ලියන්න...',
+      hint: 'Enter = Send &nbsp;|&nbsp; Shift+Enter = New Line &nbsp;|&nbsp; 🎤 = Voice',
+      langIndicator: 'භාෂාව: සිංහල',
+      voiceLang: 'si-LK',
+      wrongPass: '❌ Password වැරදියි! නැවත try කරන්න.',
+      enterName: '⚠️ නම ලියන්න!', enterGrade: '⚠️ ශ්‍රේණිය තෝරන්න!', enterPass: '⚠️ Password දෙන්න!'
+    },
+    en: {
+      name: 'English', flag: '🇬🇧',
+      namePlaceholder: 'Your name...', nameLabel: 'Your Name',
+      gradeLabel: 'Grade', passLabel: 'Password',
+      startBtn: "Let's Start! 🚀", newChat: 'New Chat',
+      subjects: 'Subjects',
+      subjectNames: ['Mathematics','Science','Sinhala','English','History','Geography','ICT'],
+      welcomeTitle: 'Hello! Welcome to <span>Sanz AI</span>!',
+      welcomeDesc: 'Ask any question — text, voice, or photo!',
+      placeholder: 'Type your question here...',
+      hint: 'Enter = Send &nbsp;|&nbsp; Shift+Enter = New Line &nbsp;|&nbsp; 🎤 = Voice',
+      langIndicator: 'Language: English',
+      voiceLang: 'en-US',
+      wrongPass: '❌ Wrong password! Try again.',
+      enterName: '⚠️ Enter your name!', enterGrade: '⚠️ Select your grade!', enterPass: '⚠️ Enter password!'
+    },
+    ta: {
+      name: 'தமிழ்', flag: '🇮🇳',
+      namePlaceholder: 'உங்கள் பெயர்...', nameLabel: 'உங்கள் பெயர்',
+      gradeLabel: 'வகுப்பு', passLabel: 'கடவுச்சொல்',
+      startBtn: 'தொடங்குவோம்! 🚀', newChat: 'புதிய உரையாடல்',
+      subjects: 'பாடங்கள்',
+      subjectNames: ['கணிதம்','அறிவியல்','சிங்களம்','ஆங்கிலம்','வரலாறு','புவியியல்','ICT'],
+      welcomeTitle: 'வணக்கம்! <span>Sanz AI</span> க்கு வரவேற்கிறோம்!',
+      welcomeDesc: 'எந்த கேள்வியும் கேளுங்கள் — உரை, குரல் அல்லது படம்!',
+      placeholder: 'உங்கள் கேள்வியை இங்கே தட்டச்சு செய்யுங்கள்...',
+      hint: 'Enter = அனுப்பு &nbsp;|&nbsp; Shift+Enter = புதிய வரி',
+      langIndicator: 'மொழி: தமிழ்',
+      voiceLang: 'ta-IN',
+      wrongPass: '❌ தவறான கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.',
+      enterName: '⚠️ பெயரை உள்ளிடவும்!', enterGrade: '⚠️ வகுப்பை தேர்ந்தெடுக்கவும்!', enterPass: '⚠️ கடவுச்சொல் உள்ளிடவும்!'
     }
+  };
+
+  // Subject keys mapping
+  const SUBJECT_KEYS = ['Math','Sci','Sin','Eng','His','Geo','ICT'];
+
+  // ══ Language Selection ══
+  function selectLang(lang, btn) {
+    selectedLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyLangToOverlay(lang);
+  }
+
+  function applyLangToOverlay(lang) {
+    const L = LANG[lang];
+    document.getElementById('nameInput').placeholder = L.namePlaceholder;
+    document.getElementById('nameLabel').textContent = L.nameLabel;
+    document.getElementById('gradeLabel').textContent = L.gradeLabel;
+    document.getElementById('passLabel').textContent = L.passLabel;
+    document.getElementById('startBtn').textContent = L.startBtn;
+  }
+
+  function applyLangToUI(lang) {
+    const L = LANG[lang];
+    // Sidebar
+    document.getElementById('newChatText').textContent = L.newChat;
+    document.getElementById('subjectsLabel').textContent = L.subjects;
+    document.getElementById('langText').textContent = L.langIndicator;
+    // Subject names
+    SUBJECT_KEYS.forEach((k, i) => {
+      const btn = document.getElementById('subj' + k);
+      if (btn) btn.querySelector('span').textContent = L.subjectNames[i];
+    });
+    // Update current subject to match language
+    currentSubject = L.subjectNames[0];
+    document.getElementById('subjectLabel').textContent = '📐 ' + L.subjectNames[0];
+    // Welcome
+    document.getElementById('welcomeTitle').innerHTML = L.welcomeTitle;
+    document.getElementById('welcomeDesc').textContent = L.welcomeDesc;
+    // Input
+    document.getElementById('questionInput').placeholder = L.placeholder;
+    document.getElementById('inputHint').innerHTML = L.hint;
+  }
+
+  // ══ Start Chat (Login) ══
+  function startChat() {
+    const L = LANG[selectedLang];
+    const name  = document.getElementById('nameInput').value.trim();
+    const grade = document.getElementById('gradeInputOverlay').value;
+    const pass  = document.getElementById('userPassInput').value;
+
+    if (!name)  { showToast(L.enterName); return; }
+    if (!grade) { showToast(L.enterGrade); return; }
+    if (!pass)  { showToast(L.enterPass); return; }
+
+    if (pass !== USER_PASSWORD) {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginError').textContent = L.wrongPass;
+      return;
+    }
+
+    userName  = name;
+    userGrade = grade;
+    document.getElementById('userName').textContent = `👋 ${name}`;
+    document.getElementById('gradeSelect').value = grade;
+    document.getElementById('nameOverlay').style.display = 'none';
+    applyLangToUI(selectedLang);
+  }
+
+  document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') startChat(); });
+  document.getElementById('userPassInput').addEventListener('keydown', e => { if (e.key === 'Enter') startChat(); });
+
+  // ══ Ctrl+F2 → Admin Login ══
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'F2') {
+      e.preventDefault();
+      document.getElementById('adminOverlay').classList.add('open');
+      document.getElementById('adminUser').focus();
+    }
+    if (e.key === 'Escape') closeAdmin();
   });
-}
 
-/* ══ IMAGE ══ */
-function onImgSel(e){const f=e.target.files[0];if(!f)return;document.getElementById('ipImg').src=URL.createObjectURL(f);document.getElementById('ipWrap').style.display='inline-block';document.getElementById('uplLbl').classList.add('hf');}
-function rmImg(){document.getElementById('imgInp').value='';document.getElementById('ipWrap').style.display='none';document.getElementById('uplLbl').classList.remove('hf');}
+  function closeAdmin() {
+    document.getElementById('adminOverlay').classList.remove('open');
+    document.getElementById('adminUser').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminError').style.display = 'none';
+  }
 
-/* ══ VOICE ══ */
-let recog=null;
-if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();recog.continuous=true;recog.interimResults=true;
-  recog.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;const ta=document.getElementById('qIn');ta.value=t;aH(ta);};
-  recog.onend=()=>{if(S.rec)recog.start();};
-}
-function toggleMic(){
-  if(!recog){showToast('Voice not supported');return;}
-  const b=document.getElementById('micBtn');
-  if(S.rec){recog.stop();S.rec=false;b.textContent='🎤';b.classList.remove('rec');}
-  else{recog.lang=UI[S.lang||'si'].sp;recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');
-    showToast(S.lang==='si'?'🎤 සවන් දෙමින්...':S.lang==='ta'?'🎤 கேட்கிறேன்...':'🎤 Listening...');}
-}
-function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=UI[S.lang||'si'].sp;u.rate=.93;window.speechSynthesis.speak(u);}
+  function adminLogin() {
+    const u = document.getElementById('adminUser').value.trim();
+    const p = document.getElementById('adminPass').value;
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      // Save credentials temporarily and open dashboard
+      sessionStorage.setItem('admin_pw', p);
+      window.open('dashboard.html', '_blank');
+      closeAdmin();
+    } else {
+      document.getElementById('adminError').style.display = 'block';
+    }
+  }
 
-/* ══ SEND ══ */
-async function sendMsg(){
-  const inp=document.getElementById('qIn');const q=inp.value.trim();
-  const t=UI[S.lang||'si'];
-  if(!q){showToast(t.empty);return;}if(S.loading)return;
-  const wc=document.getElementById('wcCard');if(wc)wc.remove();
-  addUser(q);inp.value='';aH(inp);
-  const imgFile=document.getElementById('imgInp').files[0]||null;
-  rmImg();showTyp();setLoad(true);
-  msgCount++;addLog(`Msg #${msgCount} by "${S.name}": "${q.substring(0,35)}"`);
-  document.getElementById('admMsgs').textContent=msgCount;
-  try{
-    const fd=new FormData();
-    fd.append('name',S.name);fd.append('grade',S.grade);fd.append('subject',S.subject);
-    fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck','false');
-    if(imgFile)fd.append('image',imgFile);
-    const res=await fetch(`${API}/solve`,{method:'POST',body:fd});
-    const d=await res.json();hideTyp();setLoad(false);
-    if(d.status==='banned')addAI(d.answer||'⛔ Blocked.');
-    else if(d.status==='success')addAI(d.answer,d.graph_url);
-    else addAI('⚠️ '+(d.message||'Error'));
-  }catch(e){hideTyp();setLoad(false);
-    addAI({si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි විය.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect to server.'}[S.lang||'si']);}
-}
+  document.getElementById('adminPass').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
 
-/* ══ MESSAGES ══ */
-function addUser(txt){
-  const c=document.getElementById('chatArea'),w=document.createElement('div');
-  w.className='mw user';
-  w.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,#0f3d28,#166534);color:#fff;">👤</div><div class="mbody"><div class="mbub">${esc(txt)}</div></div>`;
-  c.appendChild(w);se();
-}
-function addAI(md,graph){
-  const c=document.getElementById('chatArea'),w=document.createElement('div');
-  w.className='mw ai';const t=UI[S.lang||'si'];const raw=md||'';
-  const gr=graph?`<img src="${graph}" class="m-graph" alt="Graph">`:'';
-  const safe=raw.replace(/\\/g,'\\\\').replace(/`/g,"'");
-  w.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div>
-    <div class="mbody"><div class="mbub">${parseMD(raw)}${gr}</div>
-    <div class="macts">
-      <button class="mact" onclick="speak(this.closest('.mbody').querySelector('.mbub').innerText)">${t.listen}</button>
-      <button class="mact" onclick="cpyMsg(this,\`${safe}\`)">${t.copy}</button>
-    </div></div>`;
-  c.appendChild(w);se();
-}
-let typEl=null;
-function showTyp(){hideTyp();const c=document.getElementById('chatArea');typEl=document.createElement('div');typEl.id='typEl';typEl.className='ty-w';
-  typEl.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div><div class="ty-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
-  c.appendChild(typEl);se();}
-function hideTyp(){const e=document.getElementById('typEl');if(e)e.remove();typEl=null;}
+  // ══ Subject ══
+  function setSubject(subj, btn) {
+    currentSubject = subj;
+    document.getElementById('subjectLabel').textContent = btn.textContent;
+    document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
-/* ══ UTILS ══ */
-function setLoad(v){S.loading=v;document.getElementById('sendBtn').disabled=v;}
-function se(){const c=document.getElementById('chatArea');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight);}
-function aH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
-function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function cpyMsg(btn,txt){navigator.clipboard.writeText(txt).then(()=>{const o=btn.innerHTML;btn.innerHTML=UI[S.lang||'si'].copied;setTimeout(()=>btn.innerHTML=o,2000);});}
-function showToast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+  // ══ New Chat ══
+  function newChat() {
+    const L = LANG[selectedLang];
+    const area = document.getElementById('chatArea');
+    area.innerHTML = `<div class="welcome" id="welcome">
+      <div class="welcome-icon">🎓</div>
+      <h2 id="welcomeTitle">${L.welcomeTitle}</h2>
+      <p id="welcomeDesc">${L.welcomeDesc}</p>
+      <div class="quick-btns" id="quickBtns">
+        <button class="quick-btn" onclick="quickQ('2x² + 5x + 3 factor')">📐</button>
+        <button class="quick-btn" onclick="quickQ('photosynthesis explain')">🔬</button>
+        <button class="quick-btn" onclick="quickQ('essay writing tips')">📖</button>
+      </div>
+    </div>`;
+    selectedImage = null;
+    document.getElementById('filePreview').innerHTML = '';
+  }
 
-/* ══ MARKDOWN ══ */
-function parseMD(md){
-  if(!md)return'';let h=md;
-  h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
-  h=h.replace(/`([^`\n]+)`/g,'<code>$1</code>');
-  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
-  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
-  h=h.replace(/^[-*] (.+)$/gm,'<li>$1</li>');h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  h=h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
-  h=h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
-  h=h.replace(/^---+$/gm,'<hr>');
-  h=h.replace(/\n\n+/g,'</p><p>');h=h.replace(/\n/g,'<br>');h='<p>'+h+'</p>';
-  h=h.replace(/<p>\s*<\/p>/g,'');
-  ['pre','h1','h2','h3','ul','hr','blockquote'].forEach(t=>{h=h.replace(new RegExp(`<p>(<${t}>)`,'g'),'$1');h=h.replace(new RegExp(`(</${t}>)<\\/p>`,'g'),'$1');});
-  return h;
-}
+  function quickQ(q) {
+    document.getElementById('questionInput').value = q;
+    sendQuestion();
+  }
+
+  // ══ File ══
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    selectedImage = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('filePreview').innerHTML = `<div class="file-chip">
+        <img src="${e.target.result}">
+        <span>${file.name}</span>
+        <button onclick="removeFile()">✕</button>
+      </div>`;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function removeFile() {
+    selectedImage = null;
+    document.getElementById('filePreview').innerHTML = '';
+  }
+
+  // ══ Voice ══
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      showToast('⚠️ Voice not supported!'); return;
+    }
+    if (isRecording) { recognition.stop(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = LANG[selectedLang].voiceLang;
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('voiceBtn').classList.add('recording');
+      document.getElementById('voiceBtn').textContent = '⏹️';
+    };
+    recognition.onresult = e => {
+      document.getElementById('questionInput').value = e.results[0][0].transcript;
+      autoResize(document.getElementById('questionInput'));
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceBtn').textContent = '🎤';
+    };
+    recognition.onerror = () => {
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceBtn').textContent = '🎤';
+    };
+    recognition.start();
+  }
+
+  // ══ Send ══
+  async function sendQuestion() {
+    const q = document.getElementById('questionInput').value.trim();
+    if (!q) return;
+    if (!userName) { showToast(LANG[selectedLang].enterName); return; }
+
+    hideWelcome();
+    addMessage('user', q, null);
+    document.getElementById('questionInput').value = '';
+    autoResize(document.getElementById('questionInput'));
+    document.getElementById('sendBtn').disabled = true;
+    const typingId = addTyping();
+
+    try {
+      const formData = new FormData();
+      formData.append('name', userName);
+      formData.append('grade', document.getElementById('gradeSelect').value);
+      formData.append('subject', currentSubject);
+      formData.append('question', q);
+      formData.append('language', selectedLang); // ← Send language to backend
+      if (selectedImage) formData.append('image', selectedImage);
+
+      const res  = await fetch(`${BACKEND}/solve`, { method: 'POST', body: formData });
+      const data = await res.json();
+      removeTyping(typingId);
+
+      if (data.status === 'banned')        addSpecialMessage(data.message, 'banned');
+      else if (data.status === 'creator')  addSpecialMessage(data.message, 'creator');
+      else if (data.status === 'success')  {
+        addMessage('ai', data.answer, data.graph_url, data.verified, data.rag_used);
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utt = new SpeechSynthesisUtterance(data.answer.replace(/[#*`>\[\]]/g,'').trim());
+          utt.lang = LANG[selectedLang].voiceLang; utt.rate = 0.9;
+          window.speechSynthesis.speak(utt);
+        }
+      } else addMessage('ai', '⚠️ Error: ' + data.message, null);
+
+    } catch (e) {
+      removeTyping(typingId);
+      addMessage('ai', '⚠️ Backend connect error!', null);
+    }
+
+    document.getElementById('sendBtn').disabled = false;
+    removeFile();
+  }
+
+  // ══ UI Helpers ══
+  function hideWelcome() { const w = document.getElementById('welcome'); if (w) w.remove(); }
+
+  function addMessage(role, text, graphUrl, verified, ragUsed) {
+    const area = document.getElementById('chatArea');
+    const div  = document.createElement('div');
+    div.className = `message ${role}`;
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const fmt  = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    let badges = '';
+    if (verified !== undefined) badges += verified
+      ? `<span class="verified-badge">✅ Verified</span>`
+      : `<span style="background:rgba(251,191,36,0.15);color:#fbbf24;padding:2px 8px;border-radius:20px;font-size:10px">⚠️ Corrected</span>`;
+    if (ragUsed) badges += `<span class="rag-badge">📚 Textbook</span>`;
+    div.innerHTML = `
+      <div class="${role==='ai'?'ai':'user'}-avatar msg-avatar">${role==='ai'?'🧠':'👤'}</div>
+      <div>
+        <div class="msg-bubble">${fmt}${graphUrl?`<img class="graph-img" src="${graphUrl}">`:''}
+        </div>
+        <div class="msg-meta">${time} ${badges}</div>
+      </div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function addSpecialMessage(msg, type) {
+    const area = document.getElementById('chatArea');
+    const div  = document.createElement('div');
+    div.className = `special-msg ${type==='banned'?'banned-msg':''}`;
+    div.style.maxWidth = '600px';
+    div.innerHTML = msg.replace(/\n/g,'<br>');
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function addTyping() {
+    const area = document.getElementById('chatArea');
+    const id   = 'typing_' + Date.now();
+    const div  = document.createElement('div');
+    div.className = 'message'; div.id = id;
+    div.innerHTML = `<div class="ai-avatar msg-avatar">🧠</div>
+      <div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+  function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendQuestion(); } }
+
+  function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
 </script>
 </body>
 </html>
