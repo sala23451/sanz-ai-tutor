@@ -193,8 +193,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .react-label{font-size:10px;color:var(--text-m);font-weight:600;padding-left:2px;}
 @keyframes reactPop{0%{transform:scale(1)}40%{transform:scale(1.4)}70%{transform:scale(.9)}100%{transform:scale(1)}}
 .react-pop{animation:reactPop .35s cubic-bezier(.16,1,.3,1);}
-.feedback-sent{font-size:10.5px;color:var(--c-pri);font-weight:600;display:flex;align-items:center;gap:4px;padding:4px 0;animation:slideUp .3s ease;}
-.feedback-sent.bad{color:var(--danger);}
 
 .ty-w{display:flex;gap:8px;align-items:center;}
 .ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;box-shadow:var(--sh-sm);}
@@ -229,7 +227,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 </head>
 <body>
 
-<!-- ══ LANGUAGE ══ -->
 <div id="langScreen">
   <div class="ls-bubbles" id="lsBubbles"></div>
   <div class="ls-card">
@@ -255,7 +252,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- ══ LOGIN ══ -->
 <div class="overlay" id="loginOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
@@ -280,7 +276,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
         <div class="pw-err" id="pwErr">❌ වැරදි මුරපදයකි.</div>
       </div>
 
-      <!-- ── GRADE SELECTOR ── -->
       <div class="grade-section">
         <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය</label></div>
         <div class="grade-tabs">
@@ -288,17 +283,14 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
           <button class="grade-tab" id="gtab-s" onclick="switchGrpBtn('s')">Grade 6–11<br><small>Secondary</small></button>
           <button class="grade-tab" id="gtab-a" onclick="switchGrpBtn('a')">Grade 12–13<br><small>A/Level</small></button>
         </div>
-        <!-- Primary -->
         <div class="grade-panel show" id="gpanel-p">
           <div class="grade-btns" id="gbtns-p"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-pri)"></div><span style="color:var(--c-pri)">Primary School</span></div>
         </div>
-        <!-- Secondary -->
         <div class="grade-panel" id="gpanel-s">
           <div class="grade-btns" id="gbtns-s"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-sec)"></div><span style="color:var(--c-sec)">Secondary / O/L</span></div>
         </div>
-        <!-- A/L -->
         <div class="grade-panel" id="gpanel-a">
           <div class="grade-btns" id="gbtns-a"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-al)"></div><span style="color:var(--c-al)">Advanced Level</span></div>
@@ -310,7 +302,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="sb-hd">
     <div class="sb-logo">
@@ -329,7 +320,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   <div class="sb-ft">Developed by <b>Sanz</b> &nbsp;•&nbsp; v5.1</div>
 </aside>
 
-<!-- ══ MAIN ══ -->
 <div class="main">
   <div class="topbar">
     <div class="tb-l">
@@ -393,12 +383,12 @@ const CREATOR_MSGS = {
   },
   sanzai: {
     si:'🤖💙 Sanz AI — Sanduni ගේ ප්‍රේමය, දැනුම සහ කැපවීමෙන් ලෝකයට දීපු ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI! 🇱🇰✨',
-    ta:'🤖💙 Sanz AI — Sanduni-ஆல் அன்பு, அறிவு,헌신ம் கொண்டு வழங்கப்பட்ட இலங்கையின் சிறந்த AI! 🇱🇰✨',
+    ta:'🤖💙 Sanz AI — Sanduni-ஆல் அன்பு, அறிவு, அர்ப்பணிப்பு கொண்டு வழங்கப்பட்ட இலங்கையின் சிறந்த AI! 🇱🇰✨',
     en:'🤖💙 Sanz AI — Crafted with love, knowledge & dedication by Sanduni. Sri Lanka\'s proudest AI! 🇱🇰✨'
   },
   sanduni: {
     si:'👑💜 Sanduni — Sanz AI ගේ නිර්මාතෘවරිය! ඔබේ දැක්ම, ශ්‍රමය සහ ප්‍රේමය නිසා දහස් දරුවන්ගේ ඉගෙනීම ලස්සන වුණා! 🌸🎓',
-    ta:'👑💜 Sanduni — Sanz AI-இன் படைப்பாளி! உங்கள் தொவனம், உழைப்பு, அன்பு ஆயிரக்கணக்கான குழந்தைகளை கற்பிக்கிறது! 🌸🎓',
+    ta:'👑💜 Sanduni — Sanz AI-இன் படைப்பாளி! உங்கள் தொலைநோக்கு, உழைப்பு, அன்பு ஆயிரக்கணக்கான மாணவர்களின் கற்றலை அழகாக்கியுள்ளது! 🌸🎓',
     en:'👑💜 Sanduni — The creator of Sanz AI! Your vision, hard work & love is now shaping thousands of young minds! 🌸🎓'
   }
 };
@@ -464,6 +454,7 @@ let chosenLang = null;
 let currentGrp = 'p';
 let currentGrade = 3;
 let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
+let msgCounter = 0;
 
 /* ══ BUBBLES ══ */
 (function(){
@@ -478,7 +469,6 @@ let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'
 
 /* ══ BUILD GRADE BUTTONS ══ */
 function buildGradeButtons(){
-  // Primary 1-5
   const pb = document.getElementById('gbtns-p'); pb.innerHTML='';
   for(let g=1;g<=5;g++){
     const btn=document.createElement('button');
@@ -487,7 +477,6 @@ function buildGradeButtons(){
     btn.onclick=()=>selectGrade(g,'p');
     pb.appendChild(btn);
   }
-  // Secondary 6-11
   const sb = document.getElementById('gbtns-s'); sb.innerHTML='';
   for(let g=6;g<=11;g++){
     const btn=document.createElement('button');
@@ -496,7 +485,6 @@ function buildGradeButtons(){
     btn.onclick=()=>selectGrade(g,'s');
     sb.appendChild(btn);
   }
-  // A/L 12-13
   const ab = document.getElementById('gbtns-a'); ab.innerHTML='';
   for(let g=12;g<=13;g++){
     const btn=document.createElement('button');
@@ -505,14 +493,12 @@ function buildGradeButtons(){
     btn.onclick=()=>selectGrade(g,'a');
     ab.appendChild(btn);
   }
-  currentGrade=3; currentGrp='p';
 }
 buildGradeButtons();
 
 function selectGrade(g, grp){
   currentGrade=g; currentGrp=grp;
   const cls={p:'sel-p',s:'sel-s',a:'sel-a'};
-  // Clear all btns in this panel
   document.querySelectorAll(`#gpanel-${grp} .gb`).forEach(b=>{
     b.className='gb';
     if(parseInt(b.textContent)===g) b.className='gb '+cls[grp];
@@ -527,12 +513,8 @@ function switchGrpBtn(grp){
     tab.className='grade-tab'+(x===grp?` active-${x}`:'');
     panel.className='grade-panel'+(x===grp?' show':'');
   });
-  // set default grade for group
   const defaults={p:3,s:8,a:12};
-  currentGrade=defaults[grp];
-  // highlight default if none selected
-  const sel=document.querySelector(`#gpanel-${grp} .gb.sel-${grp}`);
-  if(!sel) selectGrade(currentGrade,grp);
+  selectGrade(defaults[grp],grp);
 }
 
 /* ══ LANGUAGE ══ */
@@ -545,7 +527,7 @@ function chooseLang(lang){
   document.getElementById('lblPass').textContent=t.lblPass;
   document.getElementById('lblGrade').textContent=t.lblGrade;
   document.getElementById('loginBtn').textContent=t.loginBtn;
-  document.getElementById('nameInp').placeholder=lang==='si'?'e.g. Kasun / Amali':lang==='ta'?'e.g. கவியா / கார்த்திக்':'e.g. Kasun / Amali';
+  document.getElementById('nameInp').placeholder=lang==='si'?'e.g. Kasun / Amali':lang==='ta'?'e.g. கவியා / கார்த்திக்':'e.g. Kasun / Amali';
   document.getElementById('sbSecLbl').textContent=t.subjects;
   document.getElementById('wcH').textContent=t.wch;
   document.getElementById('wcP').textContent=t.wcp;
@@ -569,7 +551,6 @@ function onNameType(){
   else{banner.className='creator-banner';}
 }
 
-/* ══ EYE ══ */
 function toggleEye(){
   const inp=document.getElementById('passInp');const eye=document.querySelector('.pw-eye');
   if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
@@ -595,30 +576,24 @@ function tryLogin(){
     document.getElementById('passInp').style.animation='shake .4s ease';
     setTimeout(()=>document.getElementById('passInp').style.animation='',500);return;
   }
-  document.getElementById('pwErr').classList.remove('show');
-  document.getElementById('passInp').classList.remove('err');
-  document.getElementById('nameInp').classList.remove('err');
   S.name=nm;S.lang=lang;S.grade=currentGrade;
   S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
   const catL=t.catL(S.grade);const catCls=t.catCls(S.grade);
   const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
   document.getElementById('tbGb').textContent=catL;document.getElementById('tbGb').className='tb-b '+catCls;
-  document.getElementById('tbLb').textContent=t.langLabel;
   document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
   const sc=document.getElementById('sbCat');sc.className='sb-cat '+sbCatCls;sc.textContent=catL;
-  document.getElementById('wcH').textContent=t.wch;document.getElementById('wcP').textContent=t.wcp;
-  document.getElementById('qIn').placeholder=t.ph;
   buildSidebar();
   document.getElementById('loginOverlay').style.display='none';
-  setTimeout(()=>{addAI(t.greet(nm,S.grade));},320);
+  setTimeout(()=>{addAI(t.greet(nm,S.grade), null, true);},320);
 }
 
 /* ══ SUBJECT DATA ══ */
 const SBJ={
   primary:[
-    {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'சூழல்'},
+    {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'සூழල්'},
     {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
-    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
+    {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'සිங்களம்'},
     {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
     {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
     {id:'Art',ic:'🎨',en:'Art',si:'චිත්‍ර',ta:'கலை'},
@@ -665,7 +640,7 @@ const SBJ={
       {id:'Agriculture',ic:'🌾',en:'Agriculture',si:'කෘෂිකර්මය',ta:'விவசாயம்'},
     ]},
     {id:'art',ic:'🎨',en:'Arts Stream',si:'කලා ධාරාව',ta:'கலை நெடல்',sbj:[
-      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍ය',ta:'சிங்கள இலக்கியம்'},
+      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍ය',ta:'සිங்கள இலக்கியம்'},
       {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල',ta:'புவியியல்'},
       {id:'Civic',ic:'⚖️',en:'Civic Education',si:'පුරවැසි',ta:'குடியியல்'},
       {id:'Logic',ic:'🧩',en:'Logic',si:'තර්කශාස්ත්‍රය',ta:'தர்க்கவியல்'},
@@ -685,8 +660,8 @@ const SBJ={
     ]},
   ],
   alCommon:[
-    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
-    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது IT'},
+    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
+    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්්‍ය IT',ta:'பொது IT'},
   ]
 };
 
@@ -723,12 +698,87 @@ function buildSubjs(list){
       document.getElementById('tbLc').textContent=s.ta||s.si;
     };
     nav.appendChild(b);
-    if(i===0){S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
+    if(i===0){
+      S.subject=s.id;S.subIc=s.ic;S.subLc=s.ta||s.si;
       document.getElementById('tbIc').textContent=s.ic;
       document.getElementById('tbNm').textContent=`${s.en} / ${s.si}`;
       document.getElementById('tbLc').textContent=s.ta||s.si;
     }
   });
+}
+
+/* ══ REACTIONS ══ */
+const REACTIONS = [
+  {emoji:'👍', id:'good',   cls:'reacted'},
+  {emoji:'😊', id:'ok',     cls:'reacted'},
+  {emoji:'😕', id:'bad',    cls:'reacted-bad'},
+  {emoji:'🔁', id:'ask',    cls:'reacted'},
+];
+
+function buildReactions(msgId, answerText){
+  const lang = S.lang||'si';
+  const labels = UI[lang].reactLabels;
+  const div = document.createElement('div');
+  div.className = 'reactions-wrap';
+  const row = document.createElement('div');
+  row.className = 'react-row';
+  row.id = `react-${msgId}`;
+
+  REACTIONS.forEach(r=>{
+    const btn = document.createElement('button');
+    btn.className = 'react-btn';
+    btn.dataset.id = r.id;
+    btn.dataset.cls = r.cls;
+    btn.title = labels[r.id]||r.id;
+    const cnt = document.createElement('span');
+    cnt.className = 'react-count';
+    cnt.id = `rcnt-${msgId}-${r.id}`;
+    btn.innerHTML = `${r.emoji} `;
+    btn.appendChild(cnt);
+    btn.onclick = () => doReact(msgId, r, btn, answerText);
+    row.appendChild(btn);
+  });
+  div.appendChild(row);
+  return div;
+}
+
+function doReact(msgId, reaction, btn, answerText){
+  const row = document.getElementById(`react-${msgId}`);
+  const already = row.querySelector('.reacted, .reacted-bad');
+  if(already && already===btn){
+    btn.className='react-btn';
+    const cntEl=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
+    const cur=parseInt(cntEl.textContent)||0;
+    cntEl.textContent=cur>1?cur-1:'';
+    return;
+  }
+  if(already){
+    const oldId=already.dataset.id;
+    already.className='react-btn';
+    const oldCnt=document.getElementById(`rcnt-${msgId}-${oldId}`);
+    if(oldCnt){const c=parseInt(oldCnt.textContent)||0;oldCnt.textContent=c>1?c-1:'';}
+  }
+  btn.className='react-btn '+reaction.cls+' react-pop';
+  setTimeout(()=>btn.classList.remove('react-pop'),400);
+  const cntEl=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
+  const cur=parseInt(cntEl.textContent)||0;
+  cntEl.textContent=cur+1;
+
+  if(reaction.id==='ask'){
+    const lang=S.lang||'si';
+    const reAsk={
+      si:'කරුණාකර මෙය සරලව නැවත පැහැදිලි කරන්න.',
+      ta:'இதை மீண்டும் எளிமையாக விளக்குங்கள்.',
+      en:'Please explain this again more simply.'
+    };
+    document.getElementById('qIn').value=reAsk[lang];
+    aH(document.getElementById('qIn'));
+    document.getElementById('sendBtn').focus();
+  }
+  const goodMsgs={good:{si:'🌟 ලස්සනයි! ඉගෙනීම ඉදිරියට!',ta:'🌟 சிறந்தது!',en:'🌟 Great! Keep learning!'},bad:{si:'😟 සමාවෙන්න! 🔁 නැවත send කරන්න.',ta:'😟 மன்னிக்கவும்!',en:'😟 Sorry about that! Try again.'}};
+  const lang=S.lang||'si';
+  if(reaction.id==='good')showToast(goodMsgs.good[lang]);
+  else if(reaction.id==='bad')showToast(goodMsgs.bad[lang],3500);
 }
 
 /* ══ IMAGE ══ */
@@ -751,89 +801,6 @@ function toggleMic(){
     showToast(S.lang==='si'?'🎤 සවන් දෙමින්...':S.lang==='ta'?'🎤 கேட்கிறேன்...':'🎤 Listening...');}
 }
 function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=UI[S.lang||'si'].sp;u.rate=.93;window.speechSynthesis.speak(u);}
-
-/* ══ REACTIONS ══ */
-const REACTIONS = [
-  {emoji:'👍', id:'good',   cls:'reacted'},
-  {emoji:'😊', id:'ok',     cls:'reacted'},
-  {emoji:'😕', id:'bad',    cls:'reacted-bad'},
-  {emoji:'🔁', id:'ask',    cls:'reacted'},
-];
-
-let reactCounts = {}; // msgId → {emoji, count}
-let msgCounter = 0;
-
-function buildReactions(msgId, answerText){
-  const lang = S.lang||'si';
-  const labels = UI[lang].reactLabels;
-  const div = document.createElement('div');
-  div.className = 'reactions-wrap';
-
-  const row = document.createElement('div');
-  row.className = 'react-row';
-  row.id = `react-${msgId}`;
-
-  REACTIONS.forEach(r=>{
-    const btn = document.createElement('button');
-    btn.className = 'react-btn';
-    btn.dataset.id = r.id;
-    btn.dataset.cls = r.cls;
-    btn.title = labels[r.id]||r.id;
-    const cnt = document.createElement('span');
-    cnt.className = 'react-count';
-    cnt.textContent = '';
-    cnt.id = `rcnt-${msgId}-${r.id}`;
-    btn.innerHTML = `${r.emoji} `;
-    btn.appendChild(cnt);
-    btn.onclick = () => doReact(msgId, r, btn, answerText);
-    row.appendChild(btn);
-  });
-
-  div.appendChild(row);
-  return div;
-}
-
-function doReact(msgId, reaction, btn, answerText){
-  const row = document.getElementById(`react-${msgId}`);
-  const already = row.querySelector('.reacted, .reacted-bad');
-  if(already && already===btn){ // toggle off
-    btn.className='react-btn';
-    const cntEl=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
-    const cur=parseInt(cntEl.textContent)||0;
-    cntEl.textContent=cur>1?cur-1:'';
-    return;
-  }
-  // Remove previous reaction
-  if(already){
-    const oldId=already.dataset.id;
-    already.className='react-btn';
-    const oldCnt=document.getElementById(`rcnt-${msgId}-${oldId}`);
-    if(oldCnt){const c=parseInt(oldCnt.textContent)||0;oldCnt.textContent=c>1?c-1:'';}
-  }
-  btn.className='react-btn '+reaction.cls+' react-pop';
-  setTimeout(()=>btn.classList.remove('react-pop'),400);
-  const cntEl=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
-  const cur=parseInt(cntEl.textContent)||0;
-  cntEl.textContent=cur+1;
-  // Special: ask to explain again
-  if(reaction.id==='ask'){
-    const lang=S.lang||'si';
-    const reAsk={
-      si:'කරුණාකර මෙය සරලව නැවත පැහැදිලි කරන්න.',
-      ta:'இதை மீண்டும் எளிமையாக விளக்குங்கள்.',
-      en:'Please explain this again more simply.'
-    };
-    setTimeout(()=>{
-      document.getElementById('qIn').value=reAsk[lang];
-      aH(document.getElementById('qIn'));
-    },600);
-  }
-  // Feedback toast
-  const goodMsgs={good:{si:'🌟 ලස්සනයි! ඉගෙනීම ඉදිරියට!',ta:'🌟 சிறந்தது!',en:'🌟 Great! Keep learning!'},bad:{si:'😟 සමාවෙන්න! 🔁 නැවත send කරන්න.',ta:'😟 மன்னிக்கவும்!',en:'😟 Sorry about that! Try again.'}};
-  const lang=S.lang||'si';
-  if(reaction.id==='good')showToast(goodMsgs.good[lang]);
-  else if(reaction.id==='bad')showToast(goodMsgs.bad[lang],3500);
-}
 
 /* ══ SEND ══ */
 async function sendMsg(){
@@ -916,6 +883,14 @@ function parseMD(md){
   ['pre','h1','h2','h3','ul','hr','blockquote'].forEach(t=>{h=h.replace(new RegExp(`<p>(<${t}>)`,'g'),'$1');h=h.replace(new RegExp(`(</${t}>)<\\/p>`,'g'),'$1');});
   return h;
 }
+
+/* ══ ADMIN DASHBOARD SHORTCUT ══ */
+window.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'F2') {
+    e.preventDefault();
+    window.location.href = 'admin.html';
+  }
+});
 </script>
 </body>
 </html>
