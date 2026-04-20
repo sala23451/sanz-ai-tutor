@@ -156,23 +156,96 @@ def is_rage(text: str) -> bool:
     text_lower = text.lower()
     return sum(1 for w in RAGE_WORDS if w in text_lower) >= 2
 
-def get_rag_context(question: str, grade: str) -> str:
+# ══════════════════════════════════════════
+# ── Agentic RAG System ──
+# ══════════════════════════════════════════
+
+def get_all_pdf_chunks(question: str) -> list:
+    """PDF files වලින් relevant chunks හොයාගන්නවා"""
     if not PDF_SUPPORT:
-        return ""
-    context_parts = []
+        return []
+    chunks = []
+    keywords = [kw for kw in question.lower().split() if len(kw) > 3]
     for filename in os.listdir(PDF_FOLDER):
-        if filename.endswith(".pdf"):
-            try:
-                doc = fitz.open(os.path.join(PDF_FOLDER, filename))
-                for page in doc:
-                    text = page.get_text()
-                    keywords = question.lower().split()
-                    if any(kw in text.lower() for kw in keywords if len(kw) > 3):
-                        context_parts.append(f"[{filename}]\n{text[:1000]}")
-                        break
-            except:
-                pass
-    return "\n\n".join(context_parts[:3])
+        if not filename.endswith(".pdf"):
+            continue
+        try:
+            doc = fitz.open(os.path.join(PDF_FOLDER, filename))
+            for page_num, page in enumerate(doc):
+                text = page.get_text()
+                if not text.strip():
+                    continue
+                score = sum(1 for kw in keywords if kw in text.lower())
+                if score > 0:
+                    chunks.append({
+                        "filename": filename,
+                        "page": page_num + 1,
+                        "text": text[:1500],
+                        "score": score
+                    })
+        except:
+            pass
+    chunks.sort(key=lambda x: x["score"], reverse=True)
+    return chunks[:5]
+
+def agent_decide_rag(question: str, subject: str, chunks: list) -> dict:
+    """AI Agent එකම decide කරනවා — PDF use කරන්නද නැද්ද"""
+    if not chunks:
+        return {"use_rag": False, "reason": "No PDF chunks available", "selected_chunks": []}
+
+    chunks_summary = ""
+    for i, c in enumerate(chunks):
+        chunks_summary += f"\nChunk {i+1} [{c['filename']} - Page {c['page']}]:\n{c['text'][:300]}...\n"
+
+    agent_prompt = f"""You are a RAG decision agent for a student tutor system.
+
+Question: "{question}"
+Subject: {subject}
+
+Available PDF chunks:
+{chunks_summary}
+
+Decide:
+1. Are these chunks RELEVANT to answer this question? (yes/no)
+2. Which chunk numbers are most useful? (e.g. "1,3" or "none")
+
+Reply in this exact format only:
+USE_RAG: yes/no
+CHUNKS: 1,2 or none
+REASON: one short sentence"""
+
+    try:
+        response = gemini_check.generate_content(agent_prompt)
+        text = response.text.strip()
+        use_rag = "USE_RAG: yes" in text
+        selected = []
+        chunks_line = re.search(r"CHUNKS:\s*(.+)", text)
+        if chunks_line and use_rag:
+            raw = chunks_line.group(1).strip()
+            if raw.lower() != "none":
+                for num in raw.split(","):
+                    try:
+                        idx = int(num.strip()) - 1
+                        if 0 <= idx < len(chunks):
+                            selected.append(chunks[idx])
+                    except:
+                        pass
+        reason_line = re.search(r"REASON:\s*(.+)", text)
+        reason = reason_line.group(1).strip() if reason_line else ""
+        return {"use_rag": use_rag, "reason": reason, "selected_chunks": selected}
+    except:
+        return {"use_rag": False, "reason": "Agent error", "selected_chunks": []}
+
+def get_rag_context(question: str, grade: str) -> tuple:
+    """Agentic RAG — agent decide කරලා relevant context return කරනවා"""
+    chunks = get_all_pdf_chunks(question)
+    decision = agent_decide_rag(question, grade, chunks)
+    if not decision["use_rag"] or not decision["selected_chunks"]:
+        return "", False
+    context_parts = []
+    for c in decision["selected_chunks"]:
+        context_parts.append(f"[{c['filename']} - Page {c['page']}]\n{c['text']}")
+    return "\n\n".join(context_parts), True
 
 def update_stats(subject: str):
     stats = load_json(STATS_FILE, {"total": 0, "subjects": {}})
@@ -379,7 +452,7 @@ async def solve_math(
             rage_warning = rage_msgs.get(language, "")
 
         # 5. RAG
-        rag_context = get_rag_context(question, grade)
+        rag_context, rag_used = get_rag_context(question, grade)
 
         # 6. Instruction
         instruction = f"""
@@ -442,7 +515,7 @@ async def solve_math(
             "answer": rage_warning + final_answer,
             "graph_url": graph_url,
             "verified": verified,
-            "rag_used": bool(rag_context),
+            "rag_used": rag_used,
             "detected_language": language
         }
 
