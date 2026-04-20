@@ -1,8 +1,10 @@
-flask
-flask-cors
+fastapi
+uvicorn[standard]
+python-multipart
 google-generativeai
 anthropic
 matplotlib
 numpy
 PyMuPDF
-gunicorn
+gTTS
+SpeechRecognition
