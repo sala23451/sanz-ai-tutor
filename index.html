@@ -853,16 +853,51 @@ function rmImg(){
 
 /* ══ VOICE ══ */
 let recog=null;
+let recSilenceTimer=null; // 45s silence → auto stop + send
+const REC_SILENCE_MS=45000;
+
+function resetSilenceTimer(){
+  if(recSilenceTimer){clearTimeout(recSilenceTimer);recSilenceTimer=null;}
+}
+function startSilenceTimer(){
+  resetSilenceTimer();
+  recSilenceTimer=setTimeout(()=>{
+    // User stopped talking and 45s passed — stop mic and auto-send
+    if(S.rec){
+      const lang=S.lang;
+      stopMic();
+      // Only send if there is text in the input
+      const ta=document.getElementById('qIn');
+      if(ta&&ta.value.trim().length>0){
+        sendMsg();
+      }
+    }
+  },REC_SILENCE_MS);
+}
+
 if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recog=new SR();recog.continuous=true;recog.interimResults=true;
-  recog.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;const ta=document.getElementById('qIn');ta.value=t;aH(ta);};
+  recog.onresult=e=>{
+    let t='';
+    for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;
+    const ta=document.getElementById('qIn');ta.value=t;aH(ta);
+    // Every time user speaks, reset the 45s silence timer
+    if(t.trim().length>0) startSilenceTimer();
+  };
   recog.onend=()=>{if(S.rec)recog.start();};
+}
+function stopMic(){
+  if(!recog||!S.rec)return;
+  resetSilenceTimer();
+  recog.stop();S.rec=false;
+  const b=document.getElementById('micBtn');
+  b.textContent='🎤';b.classList.remove('rec');
 }
 function toggleMic(){
   if(!recog){showToast('Voice not supported on this browser');return;}
   const b=document.getElementById('micBtn');
-  if(S.rec){recog.stop();S.rec=false;b.textContent='🎤';b.classList.remove('rec');}
+  if(S.rec){stopMic();}
   else{
     const lang=S.lang;
     recog.lang=UI[lang].sp;
@@ -991,7 +1026,7 @@ function parseMD(md){
 
 /* ══ ADMIN SHORTCUT ══ */
 window.addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){e.preventDefault();window.location.href='admin.html';}
+  if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){e.preventDefault();window.location.href='dashboard.html';}
 });
 </script>
 </body>
