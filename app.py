@@ -36,6 +36,22 @@ try:
 except ImportError:
     PDF_SUPPORT = False
 
+# ── Cloudinary ──
+try:
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    CLOUDINARY_SUPPORT = True
+except ImportError:
+    CLOUDINARY_SUPPORT = False
+
+# ── Pinecone ──
+try:
+    from pinecone import Pinecone
+    PINECONE_SUPPORT = True
+except ImportError:
+    PINECONE_SUPPORT = False
+
 # ══════════════════════════════════════════
 # ── App Setup ──
 # ══════════════════════════════════════════
@@ -63,9 +79,33 @@ HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
 PDF_FOLDER     = "textbooks"
 STATS_FILE     = "stats.json"
+CACHE_FILE     = "semantic_cache.json"
+
+# ── Semantic Cache Config ──
+CACHE_SIMILARITY_THRESHOLD = 0.82  # 82% similar නම් cache hit
+CACHE_MAX_SIZE             = 200   # maximum cached questions
+CACHE_TTL_HOURS            = 48    # 48 hours වලින් expire
 
 os.makedirs(PDF_FOLDER, exist_ok=True)
 os.makedirs("temp_audio", exist_ok=True)
+
+# ── Cloudinary Setup ──
+if CLOUDINARY_SUPPORT:
+    cloudinary.config(
+        cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        api_key    = os.environ.get("CLOUDINARY_API_KEY"),
+        api_secret = os.environ.get("CLOUDINARY_API_SECRET")
+    )
+
+# ── Pinecone Setup ──
+pinecone_index = None
+if PINECONE_SUPPORT:
+    try:
+        pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+        pinecone_index = pc.Index("sanz-tutor")
+    except Exception as e:
+        print(f"Pinecone setup error: {e}")
+        pinecone_index = None
 
 # ══════════════════════════════════════════
 # ── Language Instructions ──
@@ -157,14 +197,116 @@ def is_rage(text: str) -> bool:
     return sum(1 for w in RAGE_WORDS if w in text_lower) >= 2
 
 # ══════════════════════════════════════════
-# ── Agentic RAG System ──
+# ── Agentic RAG System (Pinecone + Multilingual) ──
 # ══════════════════════════════════════════
 
+def upload_pdf_to_cloudinary(pdf_bytes: bytes, filename: str) -> str:
+    """PDF Cloudinary වලට upload කරලා URL return කරනවා"""
+    if not CLOUDINARY_SUPPORT:
+        return ""
+    try:
+        result = cloudinary.uploader.upload(
+            pdf_bytes,
+            resource_type = "raw",
+            folder        = "sanz_textbooks",
+            public_id     = filename.replace(".pdf", ""),
+            overwrite     = True
+        )
+        return result.get("secure_url", "")
+    except Exception as e:
+        print(f"Cloudinary upload error: {e}")
+        return ""
+
+def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
+    """PDF text extract කරලා Pinecone index එකේ store කරනවා"""
+    if not PINECONE_SUPPORT or not pinecone_index or not PDF_SUPPORT:
+        return False
+    try:
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp.write(pdf_bytes)
+            tmp_path = tmp.name
+
+        doc     = fitz.open(tmp_path)
+        vectors = []
+        for page_num, page in enumerate(doc):
+            text = page.get_text().strip()
+            if not text or len(text) < 50:
+                continue
+            chunk_id = f"{filename}_page_{page_num + 1}"
+            vectors.append({
+                "id":     chunk_id,
+                "values": pinecone_embed(text),
+                "metadata": {
+                    "filename": filename,
+                    "page":     page_num + 1,
+                    "text":     text[:1000]
+                }
+            })
+        os.unlink(tmp_path)
+
+        # Batch upsert
+        batch_size = 50
+        for i in range(0, len(vectors), batch_size):
+            pinecone_index.upsert(vectors=vectors[i:i+batch_size])
+        return True
+    except Exception as e:
+        print(f"Pinecone index error: {e}")
+        return False
+
+def pinecone_embed(text: str) -> list:
+    """
+    Pinecone integrated embedding — multilingual-e5-large model use කරනවා.
+    Sinhala, Tamil, English ම support කරනවා.
+    """
+    try:
+        pc     = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+        result = pc.inference.embed(
+            model  = "multilingual-e5-large",
+            inputs = [text[:500]],
+            parameters = {"input_type": "passage"}
+        )
+        return result[0].values
+    except Exception as e:
+        print(f"Embed error: {e}")
+        # Fallback: zero vector
+        return [0.0] * 1024
+
+def pinecone_search(question: str, top_k: int = 5) -> list:
+    """Student question vector ලෙස search කරලා relevant chunks return"""
+    if not PINECONE_SUPPORT or not pinecone_index:
+        return []
+    try:
+        pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+        q_vector = pc.inference.embed(
+            model  = "multilingual-e5-large",
+            inputs = [question[:500]],
+            parameters = {"input_type": "query"}
+        )
+        results = pinecone_index.query(
+            vector          = q_vector[0].values,
+            top_k           = top_k,
+            include_metadata= True
+        )
+        # Score 0.5 ට වැඩි matches return කරනවා
+        return [m["metadata"] for m in results["matches"] if m["score"] > 0.5]
+    except Exception as e:
+        print(f"Pinecone search error: {e}")
+        return []
+
 def get_all_pdf_chunks(question: str) -> list:
-    """PDF files වලින් relevant chunks හොයාගන්නවා"""
+    """Pinecone semantic search — keyword match නෙවෙයි meaning match"""
+    # Pinecone available නම් semantic search
+    if PINECONE_SUPPORT and pinecone_index:
+        results = pinecone_search(question)
+        if results:
+            return [{"filename": r["filename"], "page": r["page"],
+                     "text": r["text"], "score": 1.0} for r in results]
+
+    # Fallback: keyword search (Pinecone නැත්නම්)
     if not PDF_SUPPORT:
         return []
-    chunks = []
+    chunks   = []
     keywords = [kw for kw in question.lower().split() if len(kw) > 3]
     for filename in os.listdir(PDF_FOLDER):
         if not filename.endswith(".pdf"):
@@ -172,17 +314,11 @@ def get_all_pdf_chunks(question: str) -> list:
         try:
             doc = fitz.open(os.path.join(PDF_FOLDER, filename))
             for page_num, page in enumerate(doc):
-                text = page.get_text()
-                if not text.strip():
-                    continue
+                text  = page.get_text()
                 score = sum(1 for kw in keywords if kw in text.lower())
                 if score > 0:
-                    chunks.append({
-                        "filename": filename,
-                        "page": page_num + 1,
-                        "text": text[:1500],
-                        "score": score
-                    })
+                    chunks.append({"filename": filename, "page": page_num+1,
+                                   "text": text[:1500], "score": score})
         except:
             pass
     chunks.sort(key=lambda x: x["score"], reverse=True)
@@ -263,6 +399,107 @@ def save_history(user_name, grade, subject, question, answer):
     history = history[-500:]
     save_json(HISTORY_FILE, history)
 
+# ══════════════════════════════════════════
+# ── Semantic Cache System ──
+# ══════════════════════════════════════════
+
+def simple_vectorize(text: str) -> dict:
+    """
+    Lightweight word-frequency vector — no external ML libraries needed.
+    Render free tier compatible ✅
+    """
+    words = re.findall(r"\w+", text.lower())
+    vec = {}
+    for w in words:
+        vec[w] = vec.get(w, 0) + 1
+    # Normalize
+    total = sum(vec.values()) or 1
+    return {k: v / total for k, v in vec.items()}
+
+def cosine_similarity(vec1: dict, vec2: dict) -> float:
+    """Cosine similarity between two word-frequency vectors"""
+    common = set(vec1.keys()) & set(vec2.keys())
+    if not common:
+        return 0.0
+    dot    = sum(vec1[w] * vec2[w] for w in common)
+    norm1  = sum(v ** 2 for v in vec1.values()) ** 0.5
+    norm2  = sum(v ** 2 for v in vec2.values()) ** 0.5
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+    return dot / (norm1 * norm2)
+
+def load_cache() -> list:
+    return load_json(CACHE_FILE, [])
+
+def save_cache(cache: list):
+    save_json(CACHE_FILE, cache)
+
+def cache_lookup(question: str, subject: str, language: str):
+    """
+    Semantic cache lookup —
+    Similar question + same subject + same language → cache hit ✅
+    """
+    cache = load_cache()
+    now   = datetime.datetime.now()
+    q_vec = simple_vectorize(question)
+
+    # Expired entries clean කරනවා
+    valid_cache = []
+    for entry in cache:
+        try:
+            cached_time = datetime.datetime.fromisoformat(entry["time"])
+            if (now - cached_time).total_seconds() < CACHE_TTL_HOURS * 3600:
+                valid_cache.append(entry)
+        except:
+            pass
+
+    if len(valid_cache) != len(cache):
+        save_cache(valid_cache)
+
+    # Similarity check
+    best_score = 0.0
+    best_entry = None
+    for entry in valid_cache:
+        if entry.get("subject") != subject or entry.get("language") != language:
+            continue
+        cached_vec = simple_vectorize(entry["question"])
+        score      = cosine_similarity(q_vec, cached_vec)
+        if score > best_score:
+            best_score = score
+            best_entry = entry
+
+    if best_score >= CACHE_SIMILARITY_THRESHOLD and best_entry:
+        return best_entry, best_score
+
+    return None, 0.0
+
+def cache_store(question: str, subject: str, language: str, answer: str, graph_url, verified: bool):
+    """New answer cache එකට save කරනවා"""
+    cache = load_cache()
+
+    # Already similar question තිබෙනවා නම් skip
+    q_vec = simple_vectorize(question)
+    for entry in cache:
+        if entry.get("subject") == subject and entry.get("language") == language:
+            if cosine_similarity(q_vec, simple_vectorize(entry["question"])) >= CACHE_SIMILARITY_THRESHOLD:
+                return  # Already cached
+
+    cache.append({
+        "question":  question,
+        "subject":   subject,
+        "language":  language,
+        "answer":    answer,
+        "graph_url": graph_url,
+        "verified":  verified,
+        "time":      datetime.datetime.now().isoformat()
+    })
+
+    # Max size limit
+    if len(cache) > CACHE_MAX_SIZE:
+        cache = cache[-CACHE_MAX_SIZE:]
+
+    save_cache(cache)
+
 def check_admin(x_admin_password: str = "") -> bool:
     return x_admin_password == ADMIN_PASSWORD
 
@@ -272,11 +509,13 @@ def check_admin(x_admin_password: str = "") -> bool:
 @app.get("/health")
 async def health_check():
     return {
-        "status": "ok",
-        "message": "Server is running! 🚀",
-        "stt_support": STT_SUPPORT,
-        "tts_support": TTS_SUPPORT,
-        "pdf_support": PDF_SUPPORT
+        "status":             "ok",
+        "message":            "Server is running! 🚀",
+        "stt_support":        STT_SUPPORT,
+        "tts_support":        TTS_SUPPORT,
+        "pdf_support":        PDF_SUPPORT,
+        "cloudinary_support": CLOUDINARY_SUPPORT,
+        "pinecone_support":   PINECONE_SUPPORT
     }
 
 # ══════════════════════════════════════════
@@ -451,10 +690,26 @@ async def solve_math(
             }
             rage_warning = rage_msgs.get(language, "")
 
-        # 5. RAG
+        # 5. Semantic Cache Check
+        cached_entry, cache_score = cache_lookup(question, subject, language)
+        if cached_entry:
+            save_history(name, grade, subject, question, cached_entry["answer"])
+            update_stats(subject)
+            return {
+                "status":            "success",
+                "answer":            rage_warning + cached_entry["answer"],
+                "graph_url":         cached_entry.get("graph_url"),
+                "verified":          cached_entry.get("verified", True),
+                "rag_used":          False,
+                "cache_hit":         True,
+                "cache_score":       round(cache_score, 3),
+                "detected_language": language
+            }
+
+        # 6. RAG
         rag_context, rag_used = get_rag_context(question, grade)
 
-        # 6. Instruction
+        # 7. Instruction
         instruction = f"""
         You are an expert {subject} teacher. Student: {name}, Grade {grade}.
         {lang_cfg['instruction']}
@@ -468,11 +723,11 @@ async def solve_math(
             image_data = await image.read()
             content_list.append({"mime_type": "image/jpeg", "data": image_data})
 
-        # 7. Gemini Flash - Main Answer
+        # 8. Gemini Flash - Main Answer
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 8. Gemini Cross Check
+        # 9. Gemini Cross Check
         cross_check_prompt = f"""
         Is this answer correct?
         Question: {question}
@@ -490,7 +745,7 @@ async def solve_math(
             final_answer = cross_check
             verified     = False
 
-        # 9. Graph
+        # 10. Graph
         graph_url   = None
         graph_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', final_answer, re.DOTALL)
         if graph_match:
@@ -510,12 +765,17 @@ async def solve_math(
         save_history(name, grade, subject, question, final_answer)
         update_stats(subject)
 
+        # Cache store — image නොමැති questions only cache කරනවා
+        if not (image and image.filename):
+            cache_store(question, subject, language, final_answer, graph_url, verified)
+
         return {
-            "status": "success",
-            "answer": rage_warning + final_answer,
-            "graph_url": graph_url,
-            "verified": verified,
-            "rag_used": rag_used,
+            "status":            "success",
+            "answer":            rage_warning + final_answer,
+            "graph_url":         graph_url,
+            "verified":          verified,
+            "rag_used":          rag_used,
+            "cache_hit":         False,
             "detected_language": language
         }
 
@@ -571,10 +831,49 @@ async def admin_upload_pdf(
 ):
     if not check_admin(x_admin_password):
         raise HTTPException(status_code=401, detail="Unauthorized")
+
     contents = await pdf.read()
-    with open(os.path.join(PDF_FOLDER, pdf.filename), "wb") as f:
+    filename = pdf.filename
+
+    # 1. Local folder save (fallback)
+    with open(os.path.join(PDF_FOLDER, filename), "wb") as f:
         f.write(contents)
-    return {"status": "success", "message": f"{pdf.filename} uploaded!"}
+
+    # 2. Cloudinary upload
+    cloud_url = ""
+    if CLOUDINARY_SUPPORT:
+        cloud_url = upload_pdf_to_cloudinary(contents, filename)
+
+    # 3. Pinecone index
+    indexed = False
+    if PINECONE_SUPPORT and pinecone_index:
+        indexed = index_pdf_to_pinecone(contents, filename)
+
+    return {
+        "status":      "success",
+        "message":     f"{filename} uploaded!",
+        "cloud_url":   cloud_url,
+        "pinecone_indexed": indexed
+    }
+
+@app.delete("/admin/pdfs/{filename}")
+async def admin_delete_pdf(
+    filename: str,
+    x_admin_password: str = Header(default="")
+):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    # Local delete
+    local_path = os.path.join(PDF_FOLDER, filename)
+    if os.path.exists(local_path):
+        os.remove(local_path)
+    # Cloudinary delete
+    if CLOUDINARY_SUPPORT:
+        try:
+            cloudinary.uploader.destroy(f"sanz_textbooks/{filename.replace('.pdf','')}", resource_type="raw")
+        except:
+            pass
+    return {"status": "success", "message": f"{filename} deleted!"}
 
 @app.get("/admin/pdfs")
 async def admin_list_pdfs(x_admin_password: str = Header(default="")):
