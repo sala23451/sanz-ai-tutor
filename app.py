@@ -65,9 +65,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GOOGLE_API_KEY    = os.environ.get("GOOGLE_API_KEY")
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-ADMIN_PASSWORD    = os.environ.get("ADMIN_PASSWORD", "admin123")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
@@ -75,16 +74,6 @@ if not GOOGLE_API_KEY:
 genai.configure(api_key=GOOGLE_API_KEY)
 gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')
 gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
-
-# ── Anthropic Claude (Cross-Check සඳහා) ──
-anthropic_client = None
-if ANTHROPIC_API_KEY:
-    try:
-        import anthropic
-        anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        print("✅ Anthropic Claude cross-check enabled!")
-    except ImportError:
-        print("⚠️ anthropic package not installed. Run: pip install anthropic")
 
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
@@ -806,25 +795,15 @@ async def solve_math(
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 9. Cross Check — Claude available නම් Claude, නැත්නම් Gemini
+        # 9. Gemini Cross Check
         cross_check_prompt = f"""
         Is this answer correct?
         Question: {question}
         Answer: {answer1[:500]}
         {lang_cfg['cross_check']}
         """
-        if anthropic_client:
-            # ✅ Claude cross-check (වඩා accurate!)
-            claude_resp = anthropic_client.messages.create(
-                model      = "claude-haiku-4-5-20251001",
-                max_tokens = 300,
-                messages   = [{"role": "user", "content": cross_check_prompt}]
-            )
-            cross_check = claude_resp.content[0].text
-        else:
-            # Fallback: Gemini cross-check
-            cross_response = gemini_check.generate_content(cross_check_prompt)
-            cross_check    = cross_response.text
+        cross_response = gemini_check.generate_content(cross_check_prompt)
+        cross_check    = cross_response.text
         correct_word   = lang_cfg['correct_word']
 
         if correct_word in cross_check:
