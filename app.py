@@ -65,8 +65,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+GOOGLE_API_KEY    = os.environ.get("GOOGLE_API_KEY")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+ADMIN_PASSWORD    = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
@@ -74,6 +75,16 @@ if not GOOGLE_API_KEY:
 genai.configure(api_key=GOOGLE_API_KEY)
 gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')
 gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
+
+# ── Anthropic Claude (Cross-Check සඳහා) ──
+anthropic_client = None
+if ANTHROPIC_API_KEY:
+    try:
+        import anthropic
+        anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        print("✅ Anthropic Claude cross-check enabled!")
+    except ImportError:
+        print("⚠️ anthropic package not installed. Run: pip install anthropic")
 
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
@@ -110,21 +121,71 @@ if PINECONE_SUPPORT:
 # ══════════════════════════════════════════
 # ── Language Instructions ──
 # ══════════════════════════════════════════
+SOCRATIC_INSTRUCTIONS = {
+    "si": """ඔබ ඉවසිලිවන්ත Socratic ගණිත ගුරුවරයෙකි. සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න.
+
+නීති:
+1. කිසිවිටෙකත් සෘජු පිළිතුර හෝ සම්පූර්ණ විසඳුම දෙන්න එපා.
+2. එක් වරකට එක් ප්‍රශ්නයක් හෝ hint එකක් පමණයි.
+3. වැරදි නම් "වැරදියි" නොකියා, ශිෂ්‍යයාට වැරැද්ද තෝරාගන්නට ප්‍රශ්නයක් අහන්න.
+4. සෑම පියවරකටම ශිෂ්‍යයාගේ reasoning check කරන්න.
+
+Phase 1 - තේරුම් ගැනීම: "දන්නා" සහ "නොදන්නා" දේ identify කරන්නට කියන්න.
+Phase 2 - සැලසුම: කුමන mathematical operation/formula use කරන්නද කියා අහන්න.
+Phase 3 - ක්‍රියාත්මක කිරීම: පළමු calculation කරන්නට prompt කරන්න.
+Phase 4 - පිළිබිඹු කිරීම: අවසාන answer එක reasonable ද කියා අහන්න.
+
+Tone: "හොඳ ආරම්භයක්!", "ඔබ නිවැරදි මාර්ගයේ!", "නැවත බලමු" වැනි වාක්‍ය use කරන්න.""",
+
+    "en": """You are a supportive, patient Socratic Math Tutor. Answer ONLY in English.
+
+Rules:
+1. Never give the final answer or full step-by-step solution, even if asked.
+2. Only ask ONE question or give ONE hint per turn.
+3. If student makes a mistake, don't say "wrong" - ask a question to help them spot their own error.
+4. Check student's reasoning before moving to the next step.
+
+Phase 1 (Understanding): Ask student to identify "knowns" and "unknowns".
+Phase 2 (Planning): Ask what mathematical operation or formula might apply.
+Phase 3 (Execution): Prompt the student to perform the first calculation.
+Phase 4 (Reflecting): Ask if the final answer makes sense in context.
+
+Tone: Use phrases like "Great start!", "You're on the right track!", "Let's look at that again." """,
+
+    "ta": """நீங்கள் ஒரு பொறுமையான Socratic கணித ஆசிரியர். தமிழில் மட்டும் பதில் சொல்லுங்கள்.
+
+விதிகள்:
+1. இறுதி விடையை அல்லது முழு தீர்வையும் கொடுக்காதீர்கள்.
+2. ஒரு முறைக்கு ஒரே ஒரு கேள்வி அல்லது hint மட்டும்.
+3. தவறு இருந்தால் "தவறு" என்று சொல்லாமல், மாணவர் தாமே கண்டுபிடிக்க கேள்வி கேளுங்கள்.
+4. அடுத்த படிக்கு செல்வதற்கு முன் மாணவரின் reasoning சரிபாருங்கள்.
+
+Phase 1: "தெரிந்தவை" மற்றும் "தெரியாதவை" identify செய்யச் சொல்லுங்கள்.
+Phase 2: எந்த mathematical operation பயன்படுத்தலாம் என்று கேளுங்கள்.
+Phase 3: முதல் calculation செய்யும்படி prompt செய்யுங்கள்.
+Phase 4: இறுதி விடை சரியானதா என்று சிந்திக்கச் சொல்லுங்கள்.
+
+Tone: "நல்ல தொடக்கம்!", "சரியான பாதையில் இருக்கிறீர்கள்!", "மீண்டும் பார்ப்போம்" போன்ற வார்த்தைகள் பயன்படுத்துங்கள்."""
+}
+
 LANG_INSTRUCTIONS = {
     "si": {
         "instruction": "සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න. පියවරෙන් පියවර සිංහලෙන් පැහැදිලි කරන්න.",
+        "socratic": SOCRATIC_INSTRUCTIONS["si"],
         "cross_check": "නිවැරදි නම් ONLY '✅ නිවැරදියි' කියා reply කරන්න. වැරදි නම් නිවැරදි පිළිතුර සිංහලෙන් දෙන්න.",
         "correct_word": "✅ නිවැරදියි",
         "gtts_lang": "si"
     },
     "en": {
         "instruction": "Answer ONLY in English. Explain step by step clearly in English.",
+        "socratic": SOCRATIC_INSTRUCTIONS["en"],
         "cross_check": "If correct reply ONLY '✅ Correct'. If wrong, give the correct answer in English.",
         "correct_word": "✅ Correct",
         "gtts_lang": "en"
     },
     "ta": {
         "instruction": "தமிழ் மொழியில் மட்டும் பதில் சொல்லுங்கள். படிப்படியாக தமிழில் விளக்குங்கள்.",
+        "socratic": SOCRATIC_INSTRUCTIONS["ta"],
         "cross_check": "சரியாக இருந்தால் ONLY '✅ சரியானது' என்று reply கொடுங்கள். தவறாக இருந்தால் சரியான பதிலை தமிழில் தாருங்கள்.",
         "correct_word": "✅ சரியானது",
         "gtts_lang": "ta"
@@ -234,13 +295,17 @@ def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
             if not text or len(text) < 50:
                 continue
             chunk_id = f"{filename}_page_{page_num + 1}"
+            # Filename එකෙන් grade extract කරනවා (e.g. "maths g-9.pdf" → "9")
+            grade_match = re.search(r'g[-_]?(\d+)', filename.lower())
+            file_grade  = grade_match.group(1) if grade_match else "unknown"
             vectors.append({
                 "id":     chunk_id,
                 "values": pinecone_embed(text),
                 "metadata": {
                     "filename": filename,
                     "page":     page_num + 1,
-                    "text":     text[:1000]
+                    "text":     text[:1000],
+                    "grade":    file_grade
                 }
             })
         os.unlink(tmp_path)
@@ -272,8 +337,8 @@ def pinecone_embed(text: str) -> list:
         # Fallback: zero vector
         return [0.0] * 1024
 
-def pinecone_search(question: str, top_k: int = 5) -> list:
-    """Student question vector ලෙස search කරලා relevant chunks return"""
+def pinecone_search(question: str, grade: str = "", top_k: int = 5) -> list:
+    """Student question vector ලෙස search කරලා relevant chunks return — grade filter සහිතව"""
     if not PINECONE_SUPPORT or not pinecone_index:
         return []
     try:
@@ -283,10 +348,15 @@ def pinecone_search(question: str, top_k: int = 5) -> list:
             inputs = [question[:500]],
             parameters = {"input_type": "query"}
         )
+        # Grade filter — grade number extract කරනවා
+        grade_num   = re.search(r'\d+', str(grade))
+        filter_dict = {"grade": {"$eq": grade_num.group()}} if grade_num else None
+
         results = pinecone_index.query(
-            vector          = q_vector[0].values,
-            top_k           = top_k,
-            include_metadata= True
+            vector           = q_vector[0].values,
+            top_k            = top_k,
+            include_metadata = True,
+            filter           = filter_dict  # ✅ Grade filter!
         )
         # Score 0.5 ට වැඩි matches return කරනවා
         return [m["metadata"] for m in results["matches"] if m["score"] > 0.5]
@@ -294,14 +364,14 @@ def pinecone_search(question: str, top_k: int = 5) -> list:
         print(f"Pinecone search error: {e}")
         return []
 
-def get_all_pdf_chunks(question: str) -> list:
-    """Pinecone semantic search — keyword match නෙවෙයි meaning match"""
+def get_all_pdf_chunks(question: str, grade: str = "") -> list:
+    """Pinecone semantic search — grade filtered"""
     # Pinecone available නම් semantic search
     if PINECONE_SUPPORT and pinecone_index:
-        results = pinecone_search(question)
+        results = pinecone_search(question, grade)
         if results:
             return [{"filename": r["filename"], "page": r["page"],
-                     "text": r["text"], "score": 1.0} for r in results]
+                     "text": r["text"], "grade": r.get("grade", ""), "score": 1.0} for r in results]
 
     # Fallback: keyword search (Pinecone නැත්නම්)
     if not PDF_SUPPORT:
@@ -373,8 +443,8 @@ REASON: one short sentence"""
         return {"use_rag": False, "reason": "Agent error", "selected_chunks": []}
 
 def get_rag_context(question: str, grade: str) -> tuple:
-    """Agentic RAG — agent decide කරලා relevant context return කරනවා"""
-    chunks = get_all_pdf_chunks(question)
+    """Agentic RAG — grade filtered, agent decide කරලා relevant context return කරනවා"""
+    chunks   = get_all_pdf_chunks(question, grade)  # ✅ grade pass කරනවා
     decision = agent_decide_rag(question, grade, chunks)
     if not decision["use_rag"] or not decision["selected_chunks"]:
         return "", False
@@ -709,13 +779,22 @@ async def solve_math(
         # 6. RAG
         rag_context, rag_used = get_rag_context(question, grade)
 
-        # 7. Instruction
-        instruction = f"""
-        You are an expert {subject} teacher. Student: {name}, Grade {grade}.
-        {lang_cfg['instruction']}
-        Solve step by step. If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
-        {f'Use this textbook reference: {rag_context}' if rag_context else ''}
-        """
+        # 7. Instruction — Maths විට Socratic Mode, අනිත් subjects සාමාන්‍ය mode
+        is_math_subject = any(w in subject.lower() for w in ["math", "maths", "ගණිත", "கணித"])
+        if is_math_subject:
+            instruction = f"""
+            {lang_cfg['socratic']}
+            Student: {name}, Grade {grade}, Subject: {subject}.
+            If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
+            {f'Use this textbook reference: {rag_context}' if rag_context else ''}
+            """
+        else:
+            instruction = f"""
+            You are an expert {subject} teacher. Student: {name}, Grade {grade}.
+            {lang_cfg['instruction']}
+            Solve step by step. If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
+            {f'Use this textbook reference: {rag_context}' if rag_context else ''}
+            """
 
         content_list = [f"User: {name}, Grade: {grade}, Subject: {subject}. Question: {question}"]
 
@@ -727,15 +806,25 @@ async def solve_math(
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 9. Gemini Cross Check
+        # 9. Cross Check — Claude available නම් Claude, නැත්නම් Gemini
         cross_check_prompt = f"""
         Is this answer correct?
         Question: {question}
         Answer: {answer1[:500]}
         {lang_cfg['cross_check']}
         """
-        cross_response = gemini_check.generate_content(cross_check_prompt)
-        cross_check    = cross_response.text
+        if anthropic_client:
+            # ✅ Claude cross-check (වඩා accurate!)
+            claude_resp = anthropic_client.messages.create(
+                model      = "claude-haiku-4-5-20251001",
+                max_tokens = 300,
+                messages   = [{"role": "user", "content": cross_check_prompt}]
+            )
+            cross_check = claude_resp.content[0].text
+        else:
+            # Fallback: Gemini cross-check
+            cross_response = gemini_check.generate_content(cross_check_prompt)
+            cross_check    = cross_response.text
         correct_word   = lang_cfg['correct_word']
 
         if correct_word in cross_check:
@@ -765,8 +854,8 @@ async def solve_math(
         save_history(name, grade, subject, question, final_answer)
         update_stats(subject)
 
-        # Cache store — image නොමැති questions only cache කරනවා
-        if not (image and image.filename):
+        # Cache store — image නොමැති + Socratic නොවන questions only cache කරනවා
+        if not (image and image.filename) and not is_math_subject:
             cache_store(question, subject, language, final_answer, graph_url, verified)
 
         return {
