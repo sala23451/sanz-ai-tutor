@@ -471,9 +471,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
         <div class="sc-head"><h3>📤 Upload PDF Textbook</h3></div>
         <div class="upload-zone" onclick="document.getElementById('pdfInput').click()">
           <i class="fas fa-cloud-upload-alt"></i>
-          Click to select a PDF textbook<br>
-          <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="uploadPDF(event)">
+          Click to select PDFs (multiple ok)<br>
+          <input type="file" id="pdfInput" accept=".pdf" multiple style="display:none" onchange="uploadPDF(event)">
           <small style="opacity:.5;display:block;margin-top:6px;">Used for RAG context in AI answers</small>
+          <div id="uploadProgress" style="display:none;margin-top:10px;font-size:12px;color:var(--pri)"></div>
         </div>
       </div>
       <div class="sc">
@@ -917,14 +918,23 @@ async function loadPDFs(){
   }catch{document.getElementById('pdfList').innerHTML='<div class="empty-state">Failed to load — backend may be sleeping</div>';}
 }
 async function uploadPDF(event){
-  const file=event.target.files[0];if(!file)return;
-  const form=new FormData();form.append('pdf',file);
-  showToast('⏳ Uploading '+file.name+'...');
-  try{
-    const res=await fetch(`${BACKEND}/admin/upload_pdf`,{method:'POST',headers:{'X-Admin-Password':ADMIN_PASS},body:form});
-    if(res.ok){showToast('✅ '+file.name+' uploaded!');loadPDFs();}
-    else showToast('❌ Upload failed: '+res.status);
-  }catch{showToast('❌ Network error');}
+  const files=[...event.target.files];if(!files.length)return;
+  const prog=document.getElementById('uploadProgress');
+  prog.style.display='block';
+  let done=0,failed=0;
+  for(const file of files){
+    prog.textContent=`⏳ Uploading ${done+1}/${files.length}: ${file.name}`;
+    const form=new FormData();form.append('pdf',file);
+    try{
+      const res=await fetch(`${BACKEND}/admin/upload_pdf`,{method:'POST',headers:{'X-Admin-Password':ADMIN_PASS},body:form});
+      if(res.ok){done++;}
+      else{failed++;showToast('❌ Failed: '+file.name);}
+    }catch{failed++;showToast('❌ Network error: '+file.name);}
+  }
+  prog.style.display='none';
+  if(done>0)showToast(`✅ ${done} PDF${done>1?'s':''} uploaded!`);
+  if(failed>0)showToast(`❌ ${failed} failed`);
+  loadPDFs();
   event.target.value='';
 }
 async function deletePDF(name){
