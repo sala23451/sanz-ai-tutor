@@ -810,8 +810,28 @@ async def solve_math(
             final_answer = answer1
             verified     = True
         else:
-            final_answer = cross_check
-            verified     = False
+            # Socratic friendly redirection — "වැරදියි" කෙලින්ම නොකියා guide කරනවා
+            if is_math_subject:
+                socratic_redirect_prompt = f"""
+                {lang_cfg['socratic']}
+                The student answered this question: "{question}"
+                Their answer has some issues. WITHOUT saying "wrong" or "incorrect" directly,
+                ask ONE gentle guiding question to help them reconsider their approach.
+                Be warm and encouraging. Keep it to 2-3 sentences max.
+                """
+                redirect_resp = gemini_check.generate_content(socratic_redirect_prompt)
+                final_answer  = redirect_resp.text
+            else:
+                # Non-math: give corrected answer gently
+                gentle_prompt = f"""
+                {lang_cfg['instruction']}
+                The student asked: "{question}"
+                Provide the correct answer in a warm, encouraging tone.
+                Start with something positive before correcting. Keep it concise.
+                """
+                gentle_resp  = gemini_check.generate_content(gentle_prompt)
+                final_answer = gentle_resp.text
+            verified = False
 
         # 10. Graph
         graph_url   = None
