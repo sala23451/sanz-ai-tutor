@@ -76,7 +76,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .grade-panel{display:none;padding:2px 0 6px;}
 .grade-panel.show{display:block;}
 
-/* Primary grade pills — child-friendly, bigger, colorful */
 .grade-btns-p{display:flex;gap:8px;flex-wrap:wrap;}
 .gb-p{min-width:52px;height:52px;border-radius:14px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:17px;font-weight:800;color:var(--text-m);cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;padding:4px 8px;}
 .gb-p .gb-num{font-size:17px;font-weight:800;line-height:1;}
@@ -85,7 +84,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .gb-p.sel{border-color:var(--c-pri);background:var(--c-pri);color:#fff;box-shadow:0 5px 16px rgba(22,163,74,.35);}
 .gb-p.sel .gb-num,.gb-p.sel .gb-ico{color:#fff;}
 
-/* Secondary & AL grade pills */
 .grade-btns-s,.grade-btns-a{display:flex;gap:7px;flex-wrap:wrap;}
 .gb{width:44px;height:44px;border-radius:10px;border:2px solid var(--border);background:#fff;font-family:inherit;font-size:15px;font-weight:700;color:var(--text-m);cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;}
 .gb:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);transform:translateY(-2px);}
@@ -297,34 +295,21 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
         <div class="pw-err" id="pwErr"></div>
       </div>
 
-      <!-- GRADE SECTION -->
       <div class="grade-section">
         <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය තෝරන්න</label></div>
         <div class="grade-tabs">
-          <button class="grade-tab active-p" id="gtab-p" onclick="switchGrp('p')">
-            🌱 Grade 1–5<br><small>Primary</small>
-          </button>
-          <button class="grade-tab" id="gtab-s" onclick="switchGrp('s')">
-            📚 Grade 6–11<br><small>Secondary</small>
-          </button>
-          <button class="grade-tab" id="gtab-a" onclick="switchGrp('a')">
-            🎓 Grade 12–13<br><small>A/Level</small>
-          </button>
+          <button class="grade-tab active-p" id="gtab-p" onclick="switchGrp('p')">🌱 Grade 1–5<br><small>Primary</small></button>
+          <button class="grade-tab" id="gtab-s" onclick="switchGrp('s')">📚 Grade 6–11<br><small>Secondary</small></button>
+          <button class="grade-tab" id="gtab-a" onclick="switchGrp('a')">🎓 Grade 12–13<br><small>A/Level</small></button>
         </div>
-
-        <!-- Primary panel — child-friendly pills -->
         <div class="grade-panel show" id="gpanel-p">
           <div class="grade-btns-p" id="gbtns-p"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-pri)"></div><span style="color:var(--c-pri)">Primary School · ප්‍රාථමික</span></div>
         </div>
-
-        <!-- Secondary panel -->
         <div class="grade-panel" id="gpanel-s">
           <div class="grade-btns-s" id="gbtns-s"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-sec)"></div><span style="color:var(--c-sec)">Secondary / O/L</span></div>
         </div>
-
-        <!-- A/L panel -->
         <div class="grade-panel" id="gpanel-a">
           <div class="grade-btns-a" id="gbtns-a"></div>
           <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-al)"></div><span style="color:var(--c-al)">Advanced Level</span></div>
@@ -385,7 +370,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
           <span class="wc-chip">📷 Image Upload</span>
           <span class="wc-chip">🔊 Listen</span>
           <span class="wc-chip">🎤 Voice</span>
-          <span class="wc-chip">👍 React</span>
+          <span class="wc-chip">🧠 Memory</span>
         </div>
       </div>
     </div>
@@ -490,7 +475,6 @@ const UI = {
   }
 };
 
-/* Primary grade icons — child-friendly */
 const GRADE_P_ICONS = {1:'🌱',2:'⭐',3:'🌟',4:'🚀',5:'🏆'};
 
 let chosenLang = 'si';
@@ -498,6 +482,7 @@ let currentGrp = 'p';
 let currentGrade = 3;
 let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
 let msgCounter = 0;
+let conversationMessages = [];  // ✅ NEW — conversation memory
 const API = 'https://sanz-ai-tutor.onrender.com';
 
 /* ══ BUBBLES ══ */
@@ -513,7 +498,6 @@ const API = 'https://sanz-ai-tutor.onrender.com';
 
 /* ══ BUILD GRADE BUTTONS ══ */
 function buildGradeButtons(){
-  /* Primary — child-friendly big pills with icons */
   const pb = document.getElementById('gbtns-p'); pb.innerHTML='';
   for(let g=1;g<=5;g++){
     const btn = document.createElement('button');
@@ -523,7 +507,6 @@ function buildGradeButtons(){
     btn.onclick = ()=>selectGrade(g,'p');
     pb.appendChild(btn);
   }
-  /* Secondary */
   const sb = document.getElementById('gbtns-s'); sb.innerHTML='';
   for(let g=6;g<=11;g++){
     const btn = document.createElement('button');
@@ -532,7 +515,6 @@ function buildGradeButtons(){
     btn.onclick = ()=>selectGrade(g,'s');
     sb.appendChild(btn);
   }
-  /* A/L */
   const ab = document.getElementById('gbtns-a'); ab.innerHTML='';
   for(let g=12;g<=13;g++){
     const btn = document.createElement('button');
@@ -570,7 +552,6 @@ function switchGrp(grp){
   currentGrade = defaults[grp];
 }
 
-/* ══ LANGUAGE CHOOSE ══ */
 function chooseLang(lang){
   chosenLang = lang;
   document.getElementById('langScreen').style.display='none';
@@ -593,7 +574,6 @@ function applyLang(lang){
   document.getElementById('nameInp').placeholder = phMap[lang];
 }
 
-/* ══ CREATOR BANNER ══ */
 function onNameType(){
   const nm = document.getElementById('nameInp').value.trim().toLowerCase();
   const lang = chosenLang;
@@ -615,7 +595,6 @@ function toggleEye(){
   eye.textContent=inp.type==='password'?'👁':'🙈';
 }
 
-/* ══ LOGIN ══ */
 function tryLogin(){
   const nm=document.getElementById('nameInp').value.trim().toLowerCase();
   const pw=document.getElementById('passInp').value;
@@ -634,7 +613,6 @@ function tryLogin(){
     document.getElementById('passInp').style.animation='shake .4s ease';
     setTimeout(()=>document.getElementById('passInp').style.animation='',500);return;
   }
-  /* Success */
   S.name=nm; S.lang=lang; S.grade=currentGrade;
   S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
   const catL=t.catL(S.grade); const catCls=t.catCls(S.grade);
@@ -645,6 +623,7 @@ function tryLogin(){
   document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
   const sc=document.getElementById('sbCat');
   sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
+  conversationMessages = [];  // ✅ NEW — clear on login
   buildSidebar();
   document.getElementById('loginOverlay').style.display='none';
   setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
@@ -751,6 +730,7 @@ function buildSubjs(list){
     b.innerHTML=`<div class="sbj-ic">${s.ic}</div><div class="sbj-tx"><div class="sbj-en">${s.en}</div><div class="sbj-lc">${lc}</div></div>`;
     b.onclick=()=>{
       S.subject=s.id;S.subIc=s.ic;
+      conversationMessages = [];  // ✅ NEW — clear memory on subject change
       document.querySelectorAll('.sbj').forEach(x=>x.classList.remove('active'));b.classList.add('active');
       document.getElementById('tbIc').textContent=s.ic;
       document.getElementById('tbNm').textContent=`${s.en} / ${s.si||s.en}`;
@@ -853,7 +833,7 @@ function rmImg(){
 
 /* ══ VOICE ══ */
 let recog=null;
-let recSilenceTimer=null; // 45s silence → auto stop + send
+let recSilenceTimer=null;
 const REC_SILENCE_MS=45000;
 
 function resetSilenceTimer(){
@@ -862,11 +842,8 @@ function resetSilenceTimer(){
 function startSilenceTimer(){
   resetSilenceTimer();
   recSilenceTimer=setTimeout(()=>{
-    // User stopped talking and 45s passed — stop mic and auto-send
     if(S.rec){
-      const lang=S.lang;
       stopMic();
-      // Only send if there is text in the input
       const ta=document.getElementById('qIn');
       if(ta&&ta.value.trim().length>0){
         sendMsg();
@@ -882,7 +859,6 @@ if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
     let t='';
     for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;
     const ta=document.getElementById('qIn');ta.value=t;aH(ta);
-    // Every time user speaks, reset the 45s silence timer
     if(t.trim().length>0) startSilenceTimer();
   };
   recog.onend=()=>{if(S.rec)recog.start();};
@@ -913,7 +889,7 @@ function speak(txt){
   window.speechSynthesis.speak(u);
 }
 
-/* ══ SEND ══ */
+/* ══ SEND — ✅ UPDATED WITH CONVERSATION MEMORY ══ */
 async function sendMsg(){
   const inp=document.getElementById('qIn');const q=inp.value.trim();
   const t=UI[S.lang];
@@ -921,6 +897,10 @@ async function sendMsg(){
   if(S.loading)return;
   const wc=document.getElementById('wcCard');if(wc)wc.remove();
   addUser(q);inp.value='';aH(inp);
+
+  // ✅ NEW — save user message to conversation
+  conversationMessages.push({ role: "user", text: q });
+
   const imgFile=document.getElementById('imgInp').files[0]||null;
   rmImg();showTyp();setLoad(true);
   try{
@@ -928,11 +908,21 @@ async function sendMsg(){
     fd.append('name',S.name);fd.append('grade',S.grade);fd.append('subject',S.subject);
     fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck','false');
     if(imgFile)fd.append('image',imgFile);
+
+    // ✅ NEW — send conversation history to backend
+    fd.append('conversation_history', JSON.stringify(conversationMessages));
+
     const res=await fetch(`${API}/solve`,{method:'POST',body:fd});
     const d=await res.json();
     hideTyp();setLoad(false);
-    if(d.status==='banned')addAI(d.answer||'⛔ Blocked.',null,false);
-    else if(d.status==='success')addAI(d.answer,d.graph_url,true);
+    if(d.status==='banned'){
+      addAI(d.answer||'⛔ Blocked.',null,false);
+    }
+    else if(d.status==='success'){
+      addAI(d.answer,d.graph_url,true);
+      // ✅ NEW — save AI response to conversation
+      conversationMessages.push({ role: "ai", text: d.answer });
+    }
     else addAI('⚠️ '+(d.message||'Error'),null,false);
   }catch(e){
     hideTyp();setLoad(false);
