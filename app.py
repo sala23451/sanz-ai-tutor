@@ -55,7 +55,7 @@ except ImportError:
 # ══════════════════════════════════════════
 # ── App Setup ──
 # ══════════════════════════════════════════
-app = FastAPI(title="Sanz AI Tutor", version="2.0.0")
+app = FastAPI(title="Sanz AI Tutor", version="2.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -82,9 +82,9 @@ STATS_FILE     = "stats.json"
 CACHE_FILE     = "semantic_cache.json"
 
 # ── Semantic Cache Config ──
-CACHE_SIMILARITY_THRESHOLD = 0.82  # 82% similar නම් cache hit
-CACHE_MAX_SIZE             = 200   # maximum cached questions
-CACHE_TTL_HOURS            = 48    # 48 hours වලින් expire
+CACHE_SIMILARITY_THRESHOLD = 0.82
+CACHE_MAX_SIZE             = 200
+CACHE_TTL_HOURS            = 48
 
 os.makedirs(PDF_FOLDER, exist_ok=True)
 os.makedirs("temp_audio", exist_ok=True)
@@ -251,7 +251,6 @@ def is_rage(text: str) -> bool:
 # ══════════════════════════════════════════
 
 def upload_pdf_to_cloudinary(pdf_bytes: bytes, filename: str) -> str:
-    """PDF Cloudinary වලට upload කරලා URL return කරනවා"""
     if not CLOUDINARY_SUPPORT:
         return ""
     try:
@@ -268,7 +267,6 @@ def upload_pdf_to_cloudinary(pdf_bytes: bytes, filename: str) -> str:
         return ""
 
 def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
-    """PDF text extract කරලා Pinecone index එකේ store කරනවා"""
     if not PINECONE_SUPPORT or not pinecone_index or not PDF_SUPPORT:
         return False
     try:
@@ -284,7 +282,6 @@ def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
             if not text or len(text) < 50:
                 continue
             chunk_id = f"{filename}_page_{page_num + 1}"
-            # Filename එකෙන් grade extract කරනවා (e.g. "maths g-9.pdf" → "9")
             grade_match = re.search(r'g[-_]?(\d+)', filename.lower())
             file_grade  = grade_match.group(1) if grade_match else "unknown"
             vectors.append({
@@ -299,7 +296,6 @@ def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
             })
         os.unlink(tmp_path)
 
-        # Batch upsert
         batch_size = 50
         for i in range(0, len(vectors), batch_size):
             pinecone_index.upsert(vectors=vectors[i:i+batch_size])
@@ -309,10 +305,6 @@ def index_pdf_to_pinecone(pdf_bytes: bytes, filename: str):
         return False
 
 def pinecone_embed(text: str) -> list:
-    """
-    Pinecone integrated embedding — multilingual-e5-large model use කරනවා.
-    Sinhala, Tamil, English ම support කරනවා.
-    """
     try:
         pc     = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
         result = pc.inference.embed(
@@ -323,11 +315,9 @@ def pinecone_embed(text: str) -> list:
         return result[0].values
     except Exception as e:
         print(f"Embed error: {e}")
-        # Fallback: zero vector
         return [0.0] * 1024
 
 def pinecone_search(question: str, grade: str = "", top_k: int = 5) -> list:
-    """Student question vector ලෙස search කරලා relevant chunks return — grade filter සහිතව"""
     if not PINECONE_SUPPORT or not pinecone_index:
         return []
     try:
@@ -337,7 +327,6 @@ def pinecone_search(question: str, grade: str = "", top_k: int = 5) -> list:
             inputs = [question[:500]],
             parameters = {"input_type": "query"}
         )
-        # Grade filter — grade number extract කරනවා
         grade_num   = re.search(r'\d+', str(grade))
         filter_dict = {"grade": {"$eq": grade_num.group()}} if grade_num else None
 
@@ -345,24 +334,20 @@ def pinecone_search(question: str, grade: str = "", top_k: int = 5) -> list:
             vector           = q_vector[0].values,
             top_k            = top_k,
             include_metadata = True,
-            filter           = filter_dict  # ✅ Grade filter!
+            filter           = filter_dict
         )
-        # Score 0.5 ට වැඩි matches return කරනවා
         return [m["metadata"] for m in results["matches"] if m["score"] > 0.5]
     except Exception as e:
         print(f"Pinecone search error: {e}")
         return []
 
 def get_all_pdf_chunks(question: str, grade: str = "") -> list:
-    """Pinecone semantic search — grade filtered"""
-    # Pinecone available නම් semantic search
     if PINECONE_SUPPORT and pinecone_index:
         results = pinecone_search(question, grade)
         if results:
             return [{"filename": r["filename"], "page": r["page"],
                      "text": r["text"], "grade": r.get("grade", ""), "score": 1.0} for r in results]
 
-    # Fallback: keyword search (Pinecone නැත්නම්)
     if not PDF_SUPPORT:
         return []
     chunks   = []
@@ -384,7 +369,6 @@ def get_all_pdf_chunks(question: str, grade: str = "") -> list:
     return chunks[:5]
 
 def agent_decide_rag(question: str, subject: str, chunks: list) -> dict:
-    """AI Agent එකම decide කරනවා — PDF use කරන්නද නැද්ද"""
     if not chunks:
         return {"use_rag": False, "reason": "No PDF chunks available", "selected_chunks": []}
 
@@ -432,8 +416,7 @@ REASON: one short sentence"""
         return {"use_rag": False, "reason": "Agent error", "selected_chunks": []}
 
 def get_rag_context(question: str, grade: str) -> tuple:
-    """Agentic RAG — grade filtered, agent decide කරලා relevant context return කරනවා"""
-    chunks   = get_all_pdf_chunks(question, grade)  # ✅ grade pass කරනවා
+    chunks   = get_all_pdf_chunks(question, grade)
     decision = agent_decide_rag(question, grade, chunks)
     if not decision["use_rag"] or not decision["selected_chunks"]:
         return "", False
@@ -463,20 +446,14 @@ def save_history(user_name, grade, subject, question, answer):
 # ══════════════════════════════════════════
 
 def simple_vectorize(text: str) -> dict:
-    """
-    Lightweight word-frequency vector — no external ML libraries needed.
-    Render free tier compatible ✅
-    """
     words = re.findall(r"\w+", text.lower())
     vec = {}
     for w in words:
         vec[w] = vec.get(w, 0) + 1
-    # Normalize
     total = sum(vec.values()) or 1
     return {k: v / total for k, v in vec.items()}
 
 def cosine_similarity(vec1: dict, vec2: dict) -> float:
-    """Cosine similarity between two word-frequency vectors"""
     common = set(vec1.keys()) & set(vec2.keys())
     if not common:
         return 0.0
@@ -494,15 +471,10 @@ def save_cache(cache: list):
     save_json(CACHE_FILE, cache)
 
 def cache_lookup(question: str, subject: str, language: str):
-    """
-    Semantic cache lookup —
-    Similar question + same subject + same language → cache hit ✅
-    """
     cache = load_cache()
     now   = datetime.datetime.now()
     q_vec = simple_vectorize(question)
 
-    # Expired entries clean කරනවා
     valid_cache = []
     for entry in cache:
         try:
@@ -515,7 +487,6 @@ def cache_lookup(question: str, subject: str, language: str):
     if len(valid_cache) != len(cache):
         save_cache(valid_cache)
 
-    # Similarity check
     best_score = 0.0
     best_entry = None
     for entry in valid_cache:
@@ -533,15 +504,13 @@ def cache_lookup(question: str, subject: str, language: str):
     return None, 0.0
 
 def cache_store(question: str, subject: str, language: str, answer: str, graph_url, verified: bool):
-    """New answer cache එකට save කරනවා"""
     cache = load_cache()
 
-    # Already similar question තිබෙනවා නම් skip
     q_vec = simple_vectorize(question)
     for entry in cache:
         if entry.get("subject") == subject and entry.get("language") == language:
             if cosine_similarity(q_vec, simple_vectorize(entry["question"])) >= CACHE_SIMILARITY_THRESHOLD:
-                return  # Already cached
+                return
 
     cache.append({
         "question":  question,
@@ -553,7 +522,6 @@ def cache_store(question: str, subject: str, language: str, answer: str, graph_u
         "time":      datetime.datetime.now().isoformat()
     })
 
-    # Max size limit
     if len(cache) > CACHE_MAX_SIZE:
         cache = cache[-CACHE_MAX_SIZE:]
 
@@ -598,7 +566,6 @@ async def voice_input(audio: UploadFile = File(...)):
         detected_text = None
         detected_lang = "en"
 
-        # Try Sinhala first
         try:
             text = recognizer.recognize_google(audio_data, language="si-LK")
             if text:
@@ -607,7 +574,6 @@ async def voice_input(audio: UploadFile = File(...)):
         except:
             pass
 
-        # Try Tamil
         if not detected_text:
             try:
                 text = recognizer.recognize_google(audio_data, language="ta-LK")
@@ -617,7 +583,6 @@ async def voice_input(audio: UploadFile = File(...)):
             except:
                 pass
 
-        # Try English
         if not detected_text:
             try:
                 text = recognizer.recognize_google(audio_data, language="en-US")
@@ -689,7 +654,7 @@ async def text_to_speech(body: TTSRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ══════════════════════════════════════════
-# ── Main Solve ──
+# ── Main Solve  (✅ CONVERSATION MEMORY ADDED) ──
 # ══════════════════════════════════════════
 @app.post("/solve")
 async def solve_math(
@@ -699,6 +664,7 @@ async def solve_math(
     question: str        = Form(default=""),
     language: str        = Form(default="si"),
     image:    UploadFile = File(default=None),
+    conversation_history: str = Form(default="[]"),   # ✅ NEW — conversation memory
 ):
     try:
         if language not in LANG_INSTRUCTIONS:
@@ -749,31 +715,54 @@ async def solve_math(
             }
             rage_warning = rage_msgs.get(language, "")
 
-        # 5. Semantic Cache Check
-        cached_entry, cache_score = cache_lookup(question, subject, language)
-        if cached_entry:
-            save_history(name, grade, subject, question, cached_entry["answer"])
-            update_stats(subject)
-            return {
-                "status":            "success",
-                "answer":            rage_warning + cached_entry["answer"],
-                "graph_url":         cached_entry.get("graph_url"),
-                "verified":          cached_entry.get("verified", True),
-                "rag_used":          False,
-                "cache_hit":         True,
-                "cache_score":       round(cache_score, 3),
-                "detected_language": language
-            }
+        # 5. Semantic Cache Check (only for first message — no conversation context)
+        conv_history = []
+        try:
+            conv_history = json.loads(conversation_history)
+            conv_history = conv_history[-10:]  # Last 10 messages only
+        except:
+            conv_history = []
+
+        # Cache only if NO conversation history (first question)
+        if not conv_history:
+            cached_entry, cache_score = cache_lookup(question, subject, language)
+            if cached_entry:
+                save_history(name, grade, subject, question, cached_entry["answer"])
+                update_stats(subject)
+                return {
+                    "status":            "success",
+                    "answer":            rage_warning + cached_entry["answer"],
+                    "graph_url":         cached_entry.get("graph_url"),
+                    "verified":          cached_entry.get("verified", True),
+                    "rag_used":          False,
+                    "cache_hit":         True,
+                    "cache_score":       round(cache_score, 3),
+                    "detected_language": language
+                }
 
         # 6. RAG
         rag_context, rag_used = get_rag_context(question, grade)
 
-        # 7. Instruction — Maths විට Socratic Mode, අනිත් subjects සාමාන්‍ය mode
+        # ✅ NEW — Build conversation context string for Gemini
+        conversation_context = ""
+        if conv_history:
+            conversation_context = "\n\nPrevious conversation:\n"
+            for msg in conv_history:
+                role = msg.get("role", "")
+                text = msg.get("text", "")[:300]  # Limit each message
+                if role == "user":
+                    conversation_context += f"Student: {text}\n"
+                elif role == "ai":
+                    conversation_context += f"Tutor: {text}\n"
+            conversation_context += "\nNow the student asks a follow-up. Use the conversation above for context. Continue naturally.\n"
+
+        # 7. Instruction — with conversation context
         is_math_subject = any(w in subject.lower() for w in ["math", "maths", "ගණිත", "கணித"])
         if is_math_subject:
             instruction = f"""
             {lang_cfg['socratic']}
             Student: {name}, Grade {grade}, Subject: {subject}.
+            {conversation_context}
             If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
             {f'Use this textbook reference: {rag_context}' if rag_context else ''}
             """
@@ -781,6 +770,7 @@ async def solve_math(
             instruction = f"""
             You are an expert {subject} teacher. Student: {name}, Grade {grade}.
             {lang_cfg['instruction']}
+            {conversation_context}
             Solve step by step. If a graph is needed, provide matplotlib code between [GRAPH_START] and [GRAPH_END]. Do NOT use plt.savefig().
             {f'Use this textbook reference: {rag_context}' if rag_context else ''}
             """
@@ -810,10 +800,10 @@ async def solve_math(
             final_answer = answer1
             verified     = True
         else:
-            # Socratic friendly redirection — "වැරදියි" කෙලින්ම නොකියා guide කරනවා
             if is_math_subject:
                 socratic_redirect_prompt = f"""
                 {lang_cfg['socratic']}
+                {conversation_context}
                 The student answered this question: "{question}"
                 Their answer has some issues. WITHOUT saying "wrong" or "incorrect" directly,
                 ask ONE gentle guiding question to help them reconsider their approach.
@@ -822,9 +812,9 @@ async def solve_math(
                 redirect_resp = gemini_check.generate_content(socratic_redirect_prompt)
                 final_answer  = redirect_resp.text
             else:
-                # Non-math: give corrected answer gently
                 gentle_prompt = f"""
                 {lang_cfg['instruction']}
+                {conversation_context}
                 The student asked: "{question}"
                 Provide the correct answer in a warm, encouraging tone.
                 Start with something positive before correcting. Keep it concise.
@@ -853,8 +843,8 @@ async def solve_math(
         save_history(name, grade, subject, question, final_answer)
         update_stats(subject)
 
-        # Cache store — image නොමැති + Socratic නොවන questions only cache කරනවා
-        if not (image and image.filename) and not is_math_subject:
+        # Cache store — only first messages (no conversation), non-math
+        if not conv_history and not (image and image.filename) and not is_math_subject:
             cache_store(question, subject, language, final_answer, graph_url, verified)
 
         return {
@@ -912,6 +902,17 @@ async def admin_remove_blacklist(
         save_json(BLACKLIST_FILE, blacklist)
     return {"status": "success", "message": f"{body.user_name} removed!"}
 
+# ✅ NEW — missing endpoint fix
+@app.post("/admin/blacklist/add")
+async def admin_add_blacklist(
+    body: BlacklistRemoveRequest,
+    x_admin_password: str = Header(default="")
+):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    add_to_blacklist(body.user_name)
+    return {"status": "success", "message": f"{body.user_name} banned for 2 hours!"}
+
 @app.post("/admin/upload_pdf")
 async def admin_upload_pdf(
     pdf: UploadFile = File(...),
@@ -923,16 +924,13 @@ async def admin_upload_pdf(
     contents = await pdf.read()
     filename = pdf.filename
 
-    # 1. Local folder save (fallback)
     with open(os.path.join(PDF_FOLDER, filename), "wb") as f:
         f.write(contents)
 
-    # 2. Cloudinary upload
     cloud_url = ""
     if CLOUDINARY_SUPPORT:
         cloud_url = upload_pdf_to_cloudinary(contents, filename)
 
-    # 3. Pinecone index
     indexed = False
     if PINECONE_SUPPORT and pinecone_index:
         indexed = index_pdf_to_pinecone(contents, filename)
@@ -951,11 +949,9 @@ async def admin_delete_pdf(
 ):
     if not check_admin(x_admin_password):
         raise HTTPException(status_code=401, detail="Unauthorized")
-    # Local delete
     local_path = os.path.join(PDF_FOLDER, filename)
     if os.path.exists(local_path):
         os.remove(local_path)
-    # Cloudinary delete
     if CLOUDINARY_SUPPORT:
         try:
             cloudinary.uploader.destroy(f"sanz_textbooks/{filename.replace('.pdf','')}", resource_type="raw")
