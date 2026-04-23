@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanz AI · Smart Tutor</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- 📐 KaTeX Math Rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <style>
 :root {
   --bg:#EEF2FB; --surface:#FFFFFF; --primary:#1845C8; --primary-lt:#2E65F0;
@@ -236,7 +240,90 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 17px;border-radius:99px;font-size:12px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}}
+
+/* ── 🆕 FEATURE MINI BUTTONS ── */
+.feat-bar{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+.feat-btn{padding:4px 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;transition:.18s;color:var(--text-m);display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.feat-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);transform:translateY(-1px);}
+.feat-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
+.feat-btn.quiz{border-color:rgba(245,158,11,.25);color:#B45309;}
+.feat-btn.quiz:hover,.feat-btn.quiz.active{background:rgba(245,158,11,.1);border-color:#F59E0B;color:#B45309;}
+.feat-btn.lb{border-color:rgba(124,58,237,.2);color:var(--c-al);}
+.feat-btn.lb:hover,.feat-btn.lb.active{background:rgba(124,58,237,.08);border-color:var(--c-al);}
+.feat-btn.img{border-color:rgba(0,191,165,.25);color:#007f6e;}
+.feat-btn.img:hover,.feat-btn.img.active{background:rgba(0,191,165,.08);border-color:var(--accent);}
+.feat-btn.fb{border-color:rgba(239,68,68,.2);color:var(--danger);}
+.feat-btn.fb:hover{background:rgba(239,68,68,.06);border-color:var(--danger);}
+
+/* ── SLIDE PANEL (quiz, leaderboard, image, feedback) ── */
+.slide-panel{position:fixed;bottom:0;left:0;right:0;z-index:5000;background:var(--surface);border-top:1px solid var(--border);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:0 -8px 40px rgba(24,69,200,.15);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);padding:0;}
+.slide-panel.open{transform:translateY(0);}
+.sp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.sp-head h3{font-size:14px;font-weight:700;color:var(--text-h);}
+.sp-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-m);padding:4px 8px;border-radius:8px;}
+.sp-close:hover{background:var(--bg);color:var(--text-h);}
+.sp-body{padding:16px 18px;}
+.sp-overlay{position:fixed;inset:0;z-index:4999;background:rgba(7,14,46,.4);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s;}
+.sp-overlay.open{opacity:1;pointer-events:all;}
+
+/* ── QUIZ PANEL ── */
+.qz-progress{height:5px;background:var(--bg);border-radius:99px;overflow:hidden;margin-bottom:14px;}
+.qz-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:99px;transition:width .4s ease;}
+.qz-num{font-size:10px;font-weight:700;color:var(--text-m);margin-bottom:6px;}
+.qz-question{font-size:14px;font-weight:700;color:var(--text-h);line-height:1.7;margin-bottom:14px;}
+.qz-opts{display:flex;flex-direction:column;gap:7px;}
+.qz-opt{padding:10px 14px;border:2px solid var(--border);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text-h);cursor:pointer;text-align:left;transition:.15s;}
+.qz-opt:hover{border-color:var(--primary);background:var(--primary-dim);}
+.qz-opt.correct{border-color:#16A34A;background:rgba(22,163,74,.08);color:#16A34A;}
+.qz-opt.wrong{border-color:var(--danger);background:rgba(239,68,68,.06);color:var(--danger);}
+.qz-opt.locked{pointer-events:none;opacity:.7;}
+.qz-exp{margin-top:12px;padding:10px 14px;background:var(--primary-dim);border-radius:var(--r-sm);font-size:11.5px;color:var(--text-p);line-height:1.7;}
+.qz-result{text-align:center;padding:16px 0;}
+.qz-circle{width:80px;height:80px;border-radius:50%;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;margin-bottom:12px;border:3px solid;}
+.qz-circle.great{border-color:#16A34A;background:rgba(22,163,74,.08);}
+.qz-circle.ok{border-color:var(--primary);background:var(--primary-dim);}
+.qz-circle.low{border-color:var(--danger);background:rgba(239,68,68,.06);}
+.qz-pct{font-size:24px;line-height:1;}
+.qz-sc{font-size:10px;color:var(--text-m);}
+.xp-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);color:#B45309;padding:5px 14px;border-radius:99px;font-weight:800;font-size:12px;margin:8px 0;}
+.qz-review{text-align:left;margin-top:14px;}
+.qz-rev-item{padding:8px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:5px;font-size:11px;}
+.qz-rev-item.right{border-color:rgba(22,163,74,.2);background:rgba(22,163,74,.03);}
+.qz-rev-item.wrong2{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.03);}
+
+/* ── LEADERBOARD PANEL ── */
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.lb-rank.g{background:rgba(245,158,11,.12);color:#B45309;}
+.lb-rank.s{background:rgba(156,163,175,.12);color:#4B5563;}
+.lb-rank.b{background:rgba(180,83,9,.1);color:#92400E;}
+.lb-rank.n{background:var(--primary-dim);color:var(--primary);}
+.lb-name{flex:1;font-size:12px;font-weight:600;color:var(--text-h);}
+.lb-xp{font-size:12px;font-weight:800;color:#B45309;}
+.lb-you{background:var(--primary-dim);border-radius:8px;padding:2px 6px;}
+
+/* ── IMAGE GEN PANEL ── */
+.ig-input{display:flex;gap:7px;margin-bottom:12px;}
+.ig-inp{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:12px;color:var(--text-h);outline:none;}
+.ig-inp:focus{border-color:var(--primary);}
+.ig-btn{padding:9px 16px;background:linear-gradient(135deg,var(--accent),#00897B);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.ig-result{text-align:center;}
+.ig-result img{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;}
+
+/* ── FEEDBACK PANEL ── */
+.fb-stars{display:flex;gap:6px;justify-content:center;margin:12px 0;}
+.fb-star{font-size:28px;cursor:pointer;transition:.15s;filter:grayscale(1) opacity(.35);}
+.fb-star:hover,.fb-star.lit{filter:none;transform:scale(1.15);}
+.fb-msg{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:12px;color:var(--text-h);outline:none;resize:none;min-height:60px;margin:8px 0;}
+.fb-msg:focus{border-color:var(--primary);}
+.fb-submit{width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;}
+.fb-submit:hover{background:var(--primary-lt);}
+
+/* ── XP BAR (topbar) ── */
+.tb-xp{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;border:1.5px solid rgba(245,158,11,.25);color:#B45309;background:rgba(245,158,11,.06);}
+
+@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}.slide-panel{max-height:85vh;}}
 </style>
 </head>
 <body>
@@ -351,6 +438,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       </div>
     </div>
     <div class="tb-r">
+      <div class="tb-xp" id="tbXp" style="display:none">⚡ <span id="tbXpVal">0</span> XP · 🔥<span id="tbStreak">0</span></div>
       <div class="tb-b bs" id="tbGb">Grade 6</div>
       <div class="tb-b bl" id="tbLb">සිංහල</div>
     </div>
@@ -382,8 +470,14 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <button class="ip-rm" onclick="rmImg()">✕</button>
     </div>
     <div class="in-tools">
-      <label class="it-upl" id="uplLbl" for="imgInp">📷 Image</label>
+      <label class="it-upl" id="uplLbl" for="imgInp">📷</label>
       <input type="file" id="imgInp" accept="image/*" onchange="onImgSel(event)">
+      <div class="feat-bar">
+        <button class="feat-btn quiz" onclick="togglePanel('quiz')">📝 Quiz</button>
+        <button class="feat-btn lb" onclick="togglePanel('lb')">🏆</button>
+        <button class="feat-btn img" onclick="togglePanel('img')">🎨 Draw</button>
+        <button class="feat-btn fb" onclick="togglePanel('fb')">💬</button>
+      </div>
     </div>
     <div class="in-box">
       <textarea id="qIn" rows="1" placeholder="ප්‍රශ්නය ටයිප් කරන්න..." onkeydown="onKey(event)" oninput="aH(this)"></textarea>
@@ -392,6 +486,53 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
     </div>
   </div>
 </div>
+
+<!-- 🆕 OVERLAY -->
+<div class="sp-overlay" id="spOverlay" onclick="closeAllPanels()"></div>
+
+<!-- 📝 QUIZ PANEL -->
+<div class="slide-panel" id="panelQuiz">
+  <div class="sp-head"><h3>📝 Quiz</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body" id="quizBody"><div style="text-align:center;color:var(--text-m);padding:20px">Touch "Start" to begin!</div>
+    <button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>
+  </div>
+</div>
+
+<!-- 🏆 LEADERBOARD PANEL -->
+<div class="slide-panel" id="panelLb">
+  <div class="sp-head"><h3>🏆 Leaderboard</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body" id="lbBody"><div style="text-align:center;color:var(--text-m);padding:20px">Loading...</div></div>
+</div>
+
+<!-- 🎨 IMAGE GEN PANEL -->
+<div class="slide-panel" id="panelImg">
+  <div class="sp-head"><h3>🎨 AI Diagram</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body">
+    <div class="ig-input">
+      <input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram, Human heart...">
+      <button class="ig-btn" onclick="genImage()">🎨 Draw</button>
+    </div>
+    <div class="ig-result" id="igResult"></div>
+  </div>
+</div>
+
+<!-- 💬 FEEDBACK PANEL -->
+<div class="slide-panel" id="panelFb">
+  <div class="sp-head"><h3>💬 Feedback</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body">
+    <div style="text-align:center;font-size:12px;color:var(--text-m);margin-bottom:6px">ඔබේ අත්දැකීම කොහොමද?</div>
+    <div class="fb-stars" id="fbStars">
+      <span class="fb-star" onclick="rateStar(1)">⭐</span>
+      <span class="fb-star" onclick="rateStar(2)">⭐</span>
+      <span class="fb-star" onclick="rateStar(3)">⭐</span>
+      <span class="fb-star" onclick="rateStar(4)">⭐</span>
+      <span class="fb-star" onclick="rateStar(5)">⭐</span>
+    </div>
+    <textarea class="fb-msg" id="fbMsg" placeholder="ඔබේ අදහස් ලියන්න... (optional)"></textarea>
+    <button class="fb-submit" onclick="submitFeedback()">📩 Send Feedback</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -651,6 +792,8 @@ async function tryLogin(){
     loginBtn.disabled=false;
     loginBtn.textContent=origText;
     setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
+    // 🎮 Load XP progress
+    setTimeout(()=>loadProgress(),500);
 
   }catch(e){
     // Server unreachable
@@ -954,6 +1097,9 @@ async function sendMsg(){
       addAI(d.answer,d.graph_url,true);
       // ✅ NEW — save AI response to conversation
       conversationMessages.push({ role: "ai", text: d.answer });
+      // 🎮 Update XP display
+      if(d.progress)updateXpDisplay(d.progress);
+      if(d.new_badge)showToast('🎉 New Badge: '+d.new_badge,3500);
     }
     else addAI('⚠️ '+(d.message||'Error'),null,false);
   }catch(e){
@@ -988,7 +1134,23 @@ function addAI(md,graph,withReactions){
   if(withReactions){
     w.querySelector('.mbody').appendChild(buildReactions(mid));
   }
-  c.appendChild(w);se();
+  c.appendChild(w);
+  // 📐 KaTeX — render math equations
+  try{
+    const bub=w.querySelector('.mbub');
+    if(window.renderMathInElement){
+      renderMathInElement(bub,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'$',right:'$',display:false},
+          {left:'\\(',right:'\\)',display:false},
+          {left:'\\[',right:'\\]',display:true},
+        ],
+        throwOnError:false
+      });
+    }
+  }catch(e){}
+  se();
 }
 
 let typEl=null;
@@ -1050,6 +1212,194 @@ function parseMD(md){
 window.addEventListener('keydown',e=>{
   if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){e.preventDefault();window.location.href='dashboard.html';}
 });
+
+/* ══════════════════════════════════════════
+   🆕 FEATURE PANELS — Toggle Show/Hide
+   ══════════════════════════════════════════ */
+let openPanel=null;
+
+function togglePanel(name){
+  const panel=document.getElementById('panel'+name.charAt(0).toUpperCase()+name.slice(1));
+  const overlay=document.getElementById('spOverlay');
+  if(openPanel===name){
+    closeAllPanels();return;
+  }
+  closeAllPanels();
+  openPanel=name;
+  panel.classList.add('open');
+  overlay.classList.add('open');
+  // Auto-load data
+  if(name==='lb')loadLeaderboard();
+  if(name==='quiz')resetQuizPanel();
+}
+
+function closeAllPanels(){
+  document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));
+  document.getElementById('spOverlay').classList.remove('open');
+  document.querySelectorAll('.feat-btn').forEach(b=>b.classList.remove('active'));
+  openPanel=null;
+}
+
+/* ══ 🎮 XP DISPLAY ══ */
+function updateXpDisplay(progress){
+  if(!progress)return;
+  const xpEl=document.getElementById('tbXp');
+  xpEl.style.display='flex';
+  document.getElementById('tbXpVal').textContent=progress.xp||0;
+  document.getElementById('tbStreak').textContent=progress.streak||0;
+}
+
+/* ══ 📝 QUIZ ══ */
+let quizSessionId=null;
+let quizAnswered=false;
+
+function resetQuizPanel(){
+  document.getElementById('quizBody').innerHTML=`
+    <div style="text-align:center;color:var(--text-m);padding:16px 0;font-size:12px">
+      ${S.subject} විෂයේ ප්‍රශ්න 5ක Quiz එකක්!<br>
+      <small>Grade ${S.grade} · ${S.lang==='si'?'සිංහල':S.lang==='ta'?'தமிழ்':'English'}</small>
+    </div>
+    <button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>`;
+}
+
+async function startQuiz(){
+  const body=document.getElementById('quizBody');
+  body.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-m)">⏳ Generating quiz...</div>';
+  try{
+    const res=await fetch(`${API}/quiz/start`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_name:S.name,grade:String(S.grade),subject:S.subject,language:S.lang})
+    });
+    const d=await res.json();
+    if(d.status==='success'){quizSessionId=d.session_id;renderQuizQ(d);}
+    else body.innerHTML=`<div style="text-align:center;padding:20px;color:var(--danger)">❌ ${d.message||'Failed'}</div>`;
+  }catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Server error</div>';}
+}
+
+function renderQuizQ(d){
+  quizAnswered=false;
+  const body=document.getElementById('quizBody');
+  body.innerHTML=`
+    <div class="qz-progress"><div class="qz-progress-fill" style="width:${d.progress_pct||0}%"></div></div>
+    <div class="qz-num">Question ${d.current}/${d.total} ${d.score_so_far!=null?'· Score: '+d.score_so_far:''}</div>
+    <div class="qz-question">${esc(d.question)}</div>
+    <div class="qz-opts">${(d.options||[]).map(o=>`<button class="qz-opt" onclick="answerQuiz('${esc(o.charAt(0))}',this)">${esc(o)}</button>`).join('')}</div>
+    <div id="qzExp"></div>`;
+}
+
+async function answerQuiz(ans,btn){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  document.querySelectorAll('.qz-opt').forEach(b=>b.classList.add('locked'));
+  try{
+    const res=await fetch(`${API}/quiz/answer`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({session_id:quizSessionId,user_name:S.name,user_answer:ans})
+    });
+    const d=await res.json();
+    btn.classList.add(d.correct?'correct':'wrong');
+    document.getElementById('qzExp').innerHTML=`<div class="qz-exp"><strong>${d.correct?'✅':'❌'}</strong> ${esc(d.explanation||'')}</div>`;
+    if(d.status==='completed'){
+      setTimeout(()=>renderQuizResult(d),1200);
+    } else {
+      setTimeout(()=>renderQuizQ({...d,session_id:quizSessionId}),1400);
+    }
+  }catch(e){quizAnswered=false;showToast('⚠️ Error');}
+}
+
+function renderQuizResult(d){
+  const pct=d.percent||0;
+  const cls=pct>=80?'great':pct>=50?'ok':'low';
+  document.getElementById('quizBody').innerHTML=`
+    <div class="qz-result">
+      <div class="qz-circle ${cls}"><span class="qz-pct">${pct}%</span><span class="qz-sc">${d.score}/${d.total}</span></div>
+      <h3 style="font-size:15px;margin-bottom:4px">${pct>=80?'🏆 Excellent!':pct>=50?'😊 Good job!':'😅 Keep trying!'}</h3>
+      <div class="xp-pill">⚡ +${d.xp_earned} XP</div>
+      <div style="display:flex;gap:7px;justify-content:center;margin:12px 0">
+        <button onclick="startQuiz()" style="padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔄 Again</button>
+        <button onclick="closeAllPanels()" style="padding:8px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-p)">Close</button>
+      </div>
+      <div class="qz-review"><div style="font-size:10px;font-weight:700;color:var(--text-m);margin-bottom:6px">REVIEW</div>
+        ${(d.answers||[]).map(a=>`<div class="qz-rev-item ${a.correct?'right':'wrong2'}"><div style="font-weight:700;margin-bottom:2px">${esc(a.question)}</div><div style="color:var(--text-m)">You: ${esc(a.user_answer)} · Answer: ${esc(a.right_answer)}</div></div>`).join('')}
+      </div>
+    </div>`;
+  // Refresh XP
+  loadProgress();
+}
+
+/* ══ 🏆 LEADERBOARD ══ */
+async function loadLeaderboard(){
+  const body=document.getElementById('lbBody');
+  body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">Loading...</div>';
+  try{
+    const res=await fetch(`${API}/leaderboard`);
+    const d=await res.json();
+    const list=d.leaderboard||[];
+    if(!list.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">No entries yet!</div>';return;}
+    body.innerHTML=list.map(e=>{
+      const rc=e.rank===1?'g':e.rank===2?'s':e.rank===3?'b':'n';
+      const emoji=e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':e.rank;
+      const isYou=e.name===S.name;
+      return`<div class="lb-row${isYou?' lb-you':''}">
+        <div class="lb-rank ${rc}">${emoji}</div>
+        <div class="lb-name">${esc(e.name)}${isYou?' <small style="color:var(--primary)">(you)</small>':''}</div>
+        <div style="font-size:10px;color:var(--text-m)">🔥${e.streak||0}d</div>
+        <div class="lb-xp">${e.xp||0} XP</div>
+      </div>`;
+    }).join('');
+  }catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Error</div>';}
+}
+
+/* ══ 🎨 IMAGE GENERATION ══ */
+async function genImage(){
+  const inp=document.getElementById('igInp');
+  const prompt=inp.value.trim();
+  if(!prompt){showToast('Describe what to draw!');return;}
+  const result=document.getElementById('igResult');
+  result.innerHTML='<div style="padding:20px;color:var(--text-m)">🎨 Drawing...</div>';
+  try{
+    const res=await fetch(`${API}/generate-image`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:prompt,subject:S.subject,language:S.lang})
+    });
+    const d=await res.json();
+    if(d.status==='success'&&d.image_url){
+      result.innerHTML=`<p style="font-size:12px;color:var(--text-p);margin-bottom:8px">${esc(d.description||'')}</p><img src="${d.image_url}" alt="Generated diagram">`;
+    } else {
+      result.innerHTML=`<div style="color:var(--text-m);padding:10px">${esc(d.description||d.message||'Could not generate image')}</div>`;
+    }
+  }catch(e){result.innerHTML='<div style="color:var(--danger);padding:10px">⚠️ Error</div>';}
+}
+
+/* ══ 💬 FEEDBACK ══ */
+let fbRating=0;
+function rateStar(n){
+  fbRating=n;
+  document.querySelectorAll('.fb-star').forEach((s,i)=>{
+    s.classList.toggle('lit',i<n);
+  });
+}
+function submitFeedback(){
+  const msg=document.getElementById('fbMsg').value.trim();
+  if(!fbRating){showToast('⭐ Please rate first!');return;}
+  // Save locally (or send to backend if you add endpoint)
+  const feedback={user:S.name,rating:fbRating,message:msg,time:new Date().toISOString()};
+  console.log('Feedback:',feedback);
+  showToast('🙏 Thank you for your feedback!');
+  closeAllPanels();
+  fbRating=0;
+  document.querySelectorAll('.fb-star').forEach(s=>s.classList.remove('lit'));
+  document.getElementById('fbMsg').value='';
+}
+
+/* ══ 📊 LOAD PROGRESS ══ */
+async function loadProgress(){
+  try{
+    const res=await fetch(`${API}/progress/${S.name}`);
+    const d=await res.json();
+    if(d.status==='success')updateXpDisplay(d.progress);
+  }catch(e){}
+}
 </script>
 </body>
 </html>
