@@ -4,6 +4,8 @@ import base64
 import re
 import json
 import datetime
+import hashlib
+import secrets
 
 from fastapi import FastAPI, Form, File, UploadFile, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -531,6 +533,80 @@ def check_admin(x_admin_password: str = "") -> bool:
     return x_admin_password == ADMIN_PASSWORD
 
 # ══════════════════════════════════════════
+# ── Backend Authentication API (🔐 NEW) ──
+# ── Frontend passwords replace කරනවා ──
+# ══════════════════════════════════════════
+USERS_FILE = "users.json"
+
+def get_users():
+    """Load users — first time default users create කරනවා"""
+    default = {
+        "sanduni": {
+            "password_hash": hashlib.sha256("momsanzdad2001#".encode()).hexdigest(),
+            "role": "admin"
+        },
+        "hansika": {
+            "password_hash": hashlib.sha256("sanz2024".encode()).hexdigest(),
+            "role": "user"
+        }
+    }
+    users = load_json(USERS_FILE, None)
+    if users is None:
+        save_json(USERS_FILE, default)
+        return default
+    return users
+
+class LoginRequest(BaseModel):
+    name: str
+    password: str
+
+class RegisterRequest(BaseModel):
+    name: str
+    password: str
+    role: str = "user"
+
+@app.post("/auth/login")
+async def login(body: LoginRequest):
+    """Frontend එකෙන් login — password backend එකේ check"""
+    users = get_users()
+    name = body.name.strip().lower()
+
+    if name not in users:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    pw_hash = hashlib.sha256(body.password.encode()).hexdigest()
+    if users[name]["password_hash"] != pw_hash:
+        raise HTTPException(status_code=401, detail="Wrong password")
+
+    # Session token generate
+    token = secrets.token_hex(32)
+    return {
+        "status": "success",
+        "token": token,
+        "role": users[name]["role"],
+        "name": name
+    }
+
+@app.post("/auth/register")
+async def register(body: RegisterRequest, x_admin_password: str = Header(default="")):
+    """Admin විතරක් new users add කරන්න පුළුවන්"""
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Only admin can register users")
+
+    users = get_users()
+    name = body.name.strip().lower()
+
+    if name in users:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    users[name] = {
+        "password_hash": hashlib.sha256(body.password.encode()).hexdigest(),
+        "role": body.role
+    }
+    save_json(USERS_FILE, users)
+    return {"status": "success", "message": f"{name} registered!"}
+
+# ══════════════════════════════════════════
 # ── Health Check ──
 # ══════════════════════════════════════════
 @app.get("/health")
@@ -823,7 +899,7 @@ async def solve_math(
                 final_answer = gentle_resp.text
             verified = False
 
-        # 10. Graph
+        # 10. Graph — 🔒 SANDBOXED exec
         graph_url   = None
         graph_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', final_answer, re.DOTALL)
         if graph_match:
@@ -831,7 +907,28 @@ async def solve_math(
             final_answer = re.sub(r'\[GRAPH_START\].*?\[GRAPH_END\]', '', final_answer, flags=re.DOTALL)
             try:
                 plt.figure(figsize=(6, 4))
-                exec(graph_code)
+                # 🔒 Sandboxed — plt, np විතරක් allow, os/system/import block
+                safe_globals = {
+                    "__builtins__": {},
+                    "plt": plt,
+                    "np": np,
+                    "range": range,
+                    "len": len,
+                    "zip": zip,
+                    "list": list,
+                    "tuple": tuple,
+                    "int": int,
+                    "float": float,
+                    "str": str,
+                    "abs": abs,
+                    "min": min,
+                    "max": max,
+                    "sum": sum,
+                    "round": round,
+                    "enumerate": enumerate,
+                    "math": __import__('math'),
+                }
+                exec(graph_code, safe_globals)
                 buf = io.BytesIO()
                 plt.savefig(buf, format='png', bbox_inches='tight')
                 buf.seek(0)
@@ -839,6 +936,7 @@ async def solve_math(
                 plt.close()
             except Exception as e:
                 print(f"Graph error: {e}")
+                plt.close()
 
         save_history(name, grade, subject, question, final_answer)
         update_stats(subject)
