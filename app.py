@@ -74,8 +74,8 @@ if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')
-gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
+gemini_flash = genai.GenerativeModel('gemini-2.0-flash-lite')   # ⚡ Main answer — different model
+gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')   # ✅ Cross-check — different quota
 
 HISTORY_FILE   = "history.json"
 BLACKLIST_FILE = "blacklist.json"
@@ -1172,22 +1172,22 @@ async def solve_math(
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
 
-        # 9. Gemini Cross Check
-        cross_check_prompt = f"""
-        Is this answer correct?
-        Question: {question}
-        Answer: {answer1[:500]}
-        {lang_cfg['cross_check']}
-        """
-        cross_response = gemini_check.generate_content(cross_check_prompt)
-        cross_check    = cross_response.text
-        correct_word   = lang_cfg['correct_word']
+        # 9. Cross Check — ⚡ MATH ONLY (saves API quota!)
+        if is_math_subject:
+            cross_check_prompt = f"""
+            Is this answer correct?
+            Question: {question}
+            Answer: {answer1[:500]}
+            {lang_cfg['cross_check']}
+            """
+            cross_response = gemini_check.generate_content(cross_check_prompt)
+            cross_check    = cross_response.text
+            correct_word   = lang_cfg['correct_word']
 
-        if correct_word in cross_check:
-            final_answer = answer1
-            verified     = True
-        else:
-            if is_math_subject:
+            if correct_word in cross_check:
+                final_answer = answer1
+                verified     = True
+            else:
                 socratic_redirect_prompt = f"""
                 {lang_cfg['socratic']}
                 {conversation_context}
@@ -1198,17 +1198,11 @@ async def solve_math(
                 """
                 redirect_resp = gemini_check.generate_content(socratic_redirect_prompt)
                 final_answer  = redirect_resp.text
-            else:
-                gentle_prompt = f"""
-                {lang_cfg['instruction']}
-                {conversation_context}
-                The student asked: "{question}"
-                Provide the correct answer in a warm, encouraging tone.
-                Start with something positive before correcting. Keep it concise.
-                """
-                gentle_resp  = gemini_check.generate_content(gentle_prompt)
-                final_answer = gentle_resp.text
-            verified = False
+                verified = False
+        else:
+            # Non-math — skip cross-check, direct answer (saves 1 API call!)
+            final_answer = answer1
+            verified     = True
 
         # 10. Graph — 🔒 SANDBOXED exec
         graph_url   = None
@@ -1273,7 +1267,18 @@ async def solve_math(
         }
 
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        error_msg = str(e)
+        # ⚡ Rate limit — friendly message instead of scary error
+        if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
+            retry_msgs = {
+                "si": "⏳ AI එක ටිකක් විවේක ගන්නවා! තත්පර 30කින් නැවත try කරන්න. 😊",
+                "en": "⏳ AI is taking a short break! Please try again in 30 seconds. 😊",
+                "ta": "⏳ AI சிறிது ஓய்வு எடுக்கிறது! 30 வினாடிகளில் மீண்டும் முயற்சிக்கவும். 😊"
+            }
+            return {"status": "success", "answer": retry_msgs.get(language, retry_msgs["en"]),
+                    "graph_url": None, "verified": True, "rag_used": False,
+                    "cache_hit": False, "detected_language": language}
+        return {"status": "error", "message": error_msg}
 
 
 # ══════════════════════════════════════════
