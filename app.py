@@ -82,6 +82,9 @@ BLACKLIST_FILE = "blacklist.json"
 PDF_FOLDER     = "textbooks"
 STATS_FILE     = "stats.json"
 CACHE_FILE     = "semantic_cache.json"
+PROGRESS_FILE  = "progress.json"      # 🎮 XP + Streaks
+QUIZ_FILE      = "quiz_sessions.json"  # 📝 Quiz sessions
+LEADERBOARD_FILE = "leaderboard.json"  # 🏆 Leaderboard
 
 # ── Semantic Cache Config ──
 CACHE_SIMILARITY_THRESHOLD = 0.82
@@ -607,6 +610,314 @@ async def register(body: RegisterRequest, x_admin_password: str = Header(default
     return {"status": "success", "message": f"{name} registered!"}
 
 # ══════════════════════════════════════════
+# ── 🎮 XP + Progress System ──
+# ══════════════════════════════════════════
+
+def get_progress(user_name: str) -> dict:
+    progress = load_json(PROGRESS_FILE, {})
+    if user_name not in progress:
+        progress[user_name] = {
+            "total_questions": 0, "correct_answers": 0,
+            "subjects": {}, "daily_counts": {},
+            "streak": 0, "last_active_date": None,
+            "xp": 0, "badges": [], "quiz_scores": []
+        }
+        save_json(PROGRESS_FILE, progress)
+    return progress[user_name]
+
+def update_progress(user_name: str, subject: str, correct: bool, xp_earned: int = 5):
+    progress = load_json(PROGRESS_FILE, {})
+    if user_name not in progress:
+        get_progress(user_name)
+        progress = load_json(PROGRESS_FILE, {})
+
+    p = progress[user_name]
+    today = datetime.date.today().isoformat()
+
+    p["total_questions"] = p.get("total_questions", 0) + 1
+    if correct:
+        p["correct_answers"] = p.get("correct_answers", 0) + 1
+        p["xp"] = p.get("xp", 0) + xp_earned
+
+    # Subject tracking
+    if subject not in p.get("subjects", {}):
+        p["subjects"][subject] = {"asked": 0, "correct": 0}
+    p["subjects"][subject]["asked"] += 1
+    if correct:
+        p["subjects"][subject]["correct"] += 1
+
+    # Daily count
+    p.setdefault("daily_counts", {})
+    p["daily_counts"][today] = p["daily_counts"].get(today, 0) + 1
+
+    # Streak
+    last = p.get("last_active_date")
+    if last:
+        diff = (datetime.date.today() - datetime.date.fromisoformat(last)).days
+        if diff == 1:
+            p["streak"] = p.get("streak", 0) + 1
+        elif diff > 1:
+            p["streak"] = 1
+    else:
+        p["streak"] = 1
+    p["last_active_date"] = today
+
+    # Badges
+    badges = p.get("badges", [])
+    new_badge = None
+    xp = p.get("xp", 0)
+    total_q = p["total_questions"]
+    streak = p.get("streak", 0)
+
+    badge_rules = [
+        (total_q >= 1,    "🌱 Beginner"),
+        (total_q >= 10,   "📚 Scholar"),
+        (total_q >= 50,   "🔥 Dedicated"),
+        (total_q >= 100,  "🏆 Champion"),
+        (total_q >= 250,  "💫 Legend"),
+        (streak >= 3,     "⚡ 3-Day Streak"),
+        (streak >= 7,     "🌟 Week Streak"),
+        (streak >= 30,    "👑 Month Streak"),
+        (xp >= 100,       "💎 XP 100"),
+        (xp >= 500,       "🔶 XP 500"),
+        (xp >= 1000,      "💠 XP 1000"),
+    ]
+    for condition, badge in badge_rules:
+        if condition and badge not in badges:
+            badges.append(badge)
+            new_badge = badge
+            break  # one badge at a time
+
+    p["badges"] = badges
+    progress[user_name] = p
+    save_json(PROGRESS_FILE, progress)
+    return new_badge
+
+def update_leaderboard(user_name: str, grade: str):
+    lb = load_json(LEADERBOARD_FILE, {})
+    progress = load_json(PROGRESS_FILE, {})
+    if user_name in progress:
+        p = progress[user_name]
+        lb[user_name] = {
+            "xp": p.get("xp", 0), "streak": p.get("streak", 0),
+            "total_q": p.get("total_questions", 0),
+            "badges": len(p.get("badges", [])),
+            "grade": grade,
+            "updated": datetime.datetime.now().isoformat()
+        }
+        save_json(LEADERBOARD_FILE, lb)
+
+@app.get("/progress/{user_name}")
+async def get_student_progress(user_name: str):
+    return {"status": "success", "progress": get_progress(user_name.lower())}
+
+@app.get("/leaderboard")
+async def get_leaderboard(grade: str = ""):
+    lb = load_json(LEADERBOARD_FILE, {})
+    entries = list(lb.items())
+    if grade:
+        entries = [(k, v) for k, v in entries if str(v.get("grade", "")) == grade]
+    entries.sort(key=lambda x: x[1].get("xp", 0), reverse=True)
+    return {"status": "success", "leaderboard": [
+        {"rank": i+1, "name": name, **data}
+        for i, (name, data) in enumerate(entries[:20])
+    ]}
+
+# ══════════════════════════════════════════
+# ── 📝 Quiz System ──
+# ══════════════════════════════════════════
+
+class QuizStartRequest(BaseModel):
+    user_name: str
+    grade: str
+    subject: str
+    language: str = "si"
+
+class QuizAnswerRequest(BaseModel):
+    session_id: str
+    user_name: str
+    user_answer: str
+
+@app.post("/quiz/start")
+async def start_quiz(body: QuizStartRequest):
+    lang = body.language if body.language in LANG_INSTRUCTIONS else "en"
+    difficulty = "easy" if int(body.grade) <= 5 else "medium" if int(body.grade) <= 9 else "hard"
+
+    prompt = f"""Generate exactly 5 multiple-choice quiz questions for:
+Grade: {body.grade}, Subject: {body.subject}, Difficulty: {difficulty}
+Language: {body.language}
+
+Return ONLY valid JSON:
+{{"questions":[{{"q":"Question","options":["A) opt1","B) opt2","C) opt3","D) opt4"],"answer":"A","explanation":"Why A is correct"}}]}}"""
+
+    try:
+        response = gemini_flash.generate_content(prompt)
+        raw = re.sub(r'^```json\s*|\s*```$', '', response.text.strip())
+        data = json.loads(raw)
+        questions = data.get("questions", [])
+        if not questions:
+            raise ValueError("No questions")
+    except Exception as e:
+        return {"status": "error", "message": f"Quiz generation failed: {e}"}
+
+    session_id = secrets.token_hex(8)
+    sessions = load_json(QUIZ_FILE, {})
+    sessions[session_id] = {
+        "user_name": body.user_name, "grade": body.grade,
+        "subject": body.subject, "language": lang,
+        "questions": questions, "current": 0,
+        "score": 0, "answers": [],
+        "started": datetime.datetime.now().isoformat(),
+        "completed": False
+    }
+    save_json(QUIZ_FILE, sessions)
+
+    q = questions[0]
+    return {
+        "status": "success", "session_id": session_id,
+        "total": len(questions), "current": 1,
+        "question": q["q"], "options": q["options"],
+        "progress_pct": 0
+    }
+
+@app.post("/quiz/answer")
+async def answer_quiz(body: QuizAnswerRequest):
+    sessions = load_json(QUIZ_FILE, {})
+    if body.session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    sess = sessions[body.session_id]
+    if sess["completed"]:
+        raise HTTPException(status_code=400, detail="Quiz already done")
+
+    idx = sess["current"]
+    q = sess["questions"][idx]
+    correct = body.user_answer.strip().upper().startswith(q["answer"].upper())
+
+    if correct:
+        sess["score"] += 1
+
+    sess["answers"].append({
+        "question": q["q"], "user_answer": body.user_answer,
+        "correct": correct, "right_answer": q["answer"],
+        "explanation": q.get("explanation", "")
+    })
+    sess["current"] += 1
+
+    # Quiz completed?
+    if sess["current"] >= len(sess["questions"]):
+        sess["completed"] = True
+        sessions[body.session_id] = sess
+        save_json(QUIZ_FILE, sessions)
+
+        # Award XP
+        xp_earned = sess["score"] * 15
+        user = body.user_name.lower()
+        progress = load_json(PROGRESS_FILE, {})
+        if user not in progress:
+            get_progress(user)
+            progress = load_json(PROGRESS_FILE, {})
+        p = progress.get(user, {})
+        p["xp"] = p.get("xp", 0) + xp_earned
+        p.setdefault("quiz_scores", []).append({
+            "subject": sess["subject"], "score": sess["score"],
+            "total": len(sess["questions"]), "xp": xp_earned,
+            "date": datetime.date.today().isoformat()
+        })
+        progress[user] = p
+        save_json(PROGRESS_FILE, progress)
+        update_leaderboard(user, sess["grade"])
+
+        return {
+            "status": "completed", "correct": correct,
+            "explanation": q.get("explanation", ""),
+            "score": sess["score"], "total": len(sess["questions"]),
+            "percent": round(sess["score"] / len(sess["questions"]) * 100),
+            "xp_earned": xp_earned, "answers": sess["answers"]
+        }
+
+    # Next question
+    sessions[body.session_id] = sess
+    save_json(QUIZ_FILE, sessions)
+    next_q = sess["questions"][sess["current"]]
+    return {
+        "status": "ongoing", "correct": correct,
+        "explanation": q.get("explanation", ""),
+        "current": sess["current"] + 1, "total": len(sess["questions"]),
+        "question": next_q["q"], "options": next_q["options"],
+        "score_so_far": sess["score"],
+        "progress_pct": round(sess["current"] / len(sess["questions"]) * 100)
+    }
+
+# ══════════════════════════════════════════
+# ── 🎨 AI Image Generation ──
+# ══════════════════════════════════════════
+
+class ImageGenRequest(BaseModel):
+    prompt: str
+    subject: str = "General"
+    language: str = "en"
+
+@app.post("/generate-image")
+async def generate_image(body: ImageGenRequest):
+    """AI image generation using Gemini's image capabilities"""
+    try:
+        # Gemini vision model for educational diagrams
+        img_prompt = f"""Create a clear, educational diagram/illustration for this topic:
+"{body.prompt}"
+Subject: {body.subject}
+
+Requirements:
+- Simple, clean, student-friendly style
+- Use labels and arrows where needed
+- Educational and easy to understand
+- Suitable for Grade school students
+
+Describe the image in detail so it can be visualized, then provide matplotlib code to draw it.
+Put the code between [GRAPH_START] and [GRAPH_END] tags.
+Do NOT use plt.savefig()."""
+
+        response = gemini_flash.generate_content(img_prompt)
+        answer = response.text
+
+        # Extract and execute graph code
+        graph_url = None
+        graph_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', answer, re.DOTALL)
+        description = re.sub(r'\[GRAPH_START\].*?\[GRAPH_END\]', '', answer, flags=re.DOTALL).strip()
+
+        if graph_match:
+            graph_code = graph_match.group(1).strip()
+            try:
+                plt.figure(figsize=(8, 6))
+                safe_globals = {
+                    "__builtins__": {},
+                    "plt": plt, "np": np,
+                    "range": range, "len": len, "zip": zip,
+                    "list": list, "tuple": tuple,
+                    "int": int, "float": float, "str": str,
+                    "abs": abs, "min": min, "max": max,
+                    "sum": sum, "round": round, "enumerate": enumerate,
+                    "math": __import__('math'),
+                }
+                exec(graph_code, safe_globals)
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png', bbox_inches='tight', dpi=150)
+                buf.seek(0)
+                graph_url = f"data:image/png;base64,{base64.b64encode(buf.read()).decode('utf-8')}"
+                plt.close()
+            except Exception as e:
+                print(f"Image gen error: {e}")
+                plt.close()
+
+        return {
+            "status": "success",
+            "description": description[:500],
+            "image_url": graph_url
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# ══════════════════════════════════════════
 # ── Health Check ──
 # ══════════════════════════════════════════
 @app.get("/health")
@@ -941,6 +1252,10 @@ async def solve_math(
         save_history(name, grade, subject, question, final_answer)
         update_stats(subject)
 
+        # 🎮 XP + Progress tracking
+        new_badge = update_progress(name.lower(), subject, verified, xp_earned=5 if verified else 2)
+        update_leaderboard(name.lower(), grade)
+
         # Cache store — only first messages (no conversation), non-math
         if not conv_history and not (image and image.filename) and not is_math_subject:
             cache_store(question, subject, language, final_answer, graph_url, verified)
@@ -952,7 +1267,9 @@ async def solve_math(
             "verified":          verified,
             "rag_used":          rag_used,
             "cache_hit":         False,
-            "detected_language": language
+            "detected_language": language,
+            "new_badge":         new_badge,
+            "progress":          get_progress(name.lower())
         }
 
     except Exception as e:
