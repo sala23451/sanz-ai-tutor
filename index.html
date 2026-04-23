@@ -395,11 +395,8 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══ USERS ══ */
-const USERS = {
-  sanduni: { pass:'momsanzdad2001#', role:'admin' },
-  hansika: { pass:'sanz2024',        role:'user'  }
-};
+/* ══ USERS — 🔐 NO MORE HARDCODED PASSWORDS ══ */
+/* Passwords backend API එකෙන් check කරනවා */
 
 /* ══ CREATOR MESSAGES ══ */
 const CREATOR_MSGS = {
@@ -595,38 +592,73 @@ function toggleEye(){
   eye.textContent=inp.type==='password'?'👁':'🙈';
 }
 
-function tryLogin(){
+/* ══ LOGIN — 🔐 BACKEND API AUTH ══ */
+async function tryLogin(){
   const nm=document.getElementById('nameInp').value.trim().toLowerCase();
   const pw=document.getElementById('passInp').value;
   const lang=chosenLang; const t=UI[lang];
   const errEl=document.getElementById('pwErr');
+  const loginBtn=document.getElementById('loginBtn');
   errEl.className='pw-err';
   if(!nm){showToast(t.emptyName);return;}
-  const user=USERS[nm];
-  if(!user){
-    errEl.textContent=t.noUser;errEl.classList.add('show');
-    document.getElementById('nameInp').classList.add('err');return;
+
+  // Disable button while checking
+  loginBtn.disabled=true;
+  const origText=loginBtn.textContent;
+  loginBtn.textContent='⏳...';
+
+  try{
+    const res=await fetch(`${API}/auth/login`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:nm, password:pw})
+    });
+
+    if(!res.ok){
+      // Login failed
+      const errData=await res.json().catch(()=>({}));
+      const detail=errData.detail||'';
+      if(detail.includes('not found')){
+        errEl.textContent=t.noUser;errEl.classList.add('show');
+        document.getElementById('nameInp').classList.add('err');
+      } else {
+        errEl.textContent=t.pwErr;errEl.classList.add('show');
+        document.getElementById('passInp').classList.add('err');
+        document.getElementById('passInp').style.animation='shake .4s ease';
+        setTimeout(()=>document.getElementById('passInp').style.animation='',500);
+      }
+      loginBtn.disabled=false;
+      loginBtn.textContent=origText;
+      return;
+    }
+
+    const data=await res.json();
+
+    // ✅ Login success
+    S.name=nm; S.lang=lang; S.grade=currentGrade;
+    S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
+    const catL=t.catL(S.grade); const catCls=t.catCls(S.grade);
+    const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
+    document.getElementById('tbGb').textContent=catL;
+    document.getElementById('tbGb').className='tb-b '+catCls;
+    document.getElementById('tbLb').textContent=t.langLabel;
+    document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
+    const sc=document.getElementById('sbCat');
+    sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
+    conversationMessages = [];
+    buildSidebar();
+    document.getElementById('loginOverlay').style.display='none';
+    loginBtn.disabled=false;
+    loginBtn.textContent=origText;
+    setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
+
+  }catch(e){
+    // Server unreachable
+    errEl.textContent='⚠️ Server එකට connect වෙන්න බැහැ. නැවත try කරන්න.';
+    errEl.classList.add('show');
+    loginBtn.disabled=false;
+    loginBtn.textContent=origText;
   }
-  if(pw!==user.pass){
-    errEl.textContent=t.pwErr;errEl.classList.add('show');
-    document.getElementById('passInp').classList.add('err');
-    document.getElementById('passInp').style.animation='shake .4s ease';
-    setTimeout(()=>document.getElementById('passInp').style.animation='',500);return;
-  }
-  S.name=nm; S.lang=lang; S.grade=currentGrade;
-  S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
-  const catL=t.catL(S.grade); const catCls=t.catCls(S.grade);
-  const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
-  document.getElementById('tbGb').textContent=catL;
-  document.getElementById('tbGb').className='tb-b '+catCls;
-  document.getElementById('tbLb').textContent=t.langLabel;
-  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-  const sc=document.getElementById('sbCat');
-  sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
-  conversationMessages = [];  // ✅ NEW — clear on login
-  buildSidebar();
-  document.getElementById('loginOverlay').style.display='none';
-  setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
 }
 
 /* ══ SUBJECT DATA ══ */
