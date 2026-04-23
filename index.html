@@ -17,6 +17,38 @@
   --sh-sm:0 2px 8px rgba(24,69,200,.07); --sh-md:0 6px 24px rgba(24,69,200,.11); --sh-lg:0 16px 48px rgba(24,69,200,.15);
   --r-sm:10px; --r-md:16px; --r-lg:22px; --r-xl:30px; --sw:280px;
   --c-pri:#16A34A; --c-sec:#1845C8; --c-al:#7C3AED;
+  --user-bubble:linear-gradient(135deg,#1845C8,#2E65F0);
+  --user-bubble-sh:rgba(24,69,200,.22);
+}
+
+/* 🟢 PRIMARY THEME (Grade 1-5) */
+body.theme-primary{
+  --primary:#16A34A; --primary-lt:#22C55E;
+  --primary-dim:rgba(22,163,74,.08);
+  --bg:#EEFBF3; --border:#C6E9D4;
+  --sh-sm:0 2px 8px rgba(22,163,74,.07);
+  --user-bubble:linear-gradient(135deg,#16A34A,#22C55E);
+  --user-bubble-sh:rgba(22,163,74,.22);
+}
+
+/* 🔵 SECONDARY THEME (Grade 6-11) — default blue */
+body.theme-secondary{
+  --primary:#1845C8; --primary-lt:#2E65F0;
+  --primary-dim:rgba(24,69,200,.08);
+  --bg:#EEF2FB; --border:#D5DFF5;
+  --sh-sm:0 2px 8px rgba(24,69,200,.07);
+  --user-bubble:linear-gradient(135deg,#1845C8,#2E65F0);
+  --user-bubble-sh:rgba(24,69,200,.22);
+}
+
+/* 🟣 A/LEVEL THEME (Grade 12-13) */
+body.theme-al{
+  --primary:#7C3AED; --primary-lt:#8B5CF6;
+  --primary-dim:rgba(124,58,237,.08);
+  --bg:#F3EEFB; --border:#D5CCF5;
+  --sh-sm:0 2px 8px rgba(124,58,237,.07);
+  --user-bubble:linear-gradient(135deg,#7C3AED,#8B5CF6);
+  --user-bubble-sh:rgba(124,58,237,.22);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
@@ -97,14 +129,14 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .grade-lbl-row{font-size:10px;color:var(--text-m);margin-top:9px;font-weight:600;display:flex;align-items:center;gap:6px;}
 .grade-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
-.login-btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(24,69,200,.28);transition:.15s;letter-spacing:.2px;}
+.login-btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px var(--primary-dim);transition:.15s;letter-spacing:.2px;}
 .login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(24,69,200,.38);}
 
 /* ═══ SIDEBAR ═══ */
 .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;box-shadow:2px 0 12px rgba(24,69,200,.05);}
 .sb-hd{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .sb-logo{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
-.sb-li{width:35px;height:35px;border-radius:10px;background:linear-gradient(135deg,#1845C8,#2E65F0);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;}
+.sb-li{width:35px;height:35px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;}
 .sb-logo h2{font-size:16px;font-weight:800;color:var(--text-h);letter-spacing:-.2px;} .sb-logo h2 span{color:var(--primary);}
 .sb-meta{font-size:11px;color:var(--text-m);} .sb-meta b{color:var(--primary);}
 .sb-cat{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:9.5px;font-weight:700;margin-top:7px;border:1.5px solid;}
@@ -154,7 +186,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .wc-wrap{margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:440px;text-align:center;}
 .wc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:30px 32px;box-shadow:var(--sh-sm);width:100%;}
 .wc-brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;}
-.wc-brand-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#1845C8,#2E65F0);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
+.wc-brand-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
 .wc-brand-nm{font-size:22px;font-weight:800;color:var(--text-h);letter-spacing:-.3px;}
 .wc-brand-nm span{color:var(--primary);}
 .wc-card h2{font-size:17px;font-weight:700;color:var(--text-h);margin-bottom:7px;}
@@ -167,13 +199,13 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 @keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .mw.user{flex-direction:row-reverse;}
 .mav{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;align-self:flex-start;margin-top:2px;}
-.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;box-shadow:0 3px 10px rgba(24,69,200,.2);}
-.mw.user .mav{background:linear-gradient(135deg,#0f3d28,#166534);color:#fff;}
+.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;box-shadow:0 3px 10px var(--primary-dim);}
+.mw.user .mav{background:var(--user-bubble);color:#fff;}
 .mbody{display:flex;flex-direction:column;gap:6px;max-width:78%;min-width:0;}
 .mw.user .mbody{align-items:flex-end;}
 .mbub{padding:12px 15px;border-radius:var(--r-md);font-size:13.5px;line-height:1.8;}
 .mw.ai .mbub{background:var(--surface);color:var(--text-h);border:1px solid var(--border);border-top-left-radius:4px;box-shadow:var(--sh-sm);}
-.mw.user .mbub{background:linear-gradient(135deg,#1845C8,#2E65F0);color:#fff;border-top-right-radius:4px;box-shadow:0 4px 14px rgba(24,69,200,.22);}
+.mw.user .mbub{background:var(--user-bubble);color:#fff;border-top-right-radius:4px;box-shadow:0 4px 14px var(--user-bubble-sh);}
 .mbub h1,.mbub h2,.mbub h3{color:var(--text-h);margin:10px 0 5px;font-weight:700;}
 .mbub h1{font-size:15px;} .mbub h2{font-size:14px;} .mbub h3{font-size:13.5px;}
 .mbub p{margin:4px 0;} .mbub ul,.mbub ol{padding-left:18px;margin:5px 0;} .mbub li{margin:3px 0;}
@@ -233,7 +265,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .bic:hover{border-color:var(--primary);color:var(--primary);}
 .bic.rec{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.07);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
-.bsend{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(24,69,200,.28);transition:.15s;}
+.bsend{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px var(--primary-dim);transition:.15s;}
 .bsend:hover{transform:scale(1.06);} .bsend:active{transform:scale(.95);} .bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
 
 /* ── TOAST ── */
@@ -623,6 +655,14 @@ let msgCounter = 0;
 let conversationMessages = [];  // ✅ NEW — conversation memory
 const API = 'https://sanz-ai-tutor.onrender.com';
 
+/* ══ 🎨 GRADE THEME SWITCHER ══ */
+function applyTheme(grade){
+  document.body.classList.remove('theme-primary','theme-secondary','theme-al');
+  if(grade<=5) document.body.classList.add('theme-primary');
+  else if(grade<=11) document.body.classList.add('theme-secondary');
+  else document.body.classList.add('theme-al');
+}
+
 /* ══ BUBBLES ══ */
 (function(){
   const c = document.getElementById('lsBubbles');
@@ -778,6 +818,7 @@ async function tryLogin(){
     // ✅ Login success
     S.name=nm; S.lang=lang; S.grade=currentGrade;
     S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
+    applyTheme(currentGrade);  // 🎨 Apply grade color theme
     const catL=t.catL(S.grade); const catCls=t.catCls(S.grade);
     const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
     document.getElementById('tbGb').textContent=catL;
