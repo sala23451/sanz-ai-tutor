@@ -400,6 +400,7 @@ REASON: one short sentence"""
 
     try:
         response = gemini_check.generate_content(agent_prompt)
+        track_api_call("gemini-2.5-flash-lite", "rag_agent")  # 📊 Track
         text = response.text.strip()
         use_rag = "USE_RAG: yes" in text
         selected = []
@@ -429,6 +430,65 @@ def get_rag_context(question: str, grade: str) -> tuple:
     for c in decision["selected_chunks"]:
         context_parts.append(f"[{c['filename']} - Page {c['page']}]\n{c['text']}")
     return "\n\n".join(context_parts), True
+
+API_USAGE_FILE = "api_usage.json"
+
+# ── 📊 API Call Tracking ──
+# Gemini free tier limits (per model per day):
+# gemini-2.0-flash-lite: 20 requests
+# gemini-2.5-flash-lite: 20 requests
+API_LIMITS = {
+    "gemini-2.0-flash-lite": 20,
+    "gemini-2.5-flash-lite": 20,
+}
+
+def track_api_call(model: str, call_type: str = "solve"):
+    """Track every Gemini API call"""
+    usage = load_json(API_USAGE_FILE, {})
+    today = datetime.date.today().isoformat()
+
+    if today not in usage:
+        usage[today] = {"total": 0, "models": {}, "by_type": {}}
+
+    usage[today]["total"] += 1
+
+    if model not in usage[today]["models"]:
+        usage[today]["models"][model] = 0
+    usage[today]["models"][model] += 1
+
+    if call_type not in usage[today]["by_type"]:
+        usage[today]["by_type"][call_type] = 0
+    usage[today]["by_type"][call_type] += 1
+
+    # Keep only last 7 days
+    keys = sorted(usage.keys())
+    if len(keys) > 7:
+        for old_key in keys[:-7]:
+            del usage[old_key]
+
+    save_json(API_USAGE_FILE, usage)
+
+def get_api_usage() -> dict:
+    """Get today's API usage + remaining calls"""
+    usage = load_json(API_USAGE_FILE, {})
+    today = datetime.date.today().isoformat()
+    today_data = usage.get(today, {"total": 0, "models": {}, "by_type": {}})
+
+    remaining = {}
+    for model, limit in API_LIMITS.items():
+        used = today_data.get("models", {}).get(model, 0)
+        remaining[model] = {"used": used, "limit": limit, "remaining": max(0, limit - used)}
+
+    total_remaining = sum(r["remaining"] for r in remaining.values())
+
+    return {
+        "today": today,
+        "total_calls_today": today_data["total"],
+        "models": remaining,
+        "by_type": today_data.get("by_type", {}),
+        "total_remaining": total_remaining,
+        "history": {k: v["total"] for k, v in usage.items()}
+    }
 
 def update_stats(subject: str):
     stats = load_json(STATS_FILE, {"total": 0, "subjects": {}})
@@ -752,6 +812,7 @@ Return ONLY valid JSON:
 
     try:
         response = gemini_flash.generate_content(prompt)
+        track_api_call("gemini-2.0-flash-lite", "quiz_generate")  # 📊 Track
         raw = re.sub(r'^```json\s*|\s*```$', '', response.text.strip())
         data = json.loads(raw)
         questions = data.get("questions", [])
@@ -878,6 +939,7 @@ Put the code between [GRAPH_START] and [GRAPH_END] tags.
 Do NOT use plt.savefig()."""
 
         response = gemini_flash.generate_content(img_prompt)
+        track_api_call("gemini-2.0-flash-lite", "image_generate")  # 📊 Track
         answer = response.text
 
         # Extract and execute graph code
@@ -1171,6 +1233,7 @@ async def solve_math(
         # 8. Gemini Flash - Main Answer
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
+        track_api_call("gemini-2.0-flash-lite", "main_answer")  # 📊 Track
 
         # 9. Cross Check — ⚡ MATH ONLY (saves API quota!)
         if is_math_subject:
@@ -1182,6 +1245,7 @@ async def solve_math(
             """
             cross_response = gemini_check.generate_content(cross_check_prompt)
             cross_check    = cross_response.text
+            track_api_call("gemini-2.5-flash-lite", "cross_check")  # 📊 Track
             correct_word   = lang_cfg['correct_word']
 
             if correct_word in cross_check:
@@ -1198,6 +1262,7 @@ async def solve_math(
                 """
                 redirect_resp = gemini_check.generate_content(socratic_redirect_prompt)
                 final_answer  = redirect_resp.text
+                track_api_call("gemini-2.5-flash-lite", "socratic_redirect")  # 📊 Track
                 verified = False
         else:
             # Non-math — skip cross-check, direct answer (saves 1 API call!)
@@ -1284,6 +1349,14 @@ async def solve_math(
 # ══════════════════════════════════════════
 # ── Admin Routes ──
 # ══════════════════════════════════════════
+
+# 📊 API Usage endpoint — dashboard එකෙන් බලන්න
+@app.get("/admin/api-usage")
+async def admin_api_usage(x_admin_password: str = Header(default="")):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return {"status": "success", "usage": get_api_usage()}
+
 @app.get("/admin/stats")
 async def admin_stats(x_admin_password: str = Header(default="")):
     if not check_admin(x_admin_password):
@@ -1291,12 +1364,14 @@ async def admin_stats(x_admin_password: str = Header(default="")):
     stats     = load_json(STATS_FILE, {"total": 0, "subjects": {}})
     history   = load_json(HISTORY_FILE, [])
     blacklist = load_json(BLACKLIST_FILE, {})
+    api_usage = get_api_usage()  # 📊 Include API usage
     return {
         "status": "success",
         "total_questions": stats["total"],
         "subjects": stats["subjects"],
         "recent_users": list(set([h["user"] for h in history[-50:]])),
-        "blacklisted_users": list(blacklist.keys())
+        "blacklisted_users": list(blacklist.keys()),
+        "api_usage": api_usage
     }
 
 @app.get("/admin/history")
