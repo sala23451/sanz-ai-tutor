@@ -1,7 +1,8 @@
 {
-  "total": 2,
+  "total": 3,
   "subjects": {
     "Science": 1,
-    "ICT": 1
+    "ICT": 1,
+    "History": 1
   }
 }
