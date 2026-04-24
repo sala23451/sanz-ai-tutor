@@ -1,0 +1,17 @@
+{
+  "kasun2010": {
+    "username": "kasun2010",
+    "full_name": "Kasun",
+    "password_hash": "15ef7c84eebae1b0af4e059b2abde72173e9bd8d2d43d591f570da24e7d07e2e",
+    "birthday": "2015-09-07",
+    "age": 10,
+    "grade": "9",
+    "email": "hsanduni447@gmail.com",
+    "phone": "0789999984",
+    "language": "si",
+    "created": "2026-04-24T16:22:45.592710",
+    "last_login": null,
+    "active": true,
+    "role": "student"
+  }
+}
