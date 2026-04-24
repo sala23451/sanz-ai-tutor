@@ -652,22 +652,29 @@ async function loadParents(){
     const parents=d.parents||[];
     document.getElementById('parent-count').textContent=parents.length+' parents';
     if(!parents.length){el.innerHTML='<div class="empty-state">No parent accounts yet</div>';return;}
-    el.innerHTML=parents.map(p=>`
-      <div class="parent-row">
+    el.innerHTML=parents.map(p=>{
+      const isStudent=p.type==='student_account';
+      const badge=isStudent
+        ?'<span class="badge" style="background:var(--ok-dim);color:var(--ok);margin-left:6px">👤 Student</span>'
+        :'<span class="badge" style="background:var(--pri-dim);color:var(--pri);margin-left:6px">👪 Parent</span>';
+      const childrenHtml=(p.children||[]).map(c=>`
+        <div style="display:flex;align-items:center;gap:6px;margin:3px 0;">
+          <span class="child-chip">🎓 ${esc(c.name)} · G${c.grade}</span>
+          <button class="btn btn-yel" style="padding:2px 7px;font-size:9px" onclick="sendEmailPromptChild('${esc(p.email)}','${esc(c.name)}')">📧</button>
+        </div>`).join('');
+      return`<div class="parent-row">
         <div class="pr-top">
           <div>
-            <div class="pr-email">${esc(p.name)} <span style="color:var(--txt3);font-weight:400">· ${esc(p.email)}</span></div>
+            <div class="pr-email">${esc(p.name)}${badge} <span style="color:var(--txt3);font-weight:400;font-size:10px">· ${esc(p.email)}</span></div>
             <div class="pr-name">Plan: ${p.plan||'free'} · Joined: ${timeAgo(p.created)}</div>
           </div>
-          <div style="display:flex;gap:5px;">
-            <button class="btn btn-yel" style="padding:4px 8px;font-size:9px" onclick="sendEmailPrompt('${esc(p.email)}')">📧 Email</button>
-          </div>
+          <button class="btn btn-yel" style="padding:4px 8px;font-size:9px" onclick="sendEmailPrompt('${esc(p.email)}')">📧 Email</button>
         </div>
         <div class="pr-children">
-          ${(p.children||[]).map(c=>`<span class="child-chip">🎓 ${esc(c.name)} · G${c.grade}</span>`).join('')}
-          ${!p.children?.length?'<span style="font-size:10px;color:var(--txt3)">No children yet</span>':''}
+          ${childrenHtml||'<span style="font-size:10px;color:var(--txt3)">No children</span>'}
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }catch(e){el.innerHTML='<div class="empty-state">⚠️ Error</div>';}
 }
 
@@ -675,6 +682,12 @@ function sendEmailPrompt(email){
   document.getElementById('emailTo').value=email;
   showPage('email',document.querySelector('.nav-item[onclick*="email"]'));
   showToast('📧 Email field filled. Add child name and send!');
+}
+function sendEmailPromptChild(email,childName){
+  document.getElementById('emailTo').value=email;
+  document.getElementById('emailChild').value=childName;
+  showPage('email',document.querySelector('.nav-item[onclick*="email"]'));
+  showToast('📧 Ready to send! Click Send Report Now.');
 }
 
 /* ══ EMAIL ══ */
