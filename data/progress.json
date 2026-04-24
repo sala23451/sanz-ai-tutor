@@ -62,20 +62,20 @@
     "quiz_scores": []
   },
   "ramani2023": {
-    "total_questions": 1,
-    "correct_answers": 1,
+    "total_questions": 2,
+    "correct_answers": 2,
     "subjects": {
       "History": {
-        "asked": 1,
-        "correct": 1
+        "asked": 2,
+        "correct": 2
       }
     },
     "daily_counts": {
-      "2026-04-24": 1
+      "2026-04-24": 2
     },
     "streak": 1,
     "last_active_date": "2026-04-24",
-    "xp": 5,
+    "xp": 10,
     "badges": [
       "Beginner"
     ],
