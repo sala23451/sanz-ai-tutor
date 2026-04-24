@@ -76,5 +76,31 @@
         "calls": 2
       }
     }
+  },
+  "guest_8534": {
+    "total_input": 39,
+    "total_output": 904,
+    "total_calls": 1,
+    "today": {
+      "2026-04-24": {
+        "input": 39,
+        "output": 904,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W16": {
+        "input": 39,
+        "output": 904,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 39,
+        "output": 904,
+        "calls": 1
+      }
+    }
   }
 }
