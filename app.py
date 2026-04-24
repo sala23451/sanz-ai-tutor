@@ -79,7 +79,7 @@ app.add_middleware(
 )
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "momsanzdad2001#")
 
 if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
