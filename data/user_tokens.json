@@ -24,5 +24,31 @@
         "calls": 1
       }
     }
+  },
+  "guest_1308": {
+    "total_input": 32,
+    "total_output": 1202,
+    "total_calls": 1,
+    "today": {
+      "2026-04-24": {
+        "input": 32,
+        "output": 1202,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W16": {
+        "input": 32,
+        "output": 1202,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 32,
+        "output": 1202,
+        "calls": 1
+      }
+    }
   }
 }
