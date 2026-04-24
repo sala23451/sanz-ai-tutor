@@ -88,7 +88,13 @@ genai.configure(api_key=GOOGLE_API_KEY)
 gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')  # 1000 RPD free — flash quota cut Dec 2025
 gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
 
-# ── File Paths ──
+# ── GitHub Storage Config ──
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO  = os.environ.get("GITHUB_REPO", "sala23451/sanz-ai-tutor")
+GITHUB_BRANCH = "main"
+GITHUB_DATA_PATH = "data"   # folder inside repo
+
+# ── File Paths (local cache) ──
 HISTORY_FILE      = "history.json"
 BLACKLIST_FILE    = "blacklist.json"
 PDF_FOLDER        = "textbooks"
@@ -98,6 +104,14 @@ PROGRESS_FILE     = "progress.json"
 QUIZ_FILE         = "quiz_sessions.json"
 LEADERBOARD_FILE  = "leaderboard.json"
 API_USAGE_FILE    = "api_usage.json"
+
+# ── GitHub persistent files (these get saved to GitHub) ──
+PERSISTENT_FILES = [
+    "history.json", "blacklist.json", "stats.json",
+    "progress.json", "leaderboard.json", "user_tokens.json",
+    "email_log.json", "parents.json", "children.json",
+    "user_accounts.json", "users.json"
+]
 PARENTS_FILE      = "parents.json"
 CHILDREN_FILE     = "children.json"
 USER_TOKENS_FILE  = "user_tokens.json"
@@ -267,7 +281,83 @@ def detect_language(text: str) -> str:
     elif tamil_count > 2:   return "ta"
     return "en"
 
+# ══════════════════════════════════════════
+# ── GitHub Storage Functions ──
+# ══════════════════════════════════════════
+import urllib.request
+
+def _gh_api(method: str, endpoint: str, body: dict = None):
+    """Low-level GitHub API call using only stdlib."""
+    if not GITHUB_TOKEN:
+        return None
+    url = f"https://api.github.com/{endpoint}"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+        "User-Agent": "SanzAI"
+    }
+    data = json.dumps(body).encode() if body else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read().decode())
+    except Exception as e:
+        print(f"GitHub API error ({method} {endpoint}): {e}")
+        return None
+
+def _gh_get_file(filename: str):
+    """Get file SHA and content from GitHub."""
+    path = f"{GITHUB_DATA_PATH}/{filename}"
+    result = _gh_api("GET", f"repos/{GITHUB_REPO}/contents/{path}?ref={GITHUB_BRANCH}")
+    return result
+
+def gh_load(filename: str, default):
+    """Load JSON from GitHub repo."""
+    try:
+        result = _gh_get_file(filename)
+        if result and "content" in result:
+            content = base64.b64decode(result["content"]).decode("utf-8")
+            return json.loads(content)
+    except Exception as e:
+        print(f"GitHub load error ({filename}): {e}")
+    # Fallback: local file
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return default
+
+def gh_save(filename: str, data):
+    """Save JSON to GitHub repo."""
+    content = json.dumps(data, ensure_ascii=False, indent=2)
+    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    # Always save locally too
+    try:
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(content)
+    except:
+        pass
+    if not GITHUB_TOKEN:
+        return
+    # Get current SHA (needed for update)
+    existing = _gh_get_file(filename)
+    sha = existing.get("sha") if existing else None
+    path = f"{GITHUB_DATA_PATH}/{filename}"
+    body = {
+        "message": f"update {filename}",
+        "content": encoded,
+        "branch": GITHUB_BRANCH
+    }
+    if sha:
+        body["sha"] = sha
+    _gh_api("PUT", f"repos/{GITHUB_REPO}/contents/{path}", body)
+
 def load_json(path: str, default):
+    """Load from GitHub if persistent, else local."""
+    filename = os.path.basename(path)
+    if filename in PERSISTENT_FILES and GITHUB_TOKEN:
+        return gh_load(filename, default)
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -275,8 +365,13 @@ def load_json(path: str, default):
         return default
 
 def save_json(path: str, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    """Save to GitHub if persistent, else local."""
+    filename = os.path.basename(path)
+    if filename in PERSISTENT_FILES and GITHUB_TOKEN:
+        gh_save(filename, data)
+    else:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
 def check_admin(x_admin_password: str = "") -> bool:
     return x_admin_password == ADMIN_PASSWORD
@@ -1448,8 +1543,38 @@ async def health_check():
         "status": "ok", "version": "3.0.0",
         "stt_support": STT_SUPPORT, "tts_support": TTS_SUPPORT,
         "pdf_support": PDF_SUPPORT, "cloudinary_support": CLOUDINARY_SUPPORT,
-        "pinecone_support": PINECONE_SUPPORT, "scheduler_support": SCHEDULER_SUPPORT
+        "pinecone_support": PINECONE_SUPPORT, "scheduler_support": SCHEDULER_SUPPORT,
+        "github_storage": bool(GITHUB_TOKEN),
+        "github_repo": GITHUB_REPO if GITHUB_TOKEN else "not configured"
     }
+
+@app.post("/admin/github/init")
+async def github_init(x_admin_password: str = Header(default="")):
+    """Create data folder in GitHub repo with empty JSON files."""
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if not GITHUB_TOKEN:
+        return {"status": "error", "message": "GITHUB_TOKEN not set!"}
+    results = {}
+    for filename in PERSISTENT_FILES:
+        existing = _gh_get_file(filename)
+        if existing and "content" in existing:
+            results[filename] = "already exists"
+            continue
+        # Load local if exists, else empty default
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except:
+            data = {} if "accounts" in filename or "parents" in filename or "children" in filename or "users" in filename or "tokens" in filename or "blacklist" in filename or "progress" in filename or "leaderboard" in filename or "stats" in filename else []
+            if "stats" in filename: data = {"total": 0, "subjects": {}}
+        content = json.dumps(data, ensure_ascii=False, indent=2)
+        encoded = base64.b64encode(content.encode()).decode()
+        path = f"{GITHUB_DATA_PATH}/{filename}"
+        body = {"message": f"init {filename}", "content": encoded, "branch": GITHUB_BRANCH}
+        result = _gh_api("PUT", f"repos/{GITHUB_REPO}/contents/{path}", body)
+        results[filename] = "created" if result else "failed"
+    return {"status": "success", "results": results}
 
 @app.get("/admin/stats")
 async def admin_stats(x_admin_password: str = Header(default="")):
