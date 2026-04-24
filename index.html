@@ -45,8 +45,23 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .ls-name{flex:1;}
 .ls-native{font-size:11px;opacity:.55;display:block;font-weight:400;margin-top:1px;}
 
-/* ═══ OVERLAYS ═══ */
-.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;}
+/* ═══ AUTH CHOICE SCREEN ═══ */
+#authChoiceOverlay{position:fixed;inset:0;z-index:5900;background:linear-gradient(135deg,#0B1740 0%,#1845C8 55%,#00BFA5 100%);display:none;align-items:center;justify-content:center;}
+.ac-card{position:relative;z-index:1;background:rgba(255,255,255,.13);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.22);border-radius:30px;padding:36px 32px 32px;width:94%;max-width:380px;text-align:center;animation:slideUp .4s cubic-bezier(.16,1,.3,1);}
+.ac-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;}
+.ac-logo-ic{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.ac-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.ac-sub{font-size:12px;color:rgba(255,255,255,.6);margin:8px 0 28px;line-height:1.7;}
+.ac-btns{display:flex;flex-direction:column;gap:10px;}
+.ac-btn-pri{padding:14px 18px;border:none;border-radius:14px;background:rgba(255,255,255,.95);color:#1845C8;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;transition:.2s;}
+.ac-btn-pri:hover{background:#fff;transform:translateY(-2px);}
+.ac-btn-sec{padding:14px 18px;border:1.5px solid rgba(255,255,255,.3);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;}
+.ac-btn-sec:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.6);transform:translateY(-2px);}
+.ac-back{margin-top:14px;font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;text-decoration:underline;}
+.ac-back:hover{color:rgba(255,255,255,.8);}
+
+/* ═══ OVERLAYS (Sign In / Sign Up) ═══ */
+.overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:5800;display:flex;align-items:center;justify-content:center;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 .lc{background:#fff;border-radius:var(--r-xl);width:94%;max-width:480px;box-shadow:var(--sh-lg);animation:slideUp .4s cubic-bezier(.16,1,.3,1);overflow:hidden;max-height:95vh;overflow-y:auto;}
@@ -60,9 +75,10 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .lc-body{padding:22px 26px 28px;}
 .fg{margin-bottom:14px;}
 .fg label{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-m);margin-bottom:6px;}
-.fg input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:13.5px;color:var(--text-h);outline:none;transition:.2s;}
-.fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
+.fg input,.fg select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:13.5px;color:var(--text-h);outline:none;transition:.2s;background:#fff;}
+.fg input:focus,.fg select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
 .fg input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .pw-wrap{position:relative;}
 .pw-wrap input{padding-right:40px;}
 .pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-m);}
@@ -71,12 +87,16 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .login-btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px var(--primary-dim);transition:.15s;letter-spacing:.2px;}
 .login-btn:hover{transform:translateY(-2px);}
 .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-
-/* ═══ PARENT LOGIN ═══ */
-#parentLoginOverlay{display:none;}
 .switch-link{text-align:center;margin-top:14px;font-size:11px;color:var(--text-m);}
 .switch-link a{color:var(--primary);font-weight:700;cursor:pointer;text-decoration:none;}
 .switch-link a:hover{text-decoration:underline;}
+.back-link{text-align:center;margin-top:8px;font-size:11px;color:var(--text-m);cursor:pointer;}
+.back-link span{color:var(--primary);font-weight:600;cursor:pointer;}
+.back-link span:hover{text-decoration:underline;}
+.form-divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.form-divider hr{flex:1;border:none;border-top:1px solid var(--border);}
+.form-divider span{font-size:10px;font-weight:700;color:var(--text-m);text-transform:uppercase;letter-spacing:.5px;}
+.info-pill{background:var(--primary-dim);border:1px solid rgba(24,69,200,.15);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--primary);margin-bottom:14px;line-height:1.6;}
 
 /* ═══ CHILD SELECT ═══ */
 #childSelectOverlay{display:none;}
@@ -89,8 +109,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .child-grade{font-size:10px;color:var(--text-m);}
 .child-school{font-size:10px;color:var(--text-m);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .child-tok{font-size:9px;color:var(--accent);font-weight:600;margin-top:4px;}
-.add-child-btn{border:2px dashed var(--border);border-radius:var(--r-md);padding:16px;text-align:center;cursor:pointer;transition:.2s;color:var(--text-m);font-size:12px;font-weight:600;}
-.add-child-btn:hover{border-color:var(--primary);color:var(--primary);}
 .parent-info-bar{background:var(--primary-dim);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:11px;}
 .pi-name{font-weight:700;color:var(--primary);}
 .pi-plan{background:var(--primary);color:#fff;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;}
@@ -170,6 +188,8 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .tb-b.ba{background:rgba(124,58,237,.08);color:var(--c-al);border-color:rgba(124,58,237,.2);}
 .tb-b.bl{background:rgba(0,191,165,.08);color:#007f6e;border-color:rgba(0,191,165,.2);}
 .tb-xp{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;border:1.5px solid rgba(245,158,11,.25);color:#B45309;background:rgba(245,158,11,.06);}
+.tb-logout{padding:4px 10px;border-radius:99px;font-size:10px;font-weight:700;border:1.5px solid rgba(239,68,68,.2);background:rgba(239,68,68,.05);color:var(--danger);cursor:pointer;transition:.15s;}
+.tb-logout:hover{background:var(--danger);color:#fff;}
 
 /* ═══ CHAT ═══ */
 .chat-area{flex:1;overflow-y:auto;padding:22px 18px;display:flex;flex-direction:column;gap:18px;background:var(--bg);}
@@ -298,10 +318,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .qz-pct{font-size:24px;line-height:1;}
 .qz-sc{font-size:10px;color:var(--text-m);}
 .xp-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);color:#B45309;padding:5px 14px;border-radius:99px;font-weight:800;font-size:12px;margin:8px 0;}
-.qz-review{text-align:left;margin-top:14px;}
-.qz-rev-item{padding:8px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:5px;font-size:11px;}
-.qz-rev-item.right{border-color:rgba(22,163,74,.2);background:rgba(22,163,74,.03);}
-.qz-rev-item.wrong2{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.03);}
 
 /* LEADERBOARD */
 .lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
@@ -334,12 +350,14 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 17px;border-radius:99px;font-size:12px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}.slide-panel{max-height:85vh;}.child-grid{grid-template-columns:1fr;}}
+@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}.slide-panel{max-height:85vh;}.child-grid{grid-template-columns:1fr;}.fg-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- LANGUAGE SCREEN -->
+<!-- ══════════════════════════════════════
+     LANGUAGE SCREEN
+══════════════════════════════════════ -->
 <div id="langScreen">
   <div class="ls-bubbles" id="lsBubbles"></div>
   <div class="ls-card">
@@ -356,63 +374,136 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- PARENT LOGIN -->
-<div class="overlay" id="parentLoginOverlay">
+<!-- ══════════════════════════════════════
+     AUTH CHOICE SCREEN  (Sign In / Sign Up)
+══════════════════════════════════════ -->
+<div id="authChoiceOverlay">
+  <div class="ls-bubbles"><div id="acBubbles"></div></div>
+  <div class="ac-card">
+    <div class="ac-logo">
+      <div class="ac-logo-ic">🎓</div>
+      <div class="ac-title">Sanz <span style="opacity:.55;font-weight:400">AI</span></div>
+    </div>
+    <p id="acSub" class="ls-sub">ඔබ කෙසේ ඉදිරියට යන්නද?<br>How would you like to continue?</p>
+    <div class="ac-btns">
+      <button class="ac-btn-pri" id="acSignInBtn" onclick="showSignIn()">🔑 Sign In / ප්‍රවේශ වන්න</button>
+      <button class="ac-btn-sec" id="acSignUpBtn" onclick="showSignUp()">✨ Sign Up / ගිණුමක් සාදන්න</button>
+    </div>
+    <div class="ac-back" onclick="showLangScreen()">← Change Language / භාෂාව වෙනස් කරන්න</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SIGN IN OVERLAY
+══════════════════════════════════════ -->
+<div class="overlay" id="signInOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
-      <div class="lc-brand"><div class="lc-brand-ic">👪</div><h1>Parent <span>Login</span></h1></div>
-      <p id="plSub">ඔබේ email සහ password ඇතුළත් කරන්න</p>
+      <div class="lc-brand"><div class="lc-brand-ic">🔑</div><h1 id="siTitle">Sign In <span>/ ප්‍රවේශ වන්න</span></h1></div>
+      <p id="siSub">ඔබේ username සහ password ඇතුළත් කරන්න</p>
     </div>
     <div class="lc-body">
-      <div class="fg"><label id="plLblEmail">Parent Email</label><input type="email" id="plEmail" placeholder="parent@gmail.com" onkeydown="if(event.key==='Enter')document.getElementById('plPass').focus()"></div>
-      <div class="fg"><label id="plLblPass">Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="plPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doParentLogin()">
-          <button class="pw-eye" onclick="toggleEye2()">👁</button>
-        </div>
-        <div class="pw-err" id="plErr"></div>
+      <div class="fg">
+        <label id="siLblUser">Username / පරිශීලක නාමය</label>
+        <input type="text" id="siUsername" placeholder="ඔබේ username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('siPass').focus()">
       </div>
-      <button class="login-btn" id="plBtn" onclick="doParentLogin()">🔐 Login</button>
-      <div class="switch-link"><a onclick="showStudentLogin()">👤 Student direct login →</a></div>
+      <div class="fg">
+        <label id="siLblPass">Password / මුරපදය</label>
+        <div class="pw-wrap">
+          <input type="password" id="siPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()">
+          <button class="pw-eye" onclick="togglePwVis('siPass')">👁</button>
+        </div>
+        <div class="pw-err" id="siErr"></div>
+      </div>
+      <button class="login-btn" id="siBtnLogin" onclick="doSignIn()">🔐 Sign In</button>
+      <div class="switch-link" id="siSwitch">ගිණුමක් නැද්ද? <a onclick="showSignUp()">Sign Up →</a></div>
+      <div class="back-link"><span onclick="showAuthChoice()">← ආපසු / Back</span></div>
     </div>
   </div>
 </div>
 
-<!-- STUDENT LOGIN (direct — legacy) -->
-<div class="overlay" id="loginOverlay" style="display:none;">
+<!-- ══════════════════════════════════════
+     SIGN UP OVERLAY
+══════════════════════════════════════ -->
+<div class="overlay" id="signUpOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
-      <div class="lc-brand"><div class="lc-brand-ic">🎓</div><h1>Sanz <span>AI</span></h1></div>
-      <p id="lcSub">Sri Lanka's Smart Multi-Language Tutor · Grade 1–13</p>
+      <div class="lc-brand"><div class="lc-brand-ic">✨</div><h1 id="suTitle">Sign Up <span>/ ගිණුම සාදන්න</span></h1></div>
+      <p id="suSub">ඔබේ විස්තර ඇතුළත් කරන්න · Fill your details</p>
     </div>
     <div class="lc-body">
-      <div class="fg"><label id="lblName">ඔබේ නම</label><input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()"></div>
-      <div class="fg"><label id="lblPass">මුරපදය</label>
-        <div class="pw-wrap">
-          <input type="password" id="passInp" placeholder="••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
-          <button class="pw-eye" onclick="toggleEye()">👁</button>
-        </div>
-        <div class="pw-err" id="pwErr"></div>
+      <div class="info-pill" id="suInfoPill">
+        📧 ඔබේ දෙමාපියන්ගේ email address දෙන්න — සතිපතා progress report email කරනවා!
       </div>
-      <div class="grade-section">
-        <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය තෝරන්න</label></div>
-        <div class="grade-tabs">
-          <button class="grade-tab active-p" id="gtab-p" onclick="switchGrp('p')">🌱 Grade 1–5<br><small>Primary</small></button>
-          <button class="grade-tab" id="gtab-s" onclick="switchGrp('s')">📚 Grade 6–11<br><small>Secondary</small></button>
-          <button class="grade-tab" id="gtab-a" onclick="switchGrp('a')">🎓 Grade 12–13<br><small>A/Level</small></button>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label id="suLblUser">Username</label>
+          <input type="text" id="suUsername" placeholder="kasun2024" autocomplete="username">
         </div>
-        <div class="grade-panel show" id="gpanel-p"><div class="grade-btns-p" id="gbtns-p"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-pri)"></div><span style="color:var(--c-pri)">Primary</span></div></div>
-        <div class="grade-panel" id="gpanel-s"><div class="grade-btns-s" id="gbtns-s"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-sec)"></div><span style="color:var(--c-sec)">Secondary / O/L</span></div></div>
-        <div class="grade-panel" id="gpanel-a"><div class="grade-btns-a" id="gbtns-a"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-al)"></div><span style="color:var(--c-al)">Advanced Level</span></div></div>
+        <div class="fg">
+          <label id="suLblPass">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="suPass" placeholder="••••••••" autocomplete="new-password">
+            <button class="pw-eye" onclick="togglePwVis('suPass')">👁</button>
+          </div>
+        </div>
       </div>
-      <button class="login-btn" id="loginBtn" onclick="tryLogin()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
-      <div class="switch-link"><a onclick="showParentLogin()">👪 Parent login →</a></div>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label id="suLblDob">Date of Birth / උපන් දිනය</label>
+          <input type="date" id="suDob">
+        </div>
+        <div class="fg">
+          <label id="suLblGrade">Grade / ශ්‍රේණිය</label>
+          <select id="suGrade">
+            <option value="">Select...</option>
+            <optgroup label="Primary (Grade 1–5)">
+              <option value="1">Grade 1</option><option value="2">Grade 2</option>
+              <option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option>
+            </optgroup>
+            <optgroup label="Secondary (Grade 6–11)">
+              <option value="6">Grade 6</option><option value="7">Grade 7</option>
+              <option value="8">Grade 8</option><option value="9">Grade 9</option>
+              <option value="10">Grade 10</option><option value="11">Grade 11 (O/L)</option>
+            </optgroup>
+            <optgroup label="A/Level (Grade 12–13)">
+              <option value="12">Grade 12 (A/L)</option><option value="13">Grade 13 (A/L)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label id="suLblSchool">School Name / පාසල</label>
+        <input type="text" id="suSchool" placeholder="e.g. Mahinda College, Galle">
+      </div>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label id="suLblParent">Parent Name / දෙමාපිය නම</label>
+          <input type="text" id="suParentName" placeholder="e.g. Kumara Silva">
+        </div>
+        <div class="fg">
+          <label id="suLblEmail">Parent Email / ඊමේල්</label>
+          <input type="email" id="suEmail" placeholder="parent@gmail.com">
+        </div>
+      </div>
+
+      <div class="pw-err" id="suErr" style="margin-bottom:10px;"></div>
+
+      <button class="login-btn" id="suBtnReg" onclick="doSignUp()">🚀 Create Account / ගිණුම සාදන්න</button>
+      <div class="switch-link" id="suSwitch">දැනටමත් ගිණුමක් ඇද්ද? <a onclick="showSignIn()">Sign In →</a></div>
+      <div class="back-link"><span onclick="showAuthChoice()">← ආපසු / Back</span></div>
     </div>
   </div>
 </div>
 
-<!-- CHILD SELECT -->
-<div class="overlay" id="childSelectOverlay">
+<!-- ══════════════════════════════════════
+     CHILD SELECT (after parent login / after signup with multiple children)
+══════════════════════════════════════ -->
+<div class="overlay" id="childSelectOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
       <div class="lc-brand"><div class="lc-brand-ic">🎓</div><h1>Select <span>Child</span></h1></div>
@@ -425,12 +516,14 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       </div>
       <div class="child-grid" id="childGrid"></div>
       <button class="login-btn" id="csBtn" onclick="doChildSelect()" style="display:none">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
-      <div class="switch-link"><a onclick="doParentLogout()">↩ Parent logout</a></div>
+      <div class="switch-link"><a onclick="doParentLogout()">↩ Logout</a></div>
     </div>
   </div>
 </div>
 
-<!-- SIDEBAR -->
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
 <aside class="sidebar">
   <div class="sb-hd">
     <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
@@ -446,7 +539,9 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   <div class="sb-ft">Developed by <b>Sanz</b> &nbsp;•&nbsp; v5.3</div>
 </aside>
 
-<!-- MAIN -->
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
 <div class="main">
   <div class="topbar">
     <div class="tb-l">
@@ -457,6 +552,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <div class="tb-xp" id="tbXp" style="display:none">⚡ <span id="tbXpVal">0</span> XP · 🔥<span id="tbStreak">0</span></div>
       <div class="tb-b bs" id="tbGb">Grade 6</div>
       <div class="tb-b bl" id="tbLb">සිංහල</div>
+      <button class="tb-logout" id="tbLogout" onclick="doFullLogout()" style="display:none">↩ Logout</button>
     </div>
   </div>
   <div class="chat-area" id="chatArea">
@@ -498,46 +594,30 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- OVERLAY -->
+<!-- Panels -->
 <div class="sp-overlay" id="spOverlay" onclick="closeAllPanels()"></div>
-
-<!-- QUIZ PANEL -->
 <div class="slide-panel" id="panelQuiz">
   <div class="sp-head"><h3>📝 Quiz</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
-  <div class="sp-body" id="quizBody">
-    <div style="text-align:center;color:var(--text-m);padding:20px">Touch "Start" to begin!</div>
-    <button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>
-  </div>
+  <div class="sp-body" id="quizBody"></div>
 </div>
-
-<!-- LEADERBOARD PANEL -->
 <div class="slide-panel" id="panelLb">
   <div class="sp-head"><h3>🏆 Leaderboard</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body" id="lbBody"><div style="text-align:center;color:var(--text-m);padding:20px">Loading...</div></div>
 </div>
-
-<!-- IMAGE GEN PANEL -->
 <div class="slide-panel" id="panelImg">
   <div class="sp-head"><h3>🎨 AI Diagram</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body">
-    <div class="ig-input">
-      <input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram...">
-      <button class="ig-btn" onclick="genImage()">🎨 Draw</button>
-    </div>
+    <div class="ig-input"><input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram..."><button class="ig-btn" onclick="genImage()">🎨 Draw</button></div>
     <div class="ig-result" id="igResult"></div>
   </div>
 </div>
-
-<!-- FEEDBACK PANEL -->
 <div class="slide-panel" id="panelFb">
   <div class="sp-head"><h3>💬 Feedback</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body">
     <div style="text-align:center;font-size:12px;color:var(--text-m);margin-bottom:6px">ඔබේ අත්දැකීම කොහොමද?</div>
     <div class="fb-stars" id="fbStars">
-      <span class="fb-star" onclick="rateStar(1)">⭐</span>
-      <span class="fb-star" onclick="rateStar(2)">⭐</span>
-      <span class="fb-star" onclick="rateStar(3)">⭐</span>
-      <span class="fb-star" onclick="rateStar(4)">⭐</span>
+      <span class="fb-star" onclick="rateStar(1)">⭐</span><span class="fb-star" onclick="rateStar(2)">⭐</span>
+      <span class="fb-star" onclick="rateStar(3)">⭐</span><span class="fb-star" onclick="rateStar(4)">⭐</span>
       <span class="fb-star" onclick="rateStar(5)">⭐</span>
     </div>
     <textarea class="fb-msg" id="fbMsg" placeholder="ඔබේ අදහස් ලියන්න..."></textarea>
@@ -548,202 +628,471 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 <div class="toast" id="toast"></div>
 
 <script>
-const API='https://sanz-ai-tutor.onrender.com';
-const GRADE_P_ICONS={1:'🌱',2:'⭐',3:'🌟',4:'🚀',5:'🏆'};
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+const API = 'https://sanz-ai-tutor.onrender.com';
+const LS_KEY = 'sanzai_accounts'; // localStorage key for username→email map
+const GRADE_P_ICONS = {1:'🌱',2:'⭐',3:'🌟',4:'🚀',5:'🏆'};
 
-let chosenLang='si';
-let currentGrp='p';
-let currentGrade=3;
-let parentSession=null; // {email, name, children, plan}
-let selectedChild=null;
-let conversationMessages=[];
-let S={name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
-let msgCounter=0;
+let chosenLang = 'si';
+let parentSession = null;
+let selectedChild = null;
+let conversationMessages = [];
+let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
+let msgCounter = 0;
 
-const UI={
-  si:{lblName:'ඔබේ නම',lblPass:'මුරපදය',lblGrade:'ශ්‍රේණිය',loginBtn:'ඉගෙනීම ආරම්භ කරන්න 🚀',pwErr:'❌ වැරදි මුරපදයකි.',noUser:'⚠️ මෙම නම හඳුනාගත නොහැකිය.',emptyName:'නමක් ඇතුළත් කරන්න!',ph:'ප්‍රශ්නය ලියන්න...',wch:'ආයුබෝවන්! 👋',wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',listen:'🔊 ඇසීමට',copy:'📋 Copy',copied:'Copied ✓',empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?',sp:'si-LK',subjects:'විෂයයන්',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 සිංහල',greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස **Sanz AI** වෙත සාදරයෙන් පිළිගනිමු.\n\nඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න! 😊`,reactLabels:{good:'ලස්සනයි! 👍',ok:'හරි 😊',bad:'නොතේරුණා 😕',ask:'නැවත කියන්න 🔁'}},
-  ta:{lblName:'உங்கள் பெயர்',lblPass:'கடவுச்சொல்',lblGrade:'வகுப்பு',loginBtn:'கற்றலை தொடங்குங்கள் 🚀',pwErr:'❌ தவறான கடவுச்சொல்.',noUser:'⚠️ இந்தப் பெயர் அடையாளம் காணப்படவில்லை.',emptyName:'பெயரை உள்ளிடுங்கள்!',ph:'கேள்வியை உள்ளிடுக...',wch:'வணக்கம்! 👋',wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',listen:'🔊 கேட்க',copy:'📋 நகலெடு',copied:'நகலெடுத்தது ✓',empty:'கேள்வியை உள்ளிடவும்!',sp:'ta-IN',subjects:'பாடங்கள்',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 தமிழ்',greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக **Sanz AI**-க்கு வரவேற்கிறோம்.\n\nஎந்த **பாடத்தை** பற்றியும் கேளுங்கள்! 😊`,reactLabels:{good:'சிறந்தது! 👍',ok:'சரி 😊',bad:'புரியவில்லை 😕',ask:'மீண்டும் விளக்குங்கள் 🔁'}},
-  en:{lblName:'Your Name',lblPass:'Password',lblGrade:'Select Grade',loginBtn:'Start Learning 🚀',pwErr:'❌ Incorrect password.',noUser:'⚠️ Name not recognised.',emptyName:'Please enter your name!',ph:'Type your question...',wch:'Welcome! 👋',wcp:'Type your question or click 🎤',listen:'🔊 Listen',copy:'📋 Copy',copied:'Copied ✓',empty:'Please type a question!',sp:'en-US',subjects:'SUBJECTS',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇬🇧 English',greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to **Sanz AI** as a Grade ${g} student.\n\nFeel free to ask about any **subject**! 😊`,reactLabels:{good:'Helpful! 👍',ok:'Okay 😊',bad:"Didn't understand 😕",ask:'Explain again 🔁'}}
+// ══════════════════════════════════════
+// LOCALSTORAGE: username → { email, grade, school, parentName, childId }
+// ══════════════════════════════════════
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; }
+}
+function saveAccounts(obj) {
+  localStorage.setItem(LS_KEY, JSON.stringify(obj));
+}
+function saveAccount(username, data) {
+  const accounts = getAccounts();
+  accounts[username.toLowerCase()] = data;
+  saveAccounts(accounts);
+}
+function lookupAccount(username) {
+  return getAccounts()[username.toLowerCase()] || null;
+}
+
+// ══════════════════════════════════════
+// UI TEXT
+// ══════════════════════════════════════
+const UI = {
+  si:{
+    lblUser:'Username / පරිශීලක නාමය',lblPass:'Password / මුරපදය',lblDob:'උපන් දිනය',lblGrade:'ශ්‍රේණිය',
+    lblSchool:'පාසල',lblParent:'දෙමාපිය නම',lblEmail:'දෙමාපිය Email',
+    signInTitle:'Sign In · ප්‍රවේශ',signUpTitle:'Sign Up · ගිණුම',
+    signInSub:'ඔබේ username සහ password ඇතුළත් කරන්න',
+    signUpSub:'ඔබේ විස්තර ඇතුළත් කරන්න',
+    signUpInfo:'📧 ඔබේ දෙමාපියන්ගේ email දෙන්න — සතිපතා progress report email කරනවා!',
+    noAccount:'ගිණුමක් නැද්ද? ',
+    haveAccount:'දැනටමත් ගිණුමක් ඇද්ද? ',
+    fillAll:'⚠️ කරුණාකර සියලු ක්ෂේත්‍ර පුරවන්න.',
+    userExists:'⚠️ මෙම username දැනටමත් භාවිතා වේ.',
+    wrongPass:'❌ Username හෝ password වැරදියි.',
+    noUser:'⚠️ Username හඳුනාගත නොහැකිය.',
+    minPass:'⚠️ Password අවම වශයෙන් අකුරු 6ක් විය යුතුය.',
+    registered:'✅ ගිණුම සාදා ගන්නා ලදී!',
+    ph:'ප්‍රශ්නය ලියන්න...',wch:'ආයුබෝවන්! 👋',wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',
+    listen:'🔊 ඇසීමට',copy:'📋 Copy',copied:'Copied ✓',empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?',sp:'si-LK',subjects:'විෂයයන්',
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 සිංහල',
+    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස **Sanz AI** වෙත සාදරයෙන් පිළිගනිමු.\n\nඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න! 😊`,
+    reactLabels:{good:'ලස්සනයි! 👍',ok:'හරි 😊',bad:'නොතේරුණා 😕',ask:'නැවත කියන්න 🔁'}
+  },
+  ta:{
+    lblUser:'Username',lblPass:'Password',lblDob:'பிறந்த தேதி',lblGrade:'வகுப்பு',
+    lblSchool:'பள்ளி',lblParent:'பெற்றோர் பெயர்',lblEmail:'பெற்றோர் Email',
+    signInTitle:'Sign In · உள்நுழைய',signUpTitle:'Sign Up · பதிவு',
+    signInSub:'Username மற்றும் password உள்ளிடுங்கள்',
+    signUpSub:'உங்கள் விவரங்களை நிரப்புங்கள்',
+    signUpInfo:'📧 பெற்றோரின் email கொடுங்கள் — வாராந்திர progress report அனுப்பப்படும்!',
+    noAccount:'கணக்கு இல்லையா? ',haveAccount:'ஏற்கனவே கணக்கு உள்ளதா? ',
+    fillAll:'⚠️ அனைத்து புலங்களையும் நிரப்பவும்.',
+    userExists:'⚠️ இந்த username ஏற்கனவே பயன்பாட்டில் உள்ளது.',
+    wrongPass:'❌ தவறான username அல்லது password.',
+    noUser:'⚠️ Username கண்டுபிடிக்கவில்லை.',
+    minPass:'⚠️ Password குறைந்தது 6 எழுத்துகள் இருக்க வேண்டும்.',
+    registered:'✅ கணக்கு உருவாக்கப்பட்டது!',
+    ph:'கேள்வியை உள்ளிடுக...',wch:'வணக்கம்! 👋',wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',
+    listen:'🔊 கேட்க',copy:'📋 நகலெடு',copied:'நகலெடுத்தது ✓',empty:'கேள்வியை உள்ளிடவும்!',sp:'ta-IN',subjects:'பாடங்கள்',
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 தமிழ்',
+    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக **Sanz AI**-க்கு வரவேற்கிறோம்.\n\nஎந்த **பாடத்தை** பற்றியும் கேளுங்கள்! 😊`,
+    reactLabels:{good:'சிறந்தது! 👍',ok:'சரி 😊',bad:'புரியவில்லை 😕',ask:'மீண்டும் விளக்குங்கள் 🔁'}
+  },
+  en:{
+    lblUser:'Username',lblPass:'Password',lblDob:'Date of Birth',lblGrade:'Grade',
+    lblSchool:'School Name',lblParent:'Parent Name',lblEmail:'Parent Email',
+    signInTitle:'Sign In',signUpTitle:'Sign Up',
+    signInSub:'Enter your username and password',
+    signUpSub:'Fill in your details below',
+    signUpInfo:'📧 Enter your parent\'s email — weekly progress reports will be sent to them!',
+    noAccount:"Don't have an account? ",haveAccount:'Already have an account? ',
+    fillAll:'⚠️ Please fill in all fields.',
+    userExists:'⚠️ This username is already taken.',
+    wrongPass:'❌ Incorrect username or password.',
+    noUser:'⚠️ Username not found.',
+    minPass:'⚠️ Password must be at least 6 characters.',
+    registered:'✅ Account created successfully!',
+    ph:'Type your question...',wch:'Welcome! 👋',wcp:'Type your question or click 🎤',
+    listen:'🔊 Listen',copy:'📋 Copy',copied:'Copied ✓',empty:'Please type a question!',sp:'en-US',subjects:'SUBJECTS',
+    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
+    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇬🇧 English',
+    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to **Sanz AI** as a Grade ${g} student.\n\nFeel free to ask about any **subject**! 😊`,
+    reactLabels:{good:'Helpful! 👍',ok:'Okay 😊',bad:"Didn't understand 😕",ask:'Explain again 🔁'}
+  }
 };
 
-// ── Bubbles ──
-(function(){const c=document.getElementById('lsBubbles');for(let i=0;i<18;i++){const b=document.createElement('div');b.className='ls-bub';const sz=30+Math.random()*120;b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*11}s;animation-delay:${Math.random()*8}s;`;c.appendChild(b);}})();
+// ══ Floating bubbles ══
+(function(){
+  const c=document.getElementById('lsBubbles');
+  for(let i=0;i<18;i++){
+    const b=document.createElement('div');b.className='ls-bub';
+    const sz=30+Math.random()*120;
+    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*11}s;animation-delay:${Math.random()*8}s;`;
+    c.appendChild(b);
+  }
+})();
 
-// ── Build grade buttons ──
-function buildGradeButtons(){
-  const pb=document.getElementById('gbtns-p');pb.innerHTML='';
-  for(let g=1;g<=5;g++){const btn=document.createElement('button');btn.className='gb-p'+(g===3?' sel':'');btn.innerHTML=`<span class="gb-num">${g}</span><span class="gb-ico">${GRADE_P_ICONS[g]}</span>`;btn.onclick=()=>selectGrade(g,'p');pb.appendChild(btn);}
-  const sb=document.getElementById('gbtns-s');sb.innerHTML='';
-  for(let g=6;g<=11;g++){const btn=document.createElement('button');btn.className='gb'+(g===8?' sel-s':'');btn.textContent=g;btn.onclick=()=>selectGrade(g,'s');sb.appendChild(btn);}
-  const ab=document.getElementById('gbtns-a');ab.innerHTML='';
-  for(let g=12;g<=13;g++){const btn=document.createElement('button');btn.className='gb'+(g===12?' sel-a':'');btn.textContent=g;btn.onclick=()=>selectGrade(g,'a');ab.appendChild(btn);}
+// ══════════════════════════════════════
+// SCREEN NAVIGATION
+// ══════════════════════════════════════
+function showLangScreen(){
+  document.getElementById('langScreen').style.display='flex';
+  document.getElementById('authChoiceOverlay').style.display='none';
+  document.getElementById('signInOverlay').style.display='none';
+  document.getElementById('signUpOverlay').style.display='none';
 }
-buildGradeButtons();
-
-function selectGrade(g,grp){
-  currentGrade=g;currentGrp=grp;
-  if(grp==='p'){document.querySelectorAll('#gbtns-p .gb-p').forEach(b=>{b.classList.toggle('sel',parseInt(b.querySelector('.gb-num').textContent)===g);});}
-  else{const selCls=grp==='s'?'sel-s':'sel-a';document.querySelectorAll(`#gbtns-${grp} .gb`).forEach(b=>{b.className='gb'+(parseInt(b.textContent)===g?' '+selCls:'');});}
-}
-function switchGrp(grp){
-  currentGrp=grp;
-  ['p','s','a'].forEach(x=>{document.getElementById('gtab-'+x).className='grade-tab'+(x===grp?` active-${x}`:'');document.getElementById('gpanel-'+x).className='grade-panel'+(x===grp?' show':'');});
-  const defaults={p:3,s:8,a:12};selectGrade(defaults[grp],grp);currentGrade=defaults[grp];
-}
-
-function applyTheme(grade){
-  document.body.classList.remove('theme-primary','theme-secondary','theme-al');
-  if(grade<=5)document.body.classList.add('theme-primary');
-  else if(grade<=11)document.body.classList.add('theme-secondary');
-  else document.body.classList.add('theme-al');
-}
-
-// ── Language ──
-function chooseLang(lang){
-  chosenLang=lang;
+function showAuthChoice(){
   document.getElementById('langScreen').style.display='none';
-  document.getElementById('parentLoginOverlay').style.display='flex';
+  document.getElementById('authChoiceOverlay').style.display='flex';
+  document.getElementById('signInOverlay').style.display='none';
+  document.getElementById('signUpOverlay').style.display='none';
+}
+function showSignIn(){
+  document.getElementById('authChoiceOverlay').style.display='none';
+  document.getElementById('signUpOverlay').style.display='none';
+  document.getElementById('signInOverlay').style.display='flex';
+  document.getElementById('siErr').className='pw-err';
+  document.getElementById('siUsername').value='';
+  document.getElementById('siPass').value='';
+  document.getElementById('siUsername').focus();
+}
+function showSignUp(){
+  document.getElementById('authChoiceOverlay').style.display='none';
+  document.getElementById('signInOverlay').style.display='none';
+  document.getElementById('signUpOverlay').style.display='flex';
+  document.getElementById('suErr').className='pw-err';
+  document.getElementById('suUsername').focus();
+}
+
+function chooseLang(lang){
+  chosenLang = lang;
   applyLangUI(lang);
+  document.getElementById('langScreen').style.display = 'none';
+  document.getElementById('authChoiceOverlay').style.display = 'flex';
 }
+
 function applyLangUI(lang){
-  const t=UI[lang];
-  document.getElementById('lblName').textContent=t.lblName;
-  document.getElementById('lblPass').textContent=t.lblPass;
-  document.getElementById('lblGrade').textContent=t.lblGrade;
-  document.getElementById('loginBtn').textContent=t.loginBtn;
-  document.getElementById('sbSecLbl').textContent=t.subjects;
-  document.getElementById('wcH').textContent=t.wch;
-  document.getElementById('wcP').textContent=t.wcp;
-  document.getElementById('qIn').placeholder=t.ph;
-  document.getElementById('tbLb').textContent=t.langLabel;
-}
-function showParentLogin(){document.getElementById('loginOverlay').style.display='none';document.getElementById('parentLoginOverlay').style.display='flex';}
-function showStudentLogin(){document.getElementById('parentLoginOverlay').style.display='none';document.getElementById('loginOverlay').style.display='flex';}
-function toggleEye(){const i=document.getElementById('passInp');i.type=i.type==='password'?'text':'password';}
-function toggleEye2(){const i=document.getElementById('plPass');i.type=i.type==='password'?'text':'password';}
-
-// ══ PARENT LOGIN ══
-async function doParentLogin(){
-  const email=document.getElementById('plEmail').value.trim().toLowerCase();
-  const pass=document.getElementById('plPass').value;
-  const errEl=document.getElementById('plErr');
-  const btn=document.getElementById('plBtn');
-  errEl.className='pw-err';
-  if(!email||!pass){errEl.textContent='⚠️ Fill all fields!';errEl.className='pw-err show';return;}
-  btn.disabled=true;btn.textContent='⏳...';
-  try{
-    const res=await fetch(`${API}/parent/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    if(!res.ok){const d=await res.json().catch(()=>({}));errEl.textContent='❌ '+(d.detail||'Login failed');errEl.className='pw-err show';btn.disabled=false;btn.textContent='🔐 Login';return;}
-    const data=await res.json();
-    parentSession={email,name:data.name,children:data.children||[],plan:data.plan||'free'};
-    document.getElementById('parentLoginOverlay').style.display='none';
-    showChildSelect();
-  }catch(e){errEl.textContent='⚠️ Cannot connect to server.';errEl.className='pw-err show';}
-  btn.disabled=false;btn.textContent='🔐 Login';
+  const t = UI[lang];
+  // Sign In
+  document.getElementById('siTitle').innerHTML = t.signInTitle;
+  document.getElementById('siSub').textContent = t.signInSub;
+  document.getElementById('siLblUser').textContent = t.lblUser;
+  document.getElementById('siLblPass').textContent = t.lblPass;
+  document.getElementById('siSwitch').innerHTML = t.noAccount + '<a onclick="showSignUp()">Sign Up →</a>';
+  // Sign Up
+  document.getElementById('suTitle').innerHTML = t.signUpTitle;
+  document.getElementById('suSub').textContent = t.signUpSub;
+  document.getElementById('suInfoPill').textContent = t.signUpInfo;
+  document.getElementById('suLblUser').textContent = t.lblUser;
+  document.getElementById('suLblPass').textContent = t.lblPass;
+  document.getElementById('suLblDob').textContent = t.lblDob;
+  document.getElementById('suLblGrade').textContent = t.lblGrade;
+  document.getElementById('suLblSchool').textContent = t.lblSchool;
+  document.getElementById('suLblParent').textContent = t.lblParent;
+  document.getElementById('suLblEmail').textContent = t.lblEmail;
+  document.getElementById('suSwitch').innerHTML = t.haveAccount + '<a onclick="showSignIn()">Sign In →</a>';
+  // Auth choice sub
+  const acSubs = {
+    si: 'ඔබ කෙසේ ඉදිරියට යන්නද? · How would you like to continue?',
+    ta: 'எவ்வாறு தொடர விரும்புகிறீர்கள்?',
+    en: 'How would you like to continue?'
+  };
+  document.getElementById('acSub').textContent = acSubs[lang] || acSubs.en;
+  // Chat
+  document.getElementById('wcH').textContent = t.wch;
+  document.getElementById('wcP').textContent = t.wcp;
+  document.getElementById('qIn').placeholder = t.ph;
+  document.getElementById('tbLb').textContent = t.langLabel;
+  document.getElementById('sbSecLbl').textContent = t.subjects;
 }
 
+function togglePwVis(id){
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+// ══════════════════════════════════════
+// SIGN UP
+// ══════════════════════════════════════
+async function doSignUp(){
+  const t = UI[chosenLang];
+  const username   = document.getElementById('suUsername').value.trim();
+  const password   = document.getElementById('suPass').value;
+  const dob        = document.getElementById('suDob').value;
+  const grade      = document.getElementById('suGrade').value;
+  const school     = document.getElementById('suSchool').value.trim();
+  const parentName = document.getElementById('suParentName').value.trim();
+  const email      = document.getElementById('suEmail').value.trim().toLowerCase();
+  const errEl      = document.getElementById('suErr');
+  const btn        = document.getElementById('suBtnReg');
+
+  errEl.className = 'pw-err';
+
+  if(!username || !password || !dob || !grade || !school || !parentName || !email){
+    errEl.textContent = t.fillAll; errEl.className = 'pw-err show'; return;
+  }
+  if(password.length < 6){
+    errEl.textContent = t.minPass; errEl.className = 'pw-err show'; return;
+  }
+  if(lookupAccount(username)){
+    errEl.textContent = t.userExists; errEl.className = 'pw-err show'; return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳...';
+
+  try {
+    // Step 1: Register parent account (using parent email + password)
+    // We append a suffix to avoid collision if same email registers twice
+    const regRes = await fetch(`${API}/parent/register`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name: parentName,
+        email: email,
+        password: password,
+        phone: ''
+      })
+    });
+    // If email already used → that's OK (parent may already exist), continue
+    // Step 2: Login as parent to get session + add child
+    const loginRes = await fetch(`${API}/parent/login`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, password: password })
+    });
+
+    if(!loginRes.ok){
+      const d = await loginRes.json().catch(()=>({}));
+      errEl.textContent = '❌ ' + (d.detail || 'Registration failed. Check email/password.');
+      errEl.className = 'pw-err show';
+      btn.disabled = false; btn.textContent = '🚀 Create Account / ගිණුම සාදන්න';
+      return;
+    }
+
+    const loginData = await loginRes.json();
+
+    // Step 3: Add child with student info
+    const childRes = await fetch(`${API}/parent/add-child`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        parent_email: email,
+        name: username,
+        birthday: dob,
+        grade: grade,
+        school: school,
+        location: 'Sri Lanka',
+        child_email: ''
+      })
+    });
+
+    let childId = '';
+    if(childRes.ok){
+      const childData = await childRes.json();
+      childId = childData.child_id || '';
+    }
+
+    // Step 4: Save to localStorage for future logins
+    saveAccount(username, {
+      email: email,
+      password: password,          // stored only locally for convenience
+      grade: parseInt(grade),
+      school: school,
+      parentName: parentName,
+      childId: childId,
+      lang: chosenLang
+    });
+
+    // Step 5: Auto-login
+    showToast(t.registered, 2500);
+    document.getElementById('signUpOverlay').style.display = 'none';
+    const targetGrade = parseInt(grade);
+    startSession(username, targetGrade, email, childId);
+
+  } catch(e){
+    errEl.textContent = '⚠️ Cannot connect to server. ' + e.message;
+    errEl.className = 'pw-err show';
+  }
+  btn.disabled = false; btn.textContent = '🚀 Create Account / ගිණුම සාදන්න';
+}
+
+// ══════════════════════════════════════
+// SIGN IN
+// ══════════════════════════════════════
+async function doSignIn(){
+  const t = UI[chosenLang];
+  const username = document.getElementById('siUsername').value.trim();
+  const password = document.getElementById('siPass').value;
+  const errEl    = document.getElementById('siErr');
+  const btn      = document.getElementById('siBtnLogin');
+
+  errEl.className = 'pw-err';
+  if(!username || !password){
+    errEl.textContent = t.fillAll; errEl.className = 'pw-err show'; return;
+  }
+
+  // Look up account in localStorage
+  const acct = lookupAccount(username);
+  if(!acct){
+    errEl.textContent = t.noUser; errEl.className = 'pw-err show'; return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳...';
+
+  try {
+    // Verify with backend
+    const res = await fetch(`${API}/parent/login`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: acct.email, password: password })
+    });
+
+    if(!res.ok){
+      errEl.textContent = t.wrongPass; errEl.className = 'pw-err show';
+      btn.disabled = false; btn.textContent = '🔐 Sign In'; return;
+    }
+
+    const data = await res.json();
+    const children = data.children || [];
+
+    document.getElementById('signInOverlay').style.display = 'none';
+
+    if(children.length === 1){
+      // Auto-select single child
+      const child = children[0];
+      startSession(child.name || username, parseInt(child.grade) || acct.grade, acct.email, child.id || acct.childId);
+    } else if(children.length > 1){
+      // Show child selector
+      parentSession = { email: acct.email, name: data.name, children, plan: data.plan || 'free' };
+      showChildSelect();
+    } else {
+      // Fallback: use local data
+      startSession(username, acct.grade, acct.email, acct.childId);
+    }
+  } catch(e){
+    errEl.textContent = '⚠️ Server connect failed.'; errEl.className = 'pw-err show';
+  }
+  btn.disabled = false; btn.textContent = '🔐 Sign In';
+}
+
+// ══════════════════════════════════════
+// CHILD SELECT
+// ══════════════════════════════════════
 function showChildSelect(){
-  const overlay=document.getElementById('childSelectOverlay');
-  overlay.style.display='flex';
-  document.getElementById('csParentName').textContent=parentSession.name;
-  document.getElementById('csParentEmail').textContent=parentSession.email;
-  document.getElementById('csPlan').textContent=parentSession.plan.toUpperCase();
+  document.getElementById('childSelectOverlay').style.display = 'flex';
+  document.getElementById('csParentName').textContent = parentSession.name;
+  document.getElementById('csParentEmail').textContent = parentSession.email;
+  document.getElementById('csPlan').textContent = (parentSession.plan||'free').toUpperCase();
   renderChildGrid(parentSession.children);
 }
-
 function renderChildGrid(children){
-  const grid=document.getElementById('childGrid');
-  grid.innerHTML='';
-  children.forEach(c=>{
-    const card=document.createElement('div');
-    card.className='child-card';
-    card.innerHTML=`
+  const grid = document.getElementById('childGrid');
+  grid.innerHTML = '';
+  children.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'child-card';
+    card.innerHTML = `
       <div class="child-av">🎓</div>
       <div class="child-name">${esc(c.name)}</div>
       <div class="child-grade">Grade ${esc(c.grade||'?')}</div>
       <div class="child-school">${esc(c.school||'')}</div>
       ${c.tokens_today?`<div class="child-tok">⚡ ${c.tokens_today} tokens today</div>`:''}`;
-    card.onclick=()=>{
+    card.onclick = () => {
       document.querySelectorAll('.child-card').forEach(x=>x.classList.remove('selected'));
       card.classList.add('selected');
-      selectedChild=c;
-      document.getElementById('csBtn').style.display='block';
+      selectedChild = c;
+      document.getElementById('csBtn').style.display = 'block';
     };
     grid.appendChild(card);
   });
-  // Add child button (max 5)
-  if(children.length<5){
-    const add=document.createElement('div');
-    add.className='add-child-btn';
-    add.innerHTML='➕<br>Add Child';
-    add.onclick=()=>showToast('Add child feature coming soon!');
-    grid.appendChild(add);
-  }
-  if(children.length===1){
-    // Auto-select if only one child
-    grid.querySelector('.child-card')?.click();
-  }
+  if(children.length === 1) grid.querySelector('.child-card')?.click();
+}
+function doChildSelect(){
+  if(!selectedChild){ showToast('Please select a child!'); return; }
+  document.getElementById('childSelectOverlay').style.display = 'none';
+  startSession(selectedChild.name, parseInt(selectedChild.grade)||6, parentSession.email, selectedChild.id||'');
+}
+function doParentLogout(){
+  parentSession = null; selectedChild = null;
+  document.getElementById('childSelectOverlay').style.display = 'none';
+  showAuthChoice();
 }
 
-function doChildSelect(){
-  if(!selectedChild){showToast('Please select a child!');return;}
-  document.getElementById('childSelectOverlay').style.display='none';
-  // Login as selected child
-  const c=selectedChild;
-  const grade=parseInt(c.grade)||6;
-  S.name=c.name;S.lang=chosenLang;S.grade=grade;
-  S.cat=grade<=5?'primary':grade<=11?'secondary':'al';
+// ══════════════════════════════════════
+// START SESSION (enter dashboard)
+// ══════════════════════════════════════
+function startSession(name, grade, email, childId){
+  S.name = name;
+  S.grade = grade;
+  S.lang = chosenLang;
+  S.cat = grade<=5?'primary':grade<=11?'secondary':'al';
+
   applyTheme(grade);
   applyLangUI(chosenLang);
-  const t=UI[chosenLang];
-  const catL=t.catL(S.grade);const catCls=t.catCls(S.grade);
-  const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
-  document.getElementById('tbGb').textContent=catL;document.getElementById('tbGb').className='tb-b '+catCls;
-  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-  const sc=document.getElementById('sbCat');sc.className='sb-cat '+sbCatCls;sc.textContent=catL;
-  conversationMessages=[];
+
+  const t = UI[chosenLang];
+  const catL = t.catL(S.grade);
+  const catCls = t.catCls(S.grade);
+  const sbCatCls = {primary:'p',secondary:'s',al:'a'}[S.cat];
+
+  document.getElementById('tbGb').textContent = catL;
+  document.getElementById('tbGb').className = 'tb-b ' + catCls;
+  document.getElementById('sbMeta').innerHTML = `<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
+  const sc = document.getElementById('sbCat');
+  sc.className = 'sb-cat ' + sbCatCls;
+  sc.textContent = catL;
+  document.getElementById('tbLogout').style.display = 'block';
+
+  // Clear and build chat
+  conversationMessages = [];
+  const chatArea = document.getElementById('chatArea');
+  chatArea.innerHTML = '';
+  const wc = document.createElement('div');
+  wc.id = 'wcCard'; wc.className = 'wc-wrap';
+  wc.innerHTML = `<div class="wc-card">
+    <div class="wc-brand"><div class="wc-brand-ic">🎓</div><div class="wc-brand-nm">Sanz <span>AI</span></div></div>
+    <h2 id="wcH">${t.wch}</h2><p>${t.wcp}</p>
+    <div class="wc-chips">
+      <span class="wc-chip">📖 Step-by-Step</span>
+      <span class="wc-chip">📷 Image Upload</span>
+      <span class="wc-chip">🔊 Listen</span>
+      <span class="wc-chip">🎤 Voice</span>
+    </div></div>`;
+  chatArea.appendChild(wc);
+
   buildSidebar();
-  setTimeout(()=>addAI(t.greet(S.name,S.grade),null,true),320);
-  setTimeout(()=>loadProgress(),500);
+  setTimeout(()=>addAI(t.greet(S.name, S.grade), null, true), 320);
+  setTimeout(()=>loadProgress(), 500);
 }
 
-function doParentLogout(){
-  parentSession=null;selectedChild=null;
-  document.getElementById('childSelectOverlay').style.display='none';
-  document.getElementById('parentLoginOverlay').style.display='flex';
+function doFullLogout(){
+  S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
+  parentSession = null; selectedChild = null; conversationMessages = [];
+  document.getElementById('tbLogout').style.display = 'none';
+  document.getElementById('tbXp').style.display = 'none';
+  showAuthChoice();
 }
 
-// ══ STUDENT LOGIN (legacy/direct) ══
-async function tryLogin(){
-  const nm=document.getElementById('nameInp').value.trim().toLowerCase();
-  const pw=document.getElementById('passInp').value;
-  const lang=chosenLang;const t=UI[lang];
-  const errEl=document.getElementById('pwErr');
-  const loginBtn=document.getElementById('loginBtn');
-  errEl.className='pw-err';
-  if(!nm){showToast(t.emptyName);return;}
-  loginBtn.disabled=true;const origText=loginBtn.textContent;loginBtn.textContent='⏳...';
-  try{
-    const res=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,password:pw})});
-    if(!res.ok){const d=await res.json().catch(()=>({}));errEl.textContent=d.detail?.includes('not found')?t.noUser:t.pwErr;errEl.className='pw-err show';loginBtn.disabled=false;loginBtn.textContent=origText;return;}
-    S.name=nm;S.lang=lang;S.grade=currentGrade;
-    S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
-    applyTheme(currentGrade);applyLangUI(lang);
-    const catL=t.catL(S.grade);const catCls=t.catCls(S.grade);
-    const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
-    document.getElementById('tbGb').textContent=catL;document.getElementById('tbGb').className='tb-b '+catCls;
-    document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-    const sc=document.getElementById('sbCat');sc.className='sb-cat '+sbCatCls;sc.textContent=catL;
-    conversationMessages=[];buildSidebar();
-    document.getElementById('loginOverlay').style.display='none';
-    loginBtn.disabled=false;loginBtn.textContent=origText;
-    setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
-    setTimeout(()=>loadProgress(),500);
-  }catch(e){errEl.textContent='⚠️ Server connect failed.';errEl.className='pw-err show';loginBtn.disabled=false;loginBtn.textContent=origText;}
+function applyTheme(grade){
+  document.body.classList.remove('theme-primary','theme-secondary','theme-al');
+  if(grade<=5) document.body.classList.add('theme-primary');
+  else if(grade<=11) document.body.classList.add('theme-secondary');
+  else document.body.classList.add('theme-al');
 }
 
-// ══ SUBJECT DATA ══
-const SBJ={
+// ══════════════════════════════════════
+// SUBJECTS
+// ══════════════════════════════════════
+const SBJ = {
   primary:[
     {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'சூழல்'},
     {id:'Mathematics',ic:'📐',en:'Mathematics',si:'ගණිතය',ta:'கணிதம்'},
@@ -767,16 +1116,31 @@ const SBJ={
     {id:'Commerce',ic:'📊',en:'Commerce',si:'වාණිජ',ta:'வணிகவியல்'},
   ],
   alStreams:[
-    {id:'bio',ic:'🧬',en:'Biology',si:'ජීව ධාරාව',ta:'உயிரியல்',sbj:[{id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},{id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'},{id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'}]},
-    {id:'maths',ic:'➕',en:'Maths',si:'ගණිත ධාරාව',ta:'கணிதம்',sbj:[{id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත',ta:'இணைந்த'},{id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'},{id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'}]},
-    {id:'commerce',ic:'💼',en:'Commerce',si:'වාණිජ ධාරාව',ta:'வணிகம்',sbj:[{id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික',ta:'பொருளாதாரம்'},{id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර',ta:'வணிக கல்வி'},{id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්',ta:'கணக்கியல்'}]},
-    {id:'art',ic:'🎨',en:'Arts',si:'කලා ධාරාව',ta:'கலை',sbj:[{id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල',ta:'புவியியல்'},{id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},{id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'}]},
+    {id:'bio',ic:'🧬',en:'Biology',si:'ජීව ධාරාව',ta:'உயிரியல்',sbj:[
+      {id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},
+      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'},
+      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'}]},
+    {id:'maths',ic:'➕',en:'Maths',si:'ගණිත ධාරාව',ta:'கணிதம்',sbj:[
+      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත',ta:'இணைந்த'},
+      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'},
+      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'}]},
+    {id:'commerce',ic:'💼',en:'Commerce',si:'වාණිජ ධාරාව',ta:'வணிகம்',sbj:[
+      {id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික',ta:'பொருளாதாரம்'},
+      {id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර',ta:'வணிக கல்வி'},
+      {id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්',ta:'கணக்கியல்'}]},
+    {id:'art',ic:'🎨',en:'Arts',si:'කලා ධාරාව',ta:'கலை',sbj:[
+      {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල',ta:'புவியியல்'},
+      {id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},
+      {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'}]},
   ],
-  alCommon:[{id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},{id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது IT'}]
+  alCommon:[
+    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
+    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது IT'}
+  ]
 };
 
 function buildSidebar(){
-  const stSel=document.getElementById('stSel');
+  const stSel = document.getElementById('stSel');
   if(S.cat==='al'){stSel.style.display='block';buildStreams();buildSubjs(getALSubjs(S.alStream));}
   else{stSel.style.display='none';buildSubjs(SBJ[S.cat]);}
 }
@@ -809,7 +1173,9 @@ function buildSubjs(list){
   });
 }
 
-// ══ REACTIONS ══
+// ══════════════════════════════════════
+// REACTIONS
+// ══════════════════════════════════════
 const REACTIONS=[{emoji:'👍',id:'good',cls:'reacted'},{emoji:'😊',id:'ok',cls:'reacted'},{emoji:'😕',id:'bad',cls:'reacted-bad'},{emoji:'🔁',id:'ask',cls:'reacted'}];
 function buildReactions(msgId){
   const lang=S.lang;const labels=UI[lang].reactLabels;
@@ -822,8 +1188,7 @@ function buildReactions(msgId){
     const cnt=document.createElement('span');cnt.className='react-count';cnt.id=`rcnt-${msgId}-${r.id}`;
     const txt=document.createElement('span');txt.className='react-txt';txt.textContent=labels[r.id]||r.id;
     btn.appendChild(document.createTextNode(r.emoji+' '));btn.appendChild(txt);btn.appendChild(cnt);
-    btn.onclick=()=>doReact(msgId,r,btn);
-    row.appendChild(btn);
+    btn.onclick=()=>doReact(msgId,r,btn);row.appendChild(btn);
   });
   wrap.appendChild(row);return wrap;
 }
@@ -835,8 +1200,7 @@ function doReact(msgId,reaction,btn){
   btn.className='react-btn '+reaction.cls+' react-pop';setTimeout(()=>btn.classList.remove('react-pop'),400);
   const c=document.getElementById(`rcnt-${msgId}-${reaction.id}`);c.textContent=(parseInt(c.textContent)||0)+1;
   if(reaction.id==='ask'){const reAsk={si:'කරුණාකර මෙය සරලව නැවත පැහැදිලි කරන්න.',ta:'இதை மீண்டும் எளிமையாக விளக்குங்கள்.',en:'Please explain this again more simply.'};document.getElementById('qIn').value=reAsk[S.lang];aH(document.getElementById('qIn'));}
-  const goodMsg={si:'🌟 ලස්සනයි!',ta:'🌟 சிறந்தது!',en:'🌟 Great!'};
-  if(reaction.id==='good')showToast(goodMsg[S.lang]);
+  if(reaction.id==='good')showToast({si:'🌟 ලස්සනයි!',ta:'🌟 சிறந்தது!',en:'🌟 Great!'}[S.lang]);
 }
 
 // ══ IMAGE ══
@@ -846,8 +1210,7 @@ function rmImg(){document.getElementById('imgInp').value='';document.getElementB
 // ══ VOICE ══
 let recog=null;
 if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();recog.continuous=true;recog.interimResults=true;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recog=new SR();recog.continuous=true;recog.interimResults=true;
   recog.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;const ta=document.getElementById('qIn');ta.value=t;aH(ta);};
   recog.onend=()=>{if(S.rec)recog.start();};
 }
@@ -859,7 +1222,9 @@ function toggleMic(){
 }
 function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=UI[S.lang].sp;u.rate=.93;window.speechSynthesis.speak(u);}
 
-// ══ SEND ══
+// ══════════════════════════════════════
+// SEND MESSAGE
+// ══════════════════════════════════════
 async function sendMsg(){
   const inp=document.getElementById('qIn');const q=inp.value.trim();
   const t=UI[S.lang];
@@ -915,8 +1280,6 @@ function addAI(md,graph,withReactions){
 let typEl=null;
 function showTyp(){hideTyp();const c=document.getElementById('chatArea');typEl=document.createElement('div');typEl.id='typEl';typEl.className='ty-w';typEl.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div><div class="ty-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;c.appendChild(typEl);se();}
 function hideTyp(){const e=document.getElementById('typEl');if(e)e.remove();typEl=null;}
-
-// ══ UTILS ══
 function setLoad(v){S.loading=v;document.getElementById('sendBtn').disabled=v;}
 function se(){const c=document.getElementById('chatArea');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight);}
 function aH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,130)+'px';}
@@ -931,13 +1294,9 @@ function parseMD(md){
   if(!md)return'';let h=md;
   h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
   h=h.replace(/`([^`\n]+)`/g,'<code>$1</code>');
-  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
-  h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
-  h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
-  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
-  h=h.replace(/^[-*] (.+)$/gm,'<li>$1</li>');
-  h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/^[-*] (.+)$/gm,'<li>$1</li>');h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
   h=h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
   h=h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
   h=h.replace(/\n\n+/g,'</p><p>');h=h.replace(/\n/g,'<br>');h='<p>'+h+'</p>';h=h.replace(/<p>\s*<\/p>/g,'');
@@ -980,7 +1339,7 @@ async function loadLeaderboard(){
 }
 
 // ══ IMAGE GEN ══
-async function genImage(){const inp=document.getElementById('igInp');const prompt=inp.value.trim();if(!prompt){showToast('Describe what to draw!');return;}const result=document.getElementById('igResult');result.innerHTML='<div style="padding:20px;color:var(--text-m)">🎨 Drawing...</div>';try{const res=await fetch(`${API}/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,subject:S.subject,language:S.lang})});const d=await res.json();if(d.status==='success'&&d.image_url){result.innerHTML=`<p style="font-size:12px;color:var(--text-p);margin-bottom:8px">${esc(d.description||'')}</p><img src="${d.image_url}" alt="Generated">"`;}else result.innerHTML=`<div style="color:var(--text-m);padding:10px">${esc(d.description||d.message||'Could not generate')}</div>`;}catch(e){result.innerHTML='<div style="color:var(--danger);padding:10px">⚠️ Error</div>';}}
+async function genImage(){const inp=document.getElementById('igInp');const prompt=inp.value.trim();if(!prompt){showToast('Describe what to draw!');return;}const result=document.getElementById('igResult');result.innerHTML='<div style="padding:20px;color:var(--text-m)">🎨 Drawing...</div>';try{const res=await fetch(`${API}/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,subject:S.subject,language:S.lang})});const d=await res.json();if(d.status==='success'&&d.image_url){result.innerHTML=`<p style="font-size:12px;color:var(--text-p);margin-bottom:8px">${esc(d.description||'')}</p><img src="${d.image_url}" alt="Generated">`;}else result.innerHTML=`<div style="color:var(--text-m);padding:10px">${esc(d.description||d.message||'Could not generate')}</div>`;}catch(e){result.innerHTML='<div style="color:var(--danger);padding:10px">⚠️ Error</div>';}}
 
 // ══ FEEDBACK ══
 let fbRating=0;
