@@ -5,55 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanz AI · Smart Tutor</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- 📐 KaTeX Math Rendering -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <style>
-:root {
-  --bg:#EEF2FB; --surface:#FFFFFF; --primary:#1845C8; --primary-lt:#2E65F0;
-  --primary-dim:rgba(24,69,200,.08); --accent:#00BFA5; --danger:#EF4444;
-  --text-h:#0B1740; --text-p:#374263; --text-m:#8A9BBE; --border:#D5DFF5;
-  --sh-sm:0 2px 8px rgba(24,69,200,.07); --sh-md:0 6px 24px rgba(24,69,200,.11); --sh-lg:0 16px 48px rgba(24,69,200,.15);
-  --r-sm:10px; --r-md:16px; --r-lg:22px; --r-xl:30px; --sw:280px;
-  --c-pri:#16A34A; --c-sec:#1845C8; --c-al:#7C3AED;
+:root{
+  --bg:#EEF2FB;--surface:#FFFFFF;--primary:#1845C8;--primary-lt:#2E65F0;
+  --primary-dim:rgba(24,69,200,.08);--accent:#00BFA5;--danger:#EF4444;
+  --text-h:#0B1740;--text-p:#374263;--text-m:#8A9BBE;--border:#D5DFF5;
+  --sh-sm:0 2px 8px rgba(24,69,200,.07);--sh-md:0 6px 24px rgba(24,69,200,.11);--sh-lg:0 16px 48px rgba(24,69,200,.15);
+  --r-sm:10px;--r-md:16px;--r-lg:22px;--r-xl:30px;--sw:280px;
+  --c-pri:#16A34A;--c-sec:#1845C8;--c-al:#7C3AED;
   --user-bubble:linear-gradient(135deg,#1845C8,#2E65F0);
   --user-bubble-sh:rgba(24,69,200,.22);
 }
-
-/* 🟢 PRIMARY THEME (Grade 1-5) */
-body.theme-primary{
-  --primary:#16A34A; --primary-lt:#22C55E;
-  --primary-dim:rgba(22,163,74,.08);
-  --bg:#EEFBF3; --border:#C6E9D4;
-  --sh-sm:0 2px 8px rgba(22,163,74,.07);
-  --user-bubble:linear-gradient(135deg,#16A34A,#22C55E);
-  --user-bubble-sh:rgba(22,163,74,.22);
-}
-
-/* 🔵 SECONDARY THEME (Grade 6-11) — default blue */
-body.theme-secondary{
-  --primary:#1845C8; --primary-lt:#2E65F0;
-  --primary-dim:rgba(24,69,200,.08);
-  --bg:#EEF2FB; --border:#D5DFF5;
-  --sh-sm:0 2px 8px rgba(24,69,200,.07);
-  --user-bubble:linear-gradient(135deg,#1845C8,#2E65F0);
-  --user-bubble-sh:rgba(24,69,200,.22);
-}
-
-/* 🟣 A/LEVEL THEME (Grade 12-13) */
-body.theme-al{
-  --primary:#7C3AED; --primary-lt:#8B5CF6;
-  --primary-dim:rgba(124,58,237,.08);
-  --bg:#F3EEFB; --border:#D5CCF5;
-  --sh-sm:0 2px 8px rgba(124,58,237,.07);
-  --user-bubble:linear-gradient(135deg,#7C3AED,#8B5CF6);
-  --user-bubble-sh:rgba(124,58,237,.22);
-}
+body.theme-primary{--primary:#16A34A;--primary-lt:#22C55E;--primary-dim:rgba(22,163,74,.08);--bg:#EEFBF3;--border:#C6E9D4;--sh-sm:0 2px 8px rgba(22,163,74,.07);--user-bubble:linear-gradient(135deg,#16A34A,#22C55E);--user-bubble-sh:rgba(22,163,74,.22);}
+body.theme-secondary{--primary:#1845C8;--primary-lt:#2E65F0;--primary-dim:rgba(24,69,200,.08);--bg:#EEF2FB;--border:#D5DFF5;}
+body.theme-al{--primary:#7C3AED;--primary-lt:#8B5CF6;--primary-dim:rgba(124,58,237,.08);--bg:#F3EEFB;--border:#D5CCF5;--user-bubble:linear-gradient(135deg,#7C3AED,#8B5CF6);--user-bubble-sh:rgba(124,58,237,.22);}
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-serif;background:var(--bg);color:var(--text-p);display:flex;}
-::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 
 /* ═══ LANGUAGE SCREEN ═══ */
 #langScreen{position:fixed;inset:0;z-index:6000;background:linear-gradient(135deg,#0B1740 0%,#1845C8 55%,#00BFA5 100%);display:flex;align-items:center;justify-content:center;}
@@ -70,9 +42,10 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .ls-btn{padding:15px 18px;border:1.5px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.09);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;text-align:left;}
 .ls-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);transform:translateX(6px);}
 .ls-flag{font-size:22px;width:32px;text-align:center;flex-shrink:0;}
-.ls-name{flex:1;} .ls-native{font-size:11px;opacity:.55;display:block;font-weight:400;margin-top:1px;}
+.ls-name{flex:1;}
+.ls-native{font-size:11px;opacity:.55;display:block;font-weight:400;margin-top:1px;}
 
-/* ═══ LOGIN ═══ */
+/* ═══ OVERLAYS ═══ */
 .overlay{position:fixed;inset:0;background:rgba(7,14,46,.72);backdrop-filter:blur(14px);z-index:3000;display:flex;align-items:center;justify-content:center;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -90,19 +63,39 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .fg input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:13.5px;color:var(--text-h);outline:none;transition:.2s;}
 .fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
 .fg input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
-.creator-banner{display:none;margin-bottom:13px;border-radius:var(--r-md);padding:13px 15px;animation:slideUp .35s cubic-bezier(.16,1,.3,1);font-size:12.5px;font-weight:600;line-height:1.7;text-align:center;position:relative;overflow:hidden;}
-.creator-banner.show{display:block;}
-.creator-banner.type-sanz{background:linear-gradient(135deg,#0B1740,#1845C8);color:#fff;border:none;}
-.creator-banner.type-sanz::before{content:'✨';font-size:55px;position:absolute;right:-6px;top:-10px;opacity:.15;pointer-events:none;}
-.creator-banner.type-sanduni{background:linear-gradient(135deg,#7C3AED,#a855f7);color:#fff;border:none;}
-.creator-banner.type-sanduni::before{content:'👑';font-size:55px;position:absolute;right:-6px;top:-10px;opacity:.18;pointer-events:none;}
 .pw-wrap{position:relative;}
 .pw-wrap input{padding-right:40px;}
 .pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--text-m);}
 .pw-err{font-size:11px;color:var(--danger);margin-top:5px;display:none;font-weight:600;}
 .pw-err.show{display:block;}
+.login-btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px var(--primary-dim);transition:.15s;letter-spacing:.2px;}
+.login-btn:hover{transform:translateY(-2px);}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
-/* ── GRADE SECTION ── */
+/* ═══ PARENT LOGIN ═══ */
+#parentLoginOverlay{display:none;}
+.switch-link{text-align:center;margin-top:14px;font-size:11px;color:var(--text-m);}
+.switch-link a{color:var(--primary);font-weight:700;cursor:pointer;text-decoration:none;}
+.switch-link a:hover{text-decoration:underline;}
+
+/* ═══ CHILD SELECT ═══ */
+#childSelectOverlay{display:none;}
+.child-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px;}
+.child-card{border:2px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;cursor:pointer;transition:.2s;background:#fff;}
+.child-card:hover{border-color:var(--primary);background:var(--primary-dim);transform:translateY(-2px);}
+.child-card.selected{border-color:var(--primary);background:var(--primary-dim);}
+.child-av{width:44px;height:44px;border-radius:12px;background:var(--primary-dim);color:var(--primary);font-size:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+.child-name{font-size:13px;font-weight:700;color:var(--text-h);}
+.child-grade{font-size:10px;color:var(--text-m);}
+.child-school{font-size:10px;color:var(--text-m);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.child-tok{font-size:9px;color:var(--accent);font-weight:600;margin-top:4px;}
+.add-child-btn{border:2px dashed var(--border);border-radius:var(--r-md);padding:16px;text-align:center;cursor:pointer;transition:.2s;color:var(--text-m);font-size:12px;font-weight:600;}
+.add-child-btn:hover{border-color:var(--primary);color:var(--primary);}
+.parent-info-bar{background:var(--primary-dim);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:11px;}
+.pi-name{font-weight:700;color:var(--primary);}
+.pi-plan{background:var(--primary);color:#fff;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;}
+
+/* GRADE SECTION */
 .grade-section{margin-bottom:16px;}
 .grade-tabs{display:flex;gap:6px;margin-bottom:10px;}
 .grade-tab{flex:1;padding:8px 4px;border:1.5px solid var(--border);border-radius:9px;background:transparent;cursor:pointer;font-family:inherit;font-size:10px;font-weight:700;color:var(--text-m);text-align:center;transition:.15s;line-height:1.5;}
@@ -111,34 +104,29 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .grade-tab.active-a{border-color:var(--c-al);background:rgba(124,58,237,.08);color:var(--c-al);}
 .grade-panel{display:none;padding:2px 0 6px;}
 .grade-panel.show{display:block;}
-
 .grade-btns-p{display:flex;gap:8px;flex-wrap:wrap;}
-.gb-p{min-width:52px;height:52px;border-radius:14px;border:2.5px solid var(--border);background:#fff;font-family:inherit;font-size:17px;font-weight:800;color:var(--text-m);cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;padding:4px 8px;}
+.gb-p{min-width:52px;height:52px;border-radius:14px;border:2.5px solid var(--border);background:#fff;font-family:inherit;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 8px;}
 .gb-p .gb-num{font-size:17px;font-weight:800;line-height:1;}
 .gb-p .gb-ico{font-size:14px;line-height:1;}
-.gb-p:hover{transform:translateY(-3px) scale(1.06);box-shadow:0 6px 18px rgba(22,163,74,.2);}
-.gb-p.sel{border-color:var(--c-pri);background:var(--c-pri);color:#fff;box-shadow:0 5px 16px rgba(22,163,74,.35);}
-.gb-p.sel .gb-num,.gb-p.sel .gb-ico{color:#fff;}
-
+.gb-p:hover{transform:translateY(-3px) scale(1.06);}
+.gb-p.sel{border-color:var(--c-pri);background:var(--c-pri);color:#fff;}
 .grade-btns-s,.grade-btns-a{display:flex;gap:7px;flex-wrap:wrap;}
 .gb{width:44px;height:44px;border-radius:10px;border:2px solid var(--border);background:#fff;font-family:inherit;font-size:15px;font-weight:700;color:var(--text-m);cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;}
-.gb:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);transform:translateY(-2px);}
-.gb.sel-s{border-color:var(--c-sec);background:var(--c-sec);color:#fff;box-shadow:0 4px 14px rgba(24,69,200,.3);}
-.gb.sel-a{border-color:var(--c-al);background:var(--c-al);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.3);}
-
+.gb:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
+.gb.sel-s{border-color:var(--c-sec);background:var(--c-sec);color:#fff;}
+.gb.sel-a{border-color:var(--c-al);background:var(--c-al);color:#fff;}
 .grade-lbl-row{font-size:10px;color:var(--text-m);margin-top:9px;font-weight:600;display:flex;align-items:center;gap:6px;}
 .grade-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-
-.login-btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px var(--primary-dim);transition:.15s;letter-spacing:.2px;}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(24,69,200,.38);}
 
 /* ═══ SIDEBAR ═══ */
 .sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;box-shadow:2px 0 12px rgba(24,69,200,.05);}
 .sb-hd{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .sb-logo{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
 .sb-li{width:35px;height:35px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;}
-.sb-logo h2{font-size:16px;font-weight:800;color:var(--text-h);letter-spacing:-.2px;} .sb-logo h2 span{color:var(--primary);}
-.sb-meta{font-size:11px;color:var(--text-m);} .sb-meta b{color:var(--primary);}
+.sb-logo h2{font-size:16px;font-weight:800;color:var(--text-h);letter-spacing:-.2px;}
+.sb-logo h2 span{color:var(--primary);}
+.sb-meta{font-size:11px;color:var(--text-m);}
+.sb-meta b{color:var(--primary);}
 .sb-cat{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:9.5px;font-weight:700;margin-top:7px;border:1.5px solid;}
 .sb-cat.p{color:var(--c-pri);border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);}
 .sb-cat.s{color:var(--c-sec);border-color:rgba(24,69,200,.2);background:var(--primary-dim);}
@@ -151,7 +139,8 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .st-btn.active{background:rgba(124,58,237,.08);border-color:var(--c-al);}
 .st-ico{width:26px;height:26px;border-radius:6px;background:var(--primary-dim);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .st-btn.active .st-ico{background:rgba(124,58,237,.15);}
-.st-nm{font-size:12px;font-weight:600;color:var(--text-h);} .st-btn.active .st-nm{color:var(--c-al);}
+.st-nm{font-size:12px;font-weight:600;color:var(--text-h);}
+.st-btn.active .st-nm{color:var(--c-al);}
 .st-lc{font-size:10px;color:var(--text-m);}
 .sb-sec{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-m);padding:10px 14px 5px;flex-shrink:0;}
 .sb-nav{flex:1;overflow-y:auto;padding:0 9px 9px;}
@@ -180,6 +169,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .tb-b.bs{background:var(--primary-dim);color:var(--primary);border-color:rgba(24,69,200,.2);}
 .tb-b.ba{background:rgba(124,58,237,.08);color:var(--c-al);border-color:rgba(124,58,237,.2);}
 .tb-b.bl{background:rgba(0,191,165,.08);color:#007f6e;border-color:rgba(0,191,165,.2);}
+.tb-xp{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;border:1.5px solid rgba(245,158,11,.25);color:#B45309;background:rgba(245,158,11,.06);}
 
 /* ═══ CHAT ═══ */
 .chat-area{flex:1;overflow-y:auto;padding:22px 18px;display:flex;flex-direction:column;gap:18px;background:var(--bg);}
@@ -194,12 +184,12 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .wc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;justify-content:center;}
 .wc-chip{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(24,69,200,.15);border-radius:99px;padding:5px 12px;font-size:10.5px;font-weight:600;}
 
-/* ── MESSAGES ── */
+/* MESSAGES */
 .mw{display:flex;gap:8px;animation:msgIn .35s cubic-bezier(.16,1,.3,1);}
 @keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .mw.user{flex-direction:row-reverse;}
 .mav{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;align-self:flex-start;margin-top:2px;}
-.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;box-shadow:0 3px 10px var(--primary-dim);}
+.mw.ai .mav{background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;}
 .mw.user .mav{background:var(--user-bubble);color:#fff;}
 .mbody{display:flex;flex-direction:column;gap:6px;max-width:78%;min-width:0;}
 .mw.user .mbody{align-items:flex-end;}
@@ -207,48 +197,45 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .mw.ai .mbub{background:var(--surface);color:var(--text-h);border:1px solid var(--border);border-top-left-radius:4px;box-shadow:var(--sh-sm);}
 .mw.user .mbub{background:var(--user-bubble);color:#fff;border-top-right-radius:4px;box-shadow:0 4px 14px var(--user-bubble-sh);}
 .mbub h1,.mbub h2,.mbub h3{color:var(--text-h);margin:10px 0 5px;font-weight:700;}
-.mbub h1{font-size:15px;} .mbub h2{font-size:14px;} .mbub h3{font-size:13.5px;}
-.mbub p{margin:4px 0;} .mbub ul,.mbub ol{padding-left:18px;margin:5px 0;} .mbub li{margin:3px 0;}
+.mbub p{margin:4px 0;}
+.mbub ul,.mbub ol{padding-left:18px;margin:5px 0;}
+.mbub li{margin:3px 0;}
 .mbub strong{color:var(--primary);font-weight:700;}
 .mbub code{background:var(--primary-dim);color:var(--primary);padding:2px 6px;border-radius:5px;font-size:11.5px;}
 .mbub pre{background:#f0f4ff;border-radius:9px;padding:10px;overflow-x:auto;margin:7px 0;}
-.mbub pre code{background:none;padding:0;}
 .mbub blockquote{border-left:3px solid var(--primary);padding-left:10px;color:var(--text-m);margin:5px 0;}
 .mbub table{border-collapse:collapse;width:100%;margin:7px 0;font-size:12px;}
 .mbub th,.mbub td{border:1px solid var(--border);padding:6px 9px;}
 .mbub th{background:var(--primary-dim);color:var(--primary);font-weight:700;}
-.m-graph{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;box-shadow:var(--sh-sm);}
-
-/* ── MESSAGE ACTIONS ── */
+.m-graph{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;}
 .macts{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .mact{background:var(--primary-dim);border:1px solid var(--border);color:var(--primary);padding:3px 10px;border-radius:99px;font-family:inherit;font-size:10.5px;font-weight:600;cursor:pointer;transition:.15s;}
 .mact:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
 
-/* ── REACTIONS ── */
+/* REACTIONS */
 .reactions-wrap{display:flex;flex-direction:column;gap:4px;}
 .react-label-row{font-size:10px;color:var(--text-m);font-weight:600;padding-left:2px;}
 .react-row{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
-.react-btn{background:rgba(255,255,255,.95);border:1.5px solid var(--border);border-radius:99px;padding:5px 13px;cursor:pointer;font-size:14px;transition:.2s;display:flex;align-items:center;gap:5px;font-family:inherit;backdrop-filter:blur(4px);}
+.react-btn{background:rgba(255,255,255,.95);border:1.5px solid var(--border);border-radius:99px;padding:5px 13px;cursor:pointer;font-size:14px;transition:.2s;display:flex;align-items:center;gap:5px;font-family:inherit;}
 .react-btn .react-txt{font-size:10.5px;font-weight:700;color:var(--text-m);}
-.react-btn:hover{transform:scale(1.1);border-color:var(--primary);background:#fff;box-shadow:var(--sh-sm);}
-.react-btn.reacted{border-color:var(--primary);background:var(--primary-dim);box-shadow:0 0 0 2px var(--primary-dim);}
+.react-btn:hover{transform:scale(1.1);border-color:var(--primary);}
+.react-btn.reacted{border-color:var(--primary);background:var(--primary-dim);}
 .react-btn.reacted .react-txt{color:var(--primary);}
 .react-btn.reacted-bad{border-color:var(--danger);background:rgba(239,68,68,.06);}
 .react-btn.reacted-bad .react-txt{color:var(--danger);}
-.react-count{font-size:10px;font-weight:700;color:var(--text-m);min-width:12px;}
-.react-btn.reacted .react-count{color:var(--primary);}
-.react-btn.reacted-bad .react-count{color:var(--danger);}
+.react-count{font-size:10px;font-weight:700;color:var(--text-m);}
 @keyframes reactPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.92)}100%{transform:scale(1)}}
 .react-pop{animation:reactPop .35s cubic-bezier(.16,1,.3,1);}
 
-/* ── TYPING ── */
+/* TYPING */
 .ty-w{display:flex;gap:8px;align-items:center;}
-.ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;box-shadow:var(--sh-sm);}
+.ty-b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);border-top-left-radius:4px;padding:12px 16px;display:flex;gap:5px;align-items:center;}
 .td{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:tdot 1.2s infinite;}
-.td:nth-child(2){animation-delay:.2s;} .td:nth-child(3){animation-delay:.4s;}
+.td:nth-child(2){animation-delay:.2s;}
+.td:nth-child(3){animation-delay:.4s;}
 @keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
 
-/* ═══ INPUT ═══ */
+/* INPUT */
 .input-area{padding:12px 15px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;}
 .in-tools{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
 .it-upl{display:flex;align-items:center;gap:5px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:10.5px;font-weight:700;color:var(--text-m);transition:.15s;}
@@ -265,29 +252,22 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .bic:hover{border-color:var(--primary);color:var(--primary);}
 .bic.rec{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.07);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
-.bsend{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px var(--primary-dim);transition:.15s;}
-.bsend:hover{transform:scale(1.06);} .bsend:active{transform:scale(.95);} .bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 17px;border-radius:99px;font-size:12px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-
-/* ── 🆕 FEATURE MINI BUTTONS ── */
+.bsend{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.15s;}
+.bsend:hover{transform:scale(1.06);}
+.bsend:disabled{opacity:.45;cursor:not-allowed;transform:none;}
 .feat-bar{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
 .feat-btn{padding:4px 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:10px;font-weight:700;cursor:pointer;transition:.18s;color:var(--text-m);display:flex;align-items:center;gap:3px;white-space:nowrap;}
-.feat-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);transform:translateY(-1px);}
-.feat-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
+.feat-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-dim);}
 .feat-btn.quiz{border-color:rgba(245,158,11,.25);color:#B45309;}
-.feat-btn.quiz:hover,.feat-btn.quiz.active{background:rgba(245,158,11,.1);border-color:#F59E0B;color:#B45309;}
+.feat-btn.quiz:hover{background:rgba(245,158,11,.1);border-color:#F59E0B;}
 .feat-btn.lb{border-color:rgba(124,58,237,.2);color:var(--c-al);}
-.feat-btn.lb:hover,.feat-btn.lb.active{background:rgba(124,58,237,.08);border-color:var(--c-al);}
+.feat-btn.lb:hover{background:rgba(124,58,237,.08);border-color:var(--c-al);}
 .feat-btn.img{border-color:rgba(0,191,165,.25);color:#007f6e;}
-.feat-btn.img:hover,.feat-btn.img.active{background:rgba(0,191,165,.08);border-color:var(--accent);}
+.feat-btn.img:hover{background:rgba(0,191,165,.08);border-color:var(--accent);}
 .feat-btn.fb{border-color:rgba(239,68,68,.2);color:var(--danger);}
 .feat-btn.fb:hover{background:rgba(239,68,68,.06);border-color:var(--danger);}
 
-/* ── SLIDE PANEL (quiz, leaderboard, image, feedback) ── */
+/* SLIDE PANELS */
 .slide-panel{position:fixed;bottom:0;left:0;right:0;z-index:5000;background:var(--surface);border-top:1px solid var(--border);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:0 -8px 40px rgba(24,69,200,.15);max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);padding:0;}
 .slide-panel.open{transform:translateY(0);}
 .sp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
@@ -298,7 +278,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .sp-overlay{position:fixed;inset:0;z-index:4999;background:rgba(7,14,46,.4);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s;}
 .sp-overlay.open{opacity:1;pointer-events:all;}
 
-/* ── QUIZ PANEL ── */
+/* QUIZ */
 .qz-progress{height:5px;background:var(--bg);border-radius:99px;overflow:hidden;margin-bottom:14px;}
 .qz-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:99px;transition:width .4s ease;}
 .qz-num{font-size:10px;font-weight:700;color:var(--text-m);margin-bottom:6px;}
@@ -323,7 +303,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .qz-rev-item.right{border-color:rgba(22,163,74,.2);background:rgba(22,163,74,.03);}
 .qz-rev-item.wrong2{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.03);}
 
-/* ── LEADERBOARD PANEL ── */
+/* LEADERBOARD */
 .lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .lb-row:last-child{border-bottom:none;}
 .lb-rank{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
@@ -335,7 +315,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .lb-xp{font-size:12px;font-weight:800;color:#B45309;}
 .lb-you{background:var(--primary-dim);border-radius:8px;padding:2px 6px;}
 
-/* ── IMAGE GEN PANEL ── */
+/* IMAGE GEN */
 .ig-input{display:flex;gap:7px;margin-bottom:12px;}
 .ig-inp{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:12px;color:var(--text-h);outline:none;}
 .ig-inp:focus{border-color:var(--primary);}
@@ -343,19 +323,18 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 .ig-result{text-align:center;}
 .ig-result img{max-width:100%;border-radius:var(--r-md);border:1px solid var(--border);margin-top:8px;}
 
-/* ── FEEDBACK PANEL ── */
+/* FEEDBACK */
 .fb-stars{display:flex;gap:6px;justify-content:center;margin:12px 0;}
 .fb-star{font-size:28px;cursor:pointer;transition:.15s;filter:grayscale(1) opacity(.35);}
 .fb-star:hover,.fb-star.lit{filter:none;transform:scale(1.15);}
 .fb-msg{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:12px;color:var(--text-h);outline:none;resize:none;min-height:60px;margin:8px 0;}
-.fb-msg:focus{border-color:var(--primary);}
-.fb-submit{width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;}
-.fb-submit:hover{background:var(--primary-lt);}
+.fb-submit{width:100%;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
 
-/* ── XP BAR (topbar) ── */
-.tb-xp{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;border:1.5px solid rgba(245,158,11,.25);color:#B45309;background:rgba(245,158,11,.06);}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(18px);background:#0f172a;color:#fff;padding:9px 17px;border-radius:99px;font-size:12px;font-weight:600;z-index:8000;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}.slide-panel{max-height:85vh;}}
+@media(max-width:680px){.sidebar{display:none;}.chat-area{padding:12px 10px;}.topbar{padding:10px 12px;}.input-area{padding:9px 10px;}.mbody{max-width:92%;}.slide-panel{max-height:85vh;}.child-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -368,52 +347,53 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <div class="ls-logo-ic">🎓</div>
       <div class="ls-title">Sanz <span>AI</span></div>
     </div>
-    <div class="ls-sub">
-      Sri Lanka's Smart Tutor · Grade 1–13<br>
-      ඔබේ භාෂාව තෝරන්න &nbsp;|&nbsp; உங்கள் மொழியை தேர்ந்தெடுங்கள்
-    </div>
+    <div class="ls-sub">Sri Lanka's Smart Tutor · Grade 1–13<br>ඔබේ භාෂාව තෝරන්න &nbsp;|&nbsp; உங்கள் மொழியை தேர்ந்தெடுங்கள்</div>
     <div class="ls-btns">
-      <button class="ls-btn" onclick="chooseLang('si')">
-        <span class="ls-flag">🇱🇰</span>
-        <span class="ls-name">සිංහල<span class="ls-native">Sinhala · සිංහල</span></span>
-      </button>
-      <button class="ls-btn" onclick="chooseLang('ta')">
-        <span class="ls-flag">🇱🇰</span>
-        <span class="ls-name">தமிழ்<span class="ls-native">Tamil · தமிழ்</span></span>
-      </button>
-      <button class="ls-btn" onclick="chooseLang('en')">
-        <span class="ls-flag">🇬🇧</span>
-        <span class="ls-name">English<span class="ls-native">English</span></span>
-      </button>
+      <button class="ls-btn" onclick="chooseLang('si')"><span class="ls-flag">🇱🇰</span><span class="ls-name">සිංහල<span class="ls-native">Sinhala</span></span></button>
+      <button class="ls-btn" onclick="chooseLang('ta')"><span class="ls-flag">🇱🇰</span><span class="ls-name">தமிழ்<span class="ls-native">Tamil</span></span></button>
+      <button class="ls-btn" onclick="chooseLang('en')"><span class="ls-flag">🇬🇧</span><span class="ls-name">English<span class="ls-native">English</span></span></button>
     </div>
   </div>
 </div>
 
-<!-- LOGIN -->
+<!-- PARENT LOGIN -->
+<div class="overlay" id="parentLoginOverlay">
+  <div class="lc">
+    <div class="lc-banner">
+      <div class="lc-brand"><div class="lc-brand-ic">👪</div><h1>Parent <span>Login</span></h1></div>
+      <p id="plSub">ඔබේ email සහ password ඇතුළත් කරන්න</p>
+    </div>
+    <div class="lc-body">
+      <div class="fg"><label id="plLblEmail">Parent Email</label><input type="email" id="plEmail" placeholder="parent@gmail.com" onkeydown="if(event.key==='Enter')document.getElementById('plPass').focus()"></div>
+      <div class="fg"><label id="plLblPass">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="plPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doParentLogin()">
+          <button class="pw-eye" onclick="toggleEye2()">👁</button>
+        </div>
+        <div class="pw-err" id="plErr"></div>
+      </div>
+      <button class="login-btn" id="plBtn" onclick="doParentLogin()">🔐 Login</button>
+      <div class="switch-link"><a onclick="showStudentLogin()">👤 Student direct login →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT LOGIN (direct — legacy) -->
 <div class="overlay" id="loginOverlay" style="display:none;">
   <div class="lc">
     <div class="lc-banner">
-      <div class="lc-brand">
-        <div class="lc-brand-ic">🎓</div>
-        <h1>Sanz <span>AI</span></h1>
-      </div>
+      <div class="lc-brand"><div class="lc-brand-ic">🎓</div><h1>Sanz <span>AI</span></h1></div>
       <p id="lcSub">Sri Lanka's Smart Multi-Language Tutor · Grade 1–13</p>
     </div>
     <div class="lc-body">
-      <div class="creator-banner" id="creatorBanner"></div>
-      <div class="fg">
-        <label id="lblName">ඔබේ නම</label>
-        <input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" oninput="onNameType()" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()">
-      </div>
-      <div class="fg">
-        <label id="lblPass">මුරපදය</label>
+      <div class="fg"><label id="lblName">ඔබේ නම</label><input type="text" id="nameInp" placeholder="e.g. Kasun / Amali" onkeydown="if(event.key==='Enter')document.getElementById('passInp').focus()"></div>
+      <div class="fg"><label id="lblPass">මුරපදය</label>
         <div class="pw-wrap">
           <input type="password" id="passInp" placeholder="••••••••" onkeydown="if(event.key==='Enter')tryLogin()">
           <button class="pw-eye" onclick="toggleEye()">👁</button>
         </div>
         <div class="pw-err" id="pwErr"></div>
       </div>
-
       <div class="grade-section">
         <div class="fg" style="margin-bottom:8px;"><label id="lblGrade">ශ්‍රේණිය තෝරන්න</label></div>
         <div class="grade-tabs">
@@ -421,21 +401,31 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
           <button class="grade-tab" id="gtab-s" onclick="switchGrp('s')">📚 Grade 6–11<br><small>Secondary</small></button>
           <button class="grade-tab" id="gtab-a" onclick="switchGrp('a')">🎓 Grade 12–13<br><small>A/Level</small></button>
         </div>
-        <div class="grade-panel show" id="gpanel-p">
-          <div class="grade-btns-p" id="gbtns-p"></div>
-          <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-pri)"></div><span style="color:var(--c-pri)">Primary School · ප්‍රාථමික</span></div>
-        </div>
-        <div class="grade-panel" id="gpanel-s">
-          <div class="grade-btns-s" id="gbtns-s"></div>
-          <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-sec)"></div><span style="color:var(--c-sec)">Secondary / O/L</span></div>
-        </div>
-        <div class="grade-panel" id="gpanel-a">
-          <div class="grade-btns-a" id="gbtns-a"></div>
-          <div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-al)"></div><span style="color:var(--c-al)">Advanced Level</span></div>
-        </div>
+        <div class="grade-panel show" id="gpanel-p"><div class="grade-btns-p" id="gbtns-p"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-pri)"></div><span style="color:var(--c-pri)">Primary</span></div></div>
+        <div class="grade-panel" id="gpanel-s"><div class="grade-btns-s" id="gbtns-s"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-sec)"></div><span style="color:var(--c-sec)">Secondary / O/L</span></div></div>
+        <div class="grade-panel" id="gpanel-a"><div class="grade-btns-a" id="gbtns-a"></div><div class="grade-lbl-row"><div class="grade-dot" style="background:var(--c-al)"></div><span style="color:var(--c-al)">Advanced Level</span></div></div>
       </div>
-
       <button class="login-btn" id="loginBtn" onclick="tryLogin()">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
+      <div class="switch-link"><a onclick="showParentLogin()">👪 Parent login →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHILD SELECT -->
+<div class="overlay" id="childSelectOverlay">
+  <div class="lc">
+    <div class="lc-banner">
+      <div class="lc-brand"><div class="lc-brand-ic">🎓</div><h1>Select <span>Child</span></h1></div>
+      <p id="csSub">ඉගෙනීම ආරම්භ කරන දරුවා තෝරන්න</p>
+    </div>
+    <div class="lc-body">
+      <div class="parent-info-bar">
+        <div><div class="pi-name" id="csParentName">Parent</div><div style="font-size:10px;color:var(--text-m)" id="csParentEmail"></div></div>
+        <span class="pi-plan" id="csPlan">FREE</span>
+      </div>
+      <div class="child-grid" id="childGrid"></div>
+      <button class="login-btn" id="csBtn" onclick="doChildSelect()" style="display:none">ඉගෙනීම ආරම්භ කරන්න 🚀</button>
+      <div class="switch-link"><a onclick="doParentLogout()">↩ Parent logout</a></div>
     </div>
   </div>
 </div>
@@ -443,20 +433,17 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sb-hd">
-    <div class="sb-logo">
-      <div class="sb-li">🎓</div>
-      <h2>Sanz <span>AI</span></h2>
-    </div>
+    <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
     <div class="sb-meta" id="sbMeta">සාදරයෙන් පිළිගනිමු!</div>
     <div class="sb-cat s" id="sbCat">📚 Secondary</div>
   </div>
   <div class="st-sel" id="stSel" style="display:none">
-    <div class="st-lbl" id="stLbl">Stream | ධාරාව | ஓட்டம்</div>
+    <div class="st-lbl" id="stLbl">Stream</div>
     <div class="st-btns" id="stBtns"></div>
   </div>
   <div class="sb-sec" id="sbSecLbl">SUBJECTS</div>
   <nav class="sb-nav" id="sbNav"></nav>
-  <div class="sb-ft">Developed by <b>Sanz</b> &nbsp;•&nbsp; v5.2</div>
+  <div class="sb-ft">Developed by <b>Sanz</b> &nbsp;•&nbsp; v5.3</div>
 </aside>
 
 <!-- MAIN -->
@@ -464,10 +451,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   <div class="topbar">
     <div class="tb-l">
       <div class="tb-ic" id="tbIc">📐</div>
-      <div>
-        <div class="tb-nm" id="tbNm">Mathematics / ගණිතය</div>
-        <div class="tb-lc" id="tbLc">கணிதம்</div>
-      </div>
+      <div><div class="tb-nm" id="tbNm">Mathematics / ගණිතය</div><div class="tb-lc" id="tbLc">கணிதம்</div></div>
     </div>
     <div class="tb-r">
       <div class="tb-xp" id="tbXp" style="display:none">⚡ <span id="tbXpVal">0</span> XP · 🔥<span id="tbStreak">0</span></div>
@@ -475,14 +459,10 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <div class="tb-b bl" id="tbLb">සිංහල</div>
     </div>
   </div>
-
   <div class="chat-area" id="chatArea">
     <div class="wc-wrap" id="wcCard">
       <div class="wc-card">
-        <div class="wc-brand">
-          <div class="wc-brand-ic">🎓</div>
-          <div class="wc-brand-nm">Sanz <span>AI</span></div>
-        </div>
+        <div class="wc-brand"><div class="wc-brand-ic">🎓</div><div class="wc-brand-nm">Sanz <span>AI</span></div></div>
         <h2 id="wcH">ආයුබෝවන්!</h2>
         <p id="wcP">ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න</p>
         <div class="wc-chips">
@@ -495,7 +475,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       </div>
     </div>
   </div>
-
   <div class="input-area">
     <div id="ipWrap" class="ip-wrap" style="display:none">
       <img id="ipImg" class="ip-img" src="" alt="">
@@ -519,36 +498,37 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
   </div>
 </div>
 
-<!-- 🆕 OVERLAY -->
+<!-- OVERLAY -->
 <div class="sp-overlay" id="spOverlay" onclick="closeAllPanels()"></div>
 
-<!-- 📝 QUIZ PANEL -->
+<!-- QUIZ PANEL -->
 <div class="slide-panel" id="panelQuiz">
   <div class="sp-head"><h3>📝 Quiz</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
-  <div class="sp-body" id="quizBody"><div style="text-align:center;color:var(--text-m);padding:20px">Touch "Start" to begin!</div>
+  <div class="sp-body" id="quizBody">
+    <div style="text-align:center;color:var(--text-m);padding:20px">Touch "Start" to begin!</div>
     <button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>
   </div>
 </div>
 
-<!-- 🏆 LEADERBOARD PANEL -->
+<!-- LEADERBOARD PANEL -->
 <div class="slide-panel" id="panelLb">
   <div class="sp-head"><h3>🏆 Leaderboard</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body" id="lbBody"><div style="text-align:center;color:var(--text-m);padding:20px">Loading...</div></div>
 </div>
 
-<!-- 🎨 IMAGE GEN PANEL -->
+<!-- IMAGE GEN PANEL -->
 <div class="slide-panel" id="panelImg">
   <div class="sp-head"><h3>🎨 AI Diagram</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body">
     <div class="ig-input">
-      <input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram, Human heart...">
+      <input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram...">
       <button class="ig-btn" onclick="genImage()">🎨 Draw</button>
     </div>
     <div class="ig-result" id="igResult"></div>
   </div>
 </div>
 
-<!-- 💬 FEEDBACK PANEL -->
+<!-- FEEDBACK PANEL -->
 <div class="slide-panel" id="panelFb">
   <div class="sp-head"><h3>💬 Feedback</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
   <div class="sp-body">
@@ -560,7 +540,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
       <span class="fb-star" onclick="rateStar(4)">⭐</span>
       <span class="fb-star" onclick="rateStar(5)">⭐</span>
     </div>
-    <textarea class="fb-msg" id="fbMsg" placeholder="ඔබේ අදහස් ලියන්න... (optional)"></textarea>
+    <textarea class="fb-msg" id="fbMsg" placeholder="ඔබේ අදහස් ලියන්න..."></textarea>
     <button class="fb-submit" onclick="submitFeedback()">📩 Send Feedback</button>
   </div>
 </div>
@@ -568,284 +548,201 @@ body{font-family:'Plus Jakarta Sans','Noto Sans Sinhala','Noto Sans Tamil',sans-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══ USERS — 🔐 NO MORE HARDCODED PASSWORDS ══ */
-/* Passwords backend API එකෙන් check කරනවා */
+const API='https://sanz-ai-tutor.onrender.com';
+const GRADE_P_ICONS={1:'🌱',2:'⭐',3:'🌟',4:'🚀',5:'🏆'};
 
-/* ══ CREATOR MESSAGES ══ */
-const CREATOR_MSGS = {
-  sanz: {
-    si:'✨ "Sanz" — Sanduni ගේ හදවතෙන් හදාපු ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI Tutor! 💙🎓',
-    ta:'✨ "Sanz" — Sanduni அவர்களின் இதயத்தால் உருவாக்கப்பட்ட இலங்கையின் சிறந்த AI Tutor! 💙🎓',
-    en:'✨ "Sanz" — Built from the heart by Sanduni, Sri Lanka\'s smartest AI Tutor! 💙🎓'
-  },
-  sanzai: {
-    si:'🤖💙 Sanz AI — Sanduni ගේ ප්‍රේමය, දැනුම හා කැපවීමෙන් ශ්‍රී ලංකාවේ ස්මාර්ට්ම AI! 🇱🇰✨',
-    ta:'🤖💙 Sanz AI — Sanduni-ஆல் அன்பு, அறிவு, அர்ப்பணிப்பு கொண்டு இலங்கையின் சிறந்த AI! 🇱🇰✨',
-    en:'🤖💙 Sanz AI — Crafted with love, knowledge & dedication by Sanduni. Sri Lanka\'s proudest AI! 🇱🇰✨'
-  },
-  sanduni: {
-    si:'👑💜 Sanduni — Sanz AI ගේ නිර්මාතෘවරිය! ඔබේ දැක්ම හා ශ්‍රමය නිසා දහස් දරුවන්ගේ ඉගෙනීම ලස්සන වුණා! 🌸🎓',
-    ta:'👑💜 Sanduni — Sanz AI-இன் படைப்பாளி! உங்கள் தொலைநோக்கும் உழைப்பும் ஆயிரக்கணக்கான மாணவர்களின் கற்றலை அழகாக்கியுள்ளது! 🌸🎓',
-    en:'👑💜 Sanduni — The creator of Sanz AI! Your vision, hard work & love is now shaping thousands of young minds! 🌸🎓'
-  }
+let chosenLang='si';
+let currentGrp='p';
+let currentGrade=3;
+let parentSession=null; // {email, name, children, plan}
+let selectedChild=null;
+let conversationMessages=[];
+let S={name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
+let msgCounter=0;
+
+const UI={
+  si:{lblName:'ඔබේ නම',lblPass:'මුරපදය',lblGrade:'ශ්‍රේණිය',loginBtn:'ඉගෙනීම ආරම්භ කරන්න 🚀',pwErr:'❌ වැරදි මුරපදයකි.',noUser:'⚠️ මෙම නම හඳුනාගත නොහැකිය.',emptyName:'නමක් ඇතුළත් කරන්න!',ph:'ප්‍රශ්නය ලියන්න...',wch:'ආයුබෝවන්! 👋',wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',listen:'🔊 ඇසීමට',copy:'📋 Copy',copied:'Copied ✓',empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?',sp:'si-LK',subjects:'විෂයයන්',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 සිංහල',greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස **Sanz AI** වෙත සාදරයෙන් පිළිගනිමු.\n\nඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න! 😊`,reactLabels:{good:'ලස්සනයි! 👍',ok:'හරි 😊',bad:'නොතේරුණා 😕',ask:'නැවත කියන්න 🔁'}},
+  ta:{lblName:'உங்கள் பெயர்',lblPass:'கடவுச்சொல்',lblGrade:'வகுப்பு',loginBtn:'கற்றலை தொடங்குங்கள் 🚀',pwErr:'❌ தவறான கடவுச்சொல்.',noUser:'⚠️ இந்தப் பெயர் அடையாளம் காணப்படவில்லை.',emptyName:'பெயரை உள்ளிடுங்கள்!',ph:'கேள்வியை உள்ளிடுக...',wch:'வணக்கம்! 👋',wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',listen:'🔊 கேட்க',copy:'📋 நகலெடு',copied:'நகலெடுத்தது ✓',empty:'கேள்வியை உள்ளிடவும்!',sp:'ta-IN',subjects:'பாடங்கள்',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇱🇰 தமிழ்',greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக **Sanz AI**-க்கு வரவேற்கிறோம்.\n\nஎந்த **பாடத்தை** பற்றியும் கேளுங்கள்! 😊`,reactLabels:{good:'சிறந்தது! 👍',ok:'சரி 😊',bad:'புரியவில்லை 😕',ask:'மீண்டும் விளக்குங்கள் 🔁'}},
+  en:{lblName:'Your Name',lblPass:'Password',lblGrade:'Select Grade',loginBtn:'Start Learning 🚀',pwErr:'❌ Incorrect password.',noUser:'⚠️ Name not recognised.',emptyName:'Please enter your name!',ph:'Type your question...',wch:'Welcome! 👋',wcp:'Type your question or click 🎤',listen:'🔊 Listen',copy:'📋 Copy',copied:'Copied ✓',empty:'Please type a question!',sp:'en-US',subjects:'SUBJECTS',catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',langLabel:'🇬🇧 English',greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to **Sanz AI** as a Grade ${g} student.\n\nFeel free to ask about any **subject**! 😊`,reactLabels:{good:'Helpful! 👍',ok:'Okay 😊',bad:"Didn't understand 😕",ask:'Explain again 🔁'}}
 };
 
-/* ══ UI STRINGS ══ */
-const UI = {
-  si:{
-    lblName:'ඔබේ නම', lblPass:'මුරපදය', lblGrade:'ශ්‍රේණිය තෝරන්න',
-    loginBtn:'ඉගෙනීම ආරම්භ කරන්න 🚀',
-    pwErr:'❌ වැරදි මුරපදයකි.',
-    noUser:'⚠️ මෙම නම හඳුනාගත නොහැකිය.',
-    emptyName:'නමක් ඇතුළත් කරන්න!',
-    ph:'ප්‍රශ්නය ලියන්න...', wch:'ආයුබෝවන්! 👋',
-    wcp:'ඔබේ ප්‍රශ්නය ටයිප් කරන්න හෝ 🎤 click කරන්න',
-    listen:'🔊 ඇසීමට', copy:'📋 Copy', copied:'Copied ✓',
-    empty:'ප්‍රශ්නයක් ලිවීමට අමතකද?', sp:'si-LK',
-    subjects:'විෂයයන්',
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'🇱🇰 සිංහල',
-    greet:(n,g)=>`ආයුබෝවන් **${n}**! 🎓 Grade ${g} ශිෂ්‍යයෙකු ලෙස **Sanz AI** වෙත සාදරයෙන් පිළිගනිමු.\n\nඕනෑ **විෂයයක්** ගැන නිදහසේ අහන්න! 😊`,
-    reactLabels:{good:'ලස්සනයි! 👍',ok:'හරි 😊',bad:'නොතේරුණා 😕',ask:'නැවත කියන්න 🔁'}
-  },
-  ta:{
-    lblName:'உங்கள் பெயர்', lblPass:'கடவுச்சொல்', lblGrade:'வகுப்பு தேர்ந்தெடுக்கவும்',
-    loginBtn:'கற்றலை தொடங்குங்கள் 🚀',
-    pwErr:'❌ தவறான கடவுச்சொல்.',
-    noUser:'⚠️ இந்தப் பெயர் அடையாளம் காணப்படவில்லை.',
-    emptyName:'பெயரை உள்ளிடுங்கள்!',
-    ph:'கேள்வியை உள்ளிடுக...', wch:'வணக்கம்! 👋',
-    wcp:'கேள்வியை தட்டச்சு செய்யுங்கள் அல்லது 🎤 அழுத்துங்கள்',
-    listen:'🔊 கேட்க', copy:'📋 நகலெடு', copied:'நகலெடுத்தது ✓',
-    empty:'கேள்வியை உள்ளிடவும்!', sp:'ta-IN',
-    subjects:'பாடங்கள்',
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'🇱🇰 தமிழ்',
-    greet:(n,g)=>`வணக்கம் **${n}**! 🎓 Grade ${g} மாணவராக **Sanz AI**-க்கு வரவேற்கிறோம்.\n\nஎந்த **பாடத்தை** பற்றியும் கேளுங்கள்! 😊`,
-    reactLabels:{good:'சிறந்தது! 👍',ok:'சரி 😊',bad:'புரியவில்லை 😕',ask:'மீண்டும் விளக்குங்கள் 🔁'}
-  },
-  en:{
-    lblName:'Your Name', lblPass:'Password', lblGrade:'Select Your Grade',
-    loginBtn:'Start Learning 🚀',
-    pwErr:'❌ Incorrect password.',
-    noUser:'⚠️ This name is not recognised.',
-    emptyName:'Please enter your name!',
-    ph:'Type your question...', wch:'Welcome! 👋',
-    wcp:'Type your question or click 🎤 to speak',
-    listen:'🔊 Listen', copy:'📋 Copy', copied:'Copied ✓',
-    empty:'Please type a question!', sp:'en-US',
-    subjects:'SUBJECTS',
-    catL:(g)=>g<=5?`Grade ${g} · Primary`:g<=11?`Grade ${g} · O/L`:`Grade ${g} · A/L`,
-    catCls:(g)=>g<=5?'bp':g<=11?'bs':'ba',
-    langLabel:'🇬🇧 English',
-    greet:(n,g)=>`Hello **${n}**! 🎓 Welcome to **Sanz AI** as a Grade ${g} student.\n\nFeel free to ask about any **subject**! 😊`,
-    reactLabels:{good:'Helpful! 👍',ok:'Okay 😊',bad:"Didn't understand 😕",ask:'Explain again 🔁'}
-  }
-};
+// ── Bubbles ──
+(function(){const c=document.getElementById('lsBubbles');for(let i=0;i<18;i++){const b=document.createElement('div');b.className='ls-bub';const sz=30+Math.random()*120;b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*11}s;animation-delay:${Math.random()*8}s;`;c.appendChild(b);}})();
 
-const GRADE_P_ICONS = {1:'🌱',2:'⭐',3:'🌟',4:'🚀',5:'🏆'};
-
-let chosenLang = 'si';
-let currentGrp = 'p';
-let currentGrade = 3;
-let S = {name:'',grade:6,cat:'secondary',lang:'si',subject:'Mathematics',subIc:'📐',subLc:'கணிதம்',alStream:'bio',rec:false,loading:false};
-let msgCounter = 0;
-let conversationMessages = [];  // ✅ NEW — conversation memory
-const API = 'https://sanz-ai-tutor.onrender.com';
-
-/* ══ 🎨 GRADE THEME SWITCHER ══ */
-function applyTheme(grade){
-  document.body.classList.remove('theme-primary','theme-secondary','theme-al');
-  if(grade<=5) document.body.classList.add('theme-primary');
-  else if(grade<=11) document.body.classList.add('theme-secondary');
-  else document.body.classList.add('theme-al');
-}
-
-/* ══ BUBBLES ══ */
-(function(){
-  const c = document.getElementById('lsBubbles');
-  for(let i=0;i<18;i++){
-    const b = document.createElement('div'); b.className='ls-bub';
-    const sz = 30+Math.random()*120;
-    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${-sz}px;animation-duration:${7+Math.random()*11}s;animation-delay:${Math.random()*8}s;`;
-    c.appendChild(b);
-  }
-})();
-
-/* ══ BUILD GRADE BUTTONS ══ */
+// ── Build grade buttons ──
 function buildGradeButtons(){
-  const pb = document.getElementById('gbtns-p'); pb.innerHTML='';
-  for(let g=1;g<=5;g++){
-    const btn = document.createElement('button');
-    btn.className = 'gb-p' + (g===3?' sel':'');
-    btn.innerHTML = `<span class="gb-num">${g}</span><span class="gb-ico">${GRADE_P_ICONS[g]}</span>`;
-    btn.title = `Grade ${g}`;
-    btn.onclick = ()=>selectGrade(g,'p');
-    pb.appendChild(btn);
-  }
-  const sb = document.getElementById('gbtns-s'); sb.innerHTML='';
-  for(let g=6;g<=11;g++){
-    const btn = document.createElement('button');
-    btn.className = 'gb' + (g===8?' sel-s':'');
-    btn.textContent = g;
-    btn.onclick = ()=>selectGrade(g,'s');
-    sb.appendChild(btn);
-  }
-  const ab = document.getElementById('gbtns-a'); ab.innerHTML='';
-  for(let g=12;g<=13;g++){
-    const btn = document.createElement('button');
-    btn.className = 'gb' + (g===12?' sel-a':'');
-    btn.textContent = g;
-    btn.onclick = ()=>selectGrade(g,'a');
-    ab.appendChild(btn);
-  }
+  const pb=document.getElementById('gbtns-p');pb.innerHTML='';
+  for(let g=1;g<=5;g++){const btn=document.createElement('button');btn.className='gb-p'+(g===3?' sel':'');btn.innerHTML=`<span class="gb-num">${g}</span><span class="gb-ico">${GRADE_P_ICONS[g]}</span>`;btn.onclick=()=>selectGrade(g,'p');pb.appendChild(btn);}
+  const sb=document.getElementById('gbtns-s');sb.innerHTML='';
+  for(let g=6;g<=11;g++){const btn=document.createElement('button');btn.className='gb'+(g===8?' sel-s':'');btn.textContent=g;btn.onclick=()=>selectGrade(g,'s');sb.appendChild(btn);}
+  const ab=document.getElementById('gbtns-a');ab.innerHTML='';
+  for(let g=12;g<=13;g++){const btn=document.createElement('button');btn.className='gb'+(g===12?' sel-a':'');btn.textContent=g;btn.onclick=()=>selectGrade(g,'a');ab.appendChild(btn);}
 }
 buildGradeButtons();
 
-function selectGrade(g, grp){
-  currentGrade = g; currentGrp = grp;
-  if(grp==='p'){
-    document.querySelectorAll('#gbtns-p .gb-p').forEach(b=>{
-      b.classList.toggle('sel', parseInt(b.querySelector('.gb-num').textContent)===g);
-    });
-  } else {
-    const selCls = grp==='s'?'sel-s':'sel-a';
-    document.querySelectorAll(`#gbtns-${grp} .gb`).forEach(b=>{
-      b.className = 'gb' + (parseInt(b.textContent)===g?' '+selCls:'');
-    });
+function selectGrade(g,grp){
+  currentGrade=g;currentGrp=grp;
+  if(grp==='p'){document.querySelectorAll('#gbtns-p .gb-p').forEach(b=>{b.classList.toggle('sel',parseInt(b.querySelector('.gb-num').textContent)===g);});}
+  else{const selCls=grp==='s'?'sel-s':'sel-a';document.querySelectorAll(`#gbtns-${grp} .gb`).forEach(b=>{b.className='gb'+(parseInt(b.textContent)===g?' '+selCls:'');});}
+}
+function switchGrp(grp){
+  currentGrp=grp;
+  ['p','s','a'].forEach(x=>{document.getElementById('gtab-'+x).className='grade-tab'+(x===grp?` active-${x}`:'');document.getElementById('gpanel-'+x).className='grade-panel'+(x===grp?' show':'');});
+  const defaults={p:3,s:8,a:12};selectGrade(defaults[grp],grp);currentGrade=defaults[grp];
+}
+
+function applyTheme(grade){
+  document.body.classList.remove('theme-primary','theme-secondary','theme-al');
+  if(grade<=5)document.body.classList.add('theme-primary');
+  else if(grade<=11)document.body.classList.add('theme-secondary');
+  else document.body.classList.add('theme-al');
+}
+
+// ── Language ──
+function chooseLang(lang){
+  chosenLang=lang;
+  document.getElementById('langScreen').style.display='none';
+  document.getElementById('parentLoginOverlay').style.display='flex';
+  applyLangUI(lang);
+}
+function applyLangUI(lang){
+  const t=UI[lang];
+  document.getElementById('lblName').textContent=t.lblName;
+  document.getElementById('lblPass').textContent=t.lblPass;
+  document.getElementById('lblGrade').textContent=t.lblGrade;
+  document.getElementById('loginBtn').textContent=t.loginBtn;
+  document.getElementById('sbSecLbl').textContent=t.subjects;
+  document.getElementById('wcH').textContent=t.wch;
+  document.getElementById('wcP').textContent=t.wcp;
+  document.getElementById('qIn').placeholder=t.ph;
+  document.getElementById('tbLb').textContent=t.langLabel;
+}
+function showParentLogin(){document.getElementById('loginOverlay').style.display='none';document.getElementById('parentLoginOverlay').style.display='flex';}
+function showStudentLogin(){document.getElementById('parentLoginOverlay').style.display='none';document.getElementById('loginOverlay').style.display='flex';}
+function toggleEye(){const i=document.getElementById('passInp');i.type=i.type==='password'?'text':'password';}
+function toggleEye2(){const i=document.getElementById('plPass');i.type=i.type==='password'?'text':'password';}
+
+// ══ PARENT LOGIN ══
+async function doParentLogin(){
+  const email=document.getElementById('plEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('plPass').value;
+  const errEl=document.getElementById('plErr');
+  const btn=document.getElementById('plBtn');
+  errEl.className='pw-err';
+  if(!email||!pass){errEl.textContent='⚠️ Fill all fields!';errEl.className='pw-err show';return;}
+  btn.disabled=true;btn.textContent='⏳...';
+  try{
+    const res=await fetch(`${API}/parent/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    if(!res.ok){const d=await res.json().catch(()=>({}));errEl.textContent='❌ '+(d.detail||'Login failed');errEl.className='pw-err show';btn.disabled=false;btn.textContent='🔐 Login';return;}
+    const data=await res.json();
+    parentSession={email,name:data.name,children:data.children||[],plan:data.plan||'free'};
+    document.getElementById('parentLoginOverlay').style.display='none';
+    showChildSelect();
+  }catch(e){errEl.textContent='⚠️ Cannot connect to server.';errEl.className='pw-err show';}
+  btn.disabled=false;btn.textContent='🔐 Login';
+}
+
+function showChildSelect(){
+  const overlay=document.getElementById('childSelectOverlay');
+  overlay.style.display='flex';
+  document.getElementById('csParentName').textContent=parentSession.name;
+  document.getElementById('csParentEmail').textContent=parentSession.email;
+  document.getElementById('csPlan').textContent=parentSession.plan.toUpperCase();
+  renderChildGrid(parentSession.children);
+}
+
+function renderChildGrid(children){
+  const grid=document.getElementById('childGrid');
+  grid.innerHTML='';
+  children.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='child-card';
+    card.innerHTML=`
+      <div class="child-av">🎓</div>
+      <div class="child-name">${esc(c.name)}</div>
+      <div class="child-grade">Grade ${esc(c.grade||'?')}</div>
+      <div class="child-school">${esc(c.school||'')}</div>
+      ${c.tokens_today?`<div class="child-tok">⚡ ${c.tokens_today} tokens today</div>`:''}`;
+    card.onclick=()=>{
+      document.querySelectorAll('.child-card').forEach(x=>x.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedChild=c;
+      document.getElementById('csBtn').style.display='block';
+    };
+    grid.appendChild(card);
+  });
+  // Add child button (max 5)
+  if(children.length<5){
+    const add=document.createElement('div');
+    add.className='add-child-btn';
+    add.innerHTML='➕<br>Add Child';
+    add.onclick=()=>showToast('Add child feature coming soon!');
+    grid.appendChild(add);
+  }
+  if(children.length===1){
+    // Auto-select if only one child
+    grid.querySelector('.child-card')?.click();
   }
 }
 
-function switchGrp(grp){
-  currentGrp = grp;
-  ['p','s','a'].forEach(x=>{
-    document.getElementById('gtab-'+x).className = 'grade-tab' + (x===grp?` active-${x}`:'');
-    const panel = document.getElementById('gpanel-'+x);
-    panel.className = 'grade-panel' + (x===grp?' show':'');
-  });
-  const defaults = {p:3,s:8,a:12};
-  selectGrade(defaults[grp], grp);
-  currentGrade = defaults[grp];
+function doChildSelect(){
+  if(!selectedChild){showToast('Please select a child!');return;}
+  document.getElementById('childSelectOverlay').style.display='none';
+  // Login as selected child
+  const c=selectedChild;
+  const grade=parseInt(c.grade)||6;
+  S.name=c.name;S.lang=chosenLang;S.grade=grade;
+  S.cat=grade<=5?'primary':grade<=11?'secondary':'al';
+  applyTheme(grade);
+  applyLangUI(chosenLang);
+  const t=UI[chosenLang];
+  const catL=t.catL(S.grade);const catCls=t.catCls(S.grade);
+  const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
+  document.getElementById('tbGb').textContent=catL;document.getElementById('tbGb').className='tb-b '+catCls;
+  document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
+  const sc=document.getElementById('sbCat');sc.className='sb-cat '+sbCatCls;sc.textContent=catL;
+  conversationMessages=[];
+  buildSidebar();
+  setTimeout(()=>addAI(t.greet(S.name,S.grade),null,true),320);
+  setTimeout(()=>loadProgress(),500);
 }
 
-function chooseLang(lang){
-  chosenLang = lang;
-  document.getElementById('langScreen').style.display='none';
-  document.getElementById('loginOverlay').style.display='flex';
-  applyLang(lang);
+function doParentLogout(){
+  parentSession=null;selectedChild=null;
+  document.getElementById('childSelectOverlay').style.display='none';
+  document.getElementById('parentLoginOverlay').style.display='flex';
 }
 
-function applyLang(lang){
-  const t = UI[lang];
-  document.getElementById('lblName').textContent = t.lblName;
-  document.getElementById('lblPass').textContent = t.lblPass;
-  document.getElementById('lblGrade').textContent = t.lblGrade;
-  document.getElementById('loginBtn').textContent = t.loginBtn;
-  document.getElementById('sbSecLbl').textContent = t.subjects;
-  document.getElementById('wcH').textContent = t.wch;
-  document.getElementById('wcP').textContent = t.wcp;
-  document.getElementById('qIn').placeholder = t.ph;
-  document.getElementById('tbLb').textContent = t.langLabel;
-  const phMap = {si:'e.g. Kasun / Amali',ta:'e.g. கவியா / கார்த்திக்',en:'e.g. Kasun / Amali'};
-  document.getElementById('nameInp').placeholder = phMap[lang];
-}
-
-function onNameType(){
-  const nm = document.getElementById('nameInp').value.trim().toLowerCase();
-  const lang = chosenLang;
-  const banner = document.getElementById('creatorBanner');
-  document.getElementById('pwErr').classList.remove('show');
-  document.getElementById('passInp').classList.remove('err');
-  document.getElementById('nameInp').classList.remove('err');
-  let matched=null, bannerType='';
-  if(nm==='sanduni'||nm.startsWith('sanduni')){matched=CREATOR_MSGS.sanduni[lang];bannerType='type-sanduni';}
-  else if(nm.includes('sanzai')||nm==='sanz ai'){matched=CREATOR_MSGS.sanzai[lang];bannerType='type-sanz';}
-  else if(nm==='sanz'||nm.startsWith('sanz')){matched=CREATOR_MSGS.sanz[lang];bannerType='type-sanz';}
-  if(matched){banner.textContent=matched;banner.className='creator-banner show '+bannerType;}
-  else{banner.className='creator-banner';}
-}
-
-function toggleEye(){
-  const inp=document.getElementById('passInp');const eye=document.querySelector('.pw-eye');
-  inp.type=inp.type==='password'?'text':'password';
-  eye.textContent=inp.type==='password'?'👁':'🙈';
-}
-
-/* ══ LOGIN — 🔐 BACKEND API AUTH ══ */
+// ══ STUDENT LOGIN (legacy/direct) ══
 async function tryLogin(){
   const nm=document.getElementById('nameInp').value.trim().toLowerCase();
   const pw=document.getElementById('passInp').value;
-  const lang=chosenLang; const t=UI[lang];
+  const lang=chosenLang;const t=UI[lang];
   const errEl=document.getElementById('pwErr');
   const loginBtn=document.getElementById('loginBtn');
   errEl.className='pw-err';
   if(!nm){showToast(t.emptyName);return;}
-
-  // Disable button while checking
-  loginBtn.disabled=true;
-  const origText=loginBtn.textContent;
-  loginBtn.textContent='⏳...';
-
+  loginBtn.disabled=true;const origText=loginBtn.textContent;loginBtn.textContent='⏳...';
   try{
-    const res=await fetch(`${API}/auth/login`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:nm, password:pw})
-    });
-
-    if(!res.ok){
-      // Login failed
-      const errData=await res.json().catch(()=>({}));
-      const detail=errData.detail||'';
-      if(detail.includes('not found')){
-        errEl.textContent=t.noUser;errEl.classList.add('show');
-        document.getElementById('nameInp').classList.add('err');
-      } else {
-        errEl.textContent=t.pwErr;errEl.classList.add('show');
-        document.getElementById('passInp').classList.add('err');
-        document.getElementById('passInp').style.animation='shake .4s ease';
-        setTimeout(()=>document.getElementById('passInp').style.animation='',500);
-      }
-      loginBtn.disabled=false;
-      loginBtn.textContent=origText;
-      return;
-    }
-
-    const data=await res.json();
-
-    // ✅ Login success
-    S.name=nm; S.lang=lang; S.grade=currentGrade;
+    const res=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,password:pw})});
+    if(!res.ok){const d=await res.json().catch(()=>({}));errEl.textContent=d.detail?.includes('not found')?t.noUser:t.pwErr;errEl.className='pw-err show';loginBtn.disabled=false;loginBtn.textContent=origText;return;}
+    S.name=nm;S.lang=lang;S.grade=currentGrade;
     S.cat=currentGrade<=5?'primary':currentGrade<=11?'secondary':'al';
-    applyTheme(currentGrade);  // 🎨 Apply grade color theme
-    const catL=t.catL(S.grade); const catCls=t.catCls(S.grade);
+    applyTheme(currentGrade);applyLangUI(lang);
+    const catL=t.catL(S.grade);const catCls=t.catCls(S.grade);
     const sbCatCls={primary:'p',secondary:'s',al:'a'}[S.cat];
-    document.getElementById('tbGb').textContent=catL;
-    document.getElementById('tbGb').className='tb-b '+catCls;
-    document.getElementById('tbLb').textContent=t.langLabel;
+    document.getElementById('tbGb').textContent=catL;document.getElementById('tbGb').className='tb-b '+catCls;
     document.getElementById('sbMeta').innerHTML=`<b>${S.name}</b> &nbsp;•&nbsp; Grade ${S.grade}`;
-    const sc=document.getElementById('sbCat');
-    sc.className='sb-cat '+sbCatCls; sc.textContent=catL;
-    conversationMessages = [];
-    buildSidebar();
+    const sc=document.getElementById('sbCat');sc.className='sb-cat '+sbCatCls;sc.textContent=catL;
+    conversationMessages=[];buildSidebar();
     document.getElementById('loginOverlay').style.display='none';
-    loginBtn.disabled=false;
-    loginBtn.textContent=origText;
+    loginBtn.disabled=false;loginBtn.textContent=origText;
     setTimeout(()=>addAI(t.greet(nm,S.grade),null,true),320);
-    // 🎮 Load XP progress
     setTimeout(()=>loadProgress(),500);
-
-  }catch(e){
-    // Server unreachable
-    errEl.textContent='⚠️ Server එකට connect වෙන්න බැහැ. නැවත try කරන්න.';
-    errEl.classList.add('show');
-    loginBtn.disabled=false;
-    loginBtn.textContent=origText;
-  }
+  }catch(e){errEl.textContent='⚠️ Server connect failed.';errEl.className='pw-err show';loginBtn.disabled=false;loginBtn.textContent=origText;}
 }
 
-/* ══ SUBJECT DATA ══ */
+// ══ SUBJECT DATA ══
 const SBJ={
   primary:[
     {id:'Environment',ic:'🌿',en:'Environment',si:'පරිසරය',ta:'சூழல்'},
@@ -868,68 +765,25 @@ const SBJ={
     {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
     {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
     {id:'Commerce',ic:'📊',en:'Commerce',si:'වාණිජ',ta:'வணிகவியல்'},
-    {id:'Health',ic:'💊',en:'Health & P.E.',si:'සෞඛ්‍ය',ta:'உடல் கல்வி'},
-    {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
-    {id:'Drama',ic:'🎭',en:'Drama',si:'නාට්‍ය',ta:'நாடகம்'},
   ],
   alStreams:[
-    {id:'bio',ic:'🧬',en:'Biology Stream',si:'ජීව ධාරාව',ta:'உயிரியல் நெடல்',sbj:[
-      {id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},
-      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'},
-      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'},
-    ]},
-    {id:'maths',ic:'➕',en:'Maths Stream',si:'ගණිත ධාරාව',ta:'கணித நெடல்',sbj:[
-      {id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත ගණිතය',ta:'இணைந்த கணிதம்'},
-      {id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'},
-      {id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'},
-      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු',ta:'தகவல்'},
-    ]},
-    {id:'commerce',ic:'💼',en:'Commerce Stream',si:'වාණිජ ධාරාව',ta:'வணிக நெடல்',sbj:[
-      {id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික විද්‍යාව',ta:'பொருளாதாரம்'},
-      {id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර',ta:'வணிக கல்வி'},
-      {id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්කරණය',ta:'கணக்கியல்'},
-      {id:'Statistics',ic:'📊',en:'Statistics',si:'සංඛ්‍යාන',ta:'புள்ளியியல்'},
-    ]},
-    {id:'tech',ic:'🔧',en:'Technology Stream',si:'තාක්ෂණ ධාරාව',ta:'தொழில்நுட்ப நெடல்',sbj:[
-      {id:'EngineeringTech',ic:'⚙️',en:'Engineering Tech.',si:'ඉංජිනේරු',ta:'பொறியியல்'},
-      {id:'ScienceTech',ic:'🔬',en:'Science for Tech.',si:'තාක්ෂණ විද්‍යාව',ta:'அறிவியல்'},
-      {id:'ICT',ic:'💻',en:'ICT',si:'තොරතුරු',ta:'தகவல்'},
-      {id:'Agriculture',ic:'🌾',en:'Agriculture',si:'කෘෂිකර්මය',ta:'விவசாயம்'},
-    ]},
-    {id:'art',ic:'🎨',en:'Arts Stream',si:'කලා ධාරාව',ta:'கலை நெடல்',sbj:[
-      {id:'SinhalaLit',ic:'📖',en:'Sinhala Literature',si:'සිංහල සාහිත්‍ය',ta:'சிங்கள இலக்கியம்'},
-      {id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල',ta:'புவியியல்'},
-      {id:'Logic',ic:'🧩',en:'Logic',si:'තර්කශාස්ත්‍රය',ta:'தர்க்கவியல்'},
-      {id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},
-      {id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'},
-      {id:'Dancing',ic:'💃',en:'Dancing',si:'නර්තනය',ta:'நடனம்'},
-      {id:'Drama',ic:'🎭',en:'Drama',si:'නාට්‍ය',ta:'நாடகம்'},
-    ]},
-    {id:'lang',ic:'🌐',en:'Languages Stream',si:'භාෂා ධාරාව',ta:'மொழி நெடல்',sbj:[
-      {id:'Sinhala',ic:'📖',en:'Sinhala',si:'සිංහල',ta:'சிங்களம்'},
-      {id:'Tamil',ic:'📜',en:'Tamil',si:'දෙමළ',ta:'தமிழ்'},
-      {id:'English',ic:'🌐',en:'English',si:'ඉංග්‍රීසි',ta:'ஆங்கிலம்'},
-      {id:'Pali',ic:'📿',en:'Pali/Sanskrit',si:'පාලි',ta:'பாலி'},
-      {id:'French',ic:'🇫🇷',en:'French',si:'ප්‍රංශ',ta:'பிரஞ்சு'},
-    ]},
+    {id:'bio',ic:'🧬',en:'Biology',si:'ජීව ධාරාව',ta:'உயிரியல்',sbj:[{id:'Biology',ic:'🧬',en:'Biology',si:'ජීව විද්‍යාව',ta:'உயிரியல்'},{id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'},{id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'}]},
+    {id:'maths',ic:'➕',en:'Maths',si:'ගණිත ධාරාව',ta:'கணிதம்',sbj:[{id:'CombinedMaths',ic:'📐',en:'Combined Maths',si:'සංයුක්ත',ta:'இணைந்த'},{id:'Physics',ic:'⚡',en:'Physics',si:'භෞතික',ta:'இயற்பியல்'},{id:'Chemistry',ic:'⚗️',en:'Chemistry',si:'රසායන',ta:'வேதியியல்'}]},
+    {id:'commerce',ic:'💼',en:'Commerce',si:'වාණිජ ධාරාව',ta:'வணிகம்',sbj:[{id:'Economics',ic:'📈',en:'Economics',si:'ආර්ථික',ta:'பொருளாதாரம்'},{id:'BusinessStudies',ic:'🏢',en:'Business Studies',si:'ව්‍යාපාර',ta:'வணிக கல்வி'},{id:'Accounting',ic:'🧾',en:'Accounting',si:'ගිණුම්',ta:'கணக்கியல்'}]},
+    {id:'art',ic:'🎨',en:'Arts',si:'කලා ධාරාව',ta:'கலை',sbj:[{id:'Geography',ic:'🌍',en:'Geography',si:'භූගෝල',ta:'புவியியல்'},{id:'Art',ic:'🖼️',en:'Art',si:'චිත්‍ර',ta:'கலை'},{id:'Music',ic:'🎵',en:'Music',si:'සංගීතය',ta:'இசை'}]},
   ],
-  alCommon:[
-    {id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},
-    {id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது IT'},
-  ]
+  alCommon:[{id:'GenEnglish',ic:'🌐',en:'General English',si:'සාමාන්‍ය ඉංග්‍රීසි',ta:'பொது ஆங்கிலம்'},{id:'GenIT',ic:'💻',en:'General IT',si:'සාමාන්‍ය IT',ta:'பொது IT'}]
 };
 
-/* ══ SIDEBAR ══ */
 function buildSidebar(){
   const stSel=document.getElementById('stSel');
   if(S.cat==='al'){stSel.style.display='block';buildStreams();buildSubjs(getALSubjs(S.alStream));}
   else{stSel.style.display='none';buildSubjs(SBJ[S.cat]);}
 }
 function buildStreams(){
-  const c=document.getElementById('stBtns'); c.innerHTML='';
+  const c=document.getElementById('stBtns');c.innerHTML='';
   SBJ.alStreams.forEach(st=>{
-    const b=document.createElement('button');
-    b.className='st-btn'+(st.id===S.alStream?' active':'');
+    const b=document.createElement('button');b.className='st-btn'+(st.id===S.alStream?' active':'');
     const nm=S.lang==='ta'?st.ta:S.lang==='si'?st.si:st.en;
     b.innerHTML=`<div class="st-ico">${st.ic}</div><div><div class="st-nm">${nm||st.en}</div><div class="st-lc">${st.en}</div></div>`;
     b.onclick=()=>{S.alStream=st.id;buildStreams();buildSubjs(getALSubjs(st.id));};
@@ -938,174 +792,74 @@ function buildStreams(){
 }
 function getALSubjs(sid){const st=SBJ.alStreams.find(s=>s.id===sid);return[...(st?st.sbj:[]),...SBJ.alCommon];}
 function buildSubjs(list){
-  const nav=document.getElementById('sbNav'); nav.innerHTML='';
+  const nav=document.getElementById('sbNav');nav.innerHTML='';
   list.forEach((s,i)=>{
-    const b=document.createElement('button');
-    b.className='sbj'+(i===0?' active':'');
+    const b=document.createElement('button');b.className='sbj'+(i===0?' active':'');
     const lc=S.lang==='ta'?s.ta:S.lang==='si'?s.si:s.en;
     b.innerHTML=`<div class="sbj-ic">${s.ic}</div><div class="sbj-tx"><div class="sbj-en">${s.en}</div><div class="sbj-lc">${lc}</div></div>`;
     b.onclick=()=>{
-      S.subject=s.id;S.subIc=s.ic;
-      conversationMessages = [];  // ✅ NEW — clear memory on subject change
+      S.subject=s.id;S.subIc=s.ic;conversationMessages=[];
       document.querySelectorAll('.sbj').forEach(x=>x.classList.remove('active'));b.classList.add('active');
       document.getElementById('tbIc').textContent=s.ic;
       document.getElementById('tbNm').textContent=`${s.en} / ${s.si||s.en}`;
       document.getElementById('tbLc').textContent=s.ta||s.si||s.en;
     };
     nav.appendChild(b);
-    if(i===0){
-      S.subject=s.id;S.subIc=s.ic;
-      document.getElementById('tbIc').textContent=s.ic;
-      document.getElementById('tbNm').textContent=`${s.en} / ${s.si||s.en}`;
-      document.getElementById('tbLc').textContent=s.ta||s.si||s.en;
-    }
+    if(i===0){S.subject=s.id;S.subIc=s.ic;document.getElementById('tbIc').textContent=s.ic;document.getElementById('tbNm').textContent=`${s.en} / ${s.si||s.en}`;document.getElementById('tbLc').textContent=s.ta||s.si||s.en;}
   });
 }
 
-/* ══ REACTIONS ══ */
-const REACTIONS=[
-  {emoji:'👍',id:'good',cls:'reacted'},
-  {emoji:'😊',id:'ok',cls:'reacted'},
-  {emoji:'😕',id:'bad',cls:'reacted-bad'},
-  {emoji:'🔁',id:'ask',cls:'reacted'},
-];
-
+// ══ REACTIONS ══
+const REACTIONS=[{emoji:'👍',id:'good',cls:'reacted'},{emoji:'😊',id:'ok',cls:'reacted'},{emoji:'😕',id:'bad',cls:'reacted-bad'},{emoji:'🔁',id:'ask',cls:'reacted'}];
 function buildReactions(msgId){
-  const lang=S.lang;
-  const labels=UI[lang].reactLabels;
-  const wrap=document.createElement('div');
-  wrap.className='reactions-wrap';
-  const lbl=document.createElement('div');
-  lbl.className='react-label-row';
-  lbl.textContent={si:'ඔබේ ප්‍රතිචාරය:',ta:'உங்கள் கருத்து:',en:'Your reaction:'}[lang];
+  const lang=S.lang;const labels=UI[lang].reactLabels;
+  const wrap=document.createElement('div');wrap.className='reactions-wrap';
+  const lbl=document.createElement('div');lbl.className='react-label-row';lbl.textContent={si:'ඔබේ ප්‍රතිචාරය:',ta:'உங்கள் கருத்து:',en:'Your reaction:'}[lang];
   wrap.appendChild(lbl);
-  const row=document.createElement('div');
-  row.className='react-row';
-  row.id=`react-${msgId}`;
+  const row=document.createElement('div');row.className='react-row';row.id=`react-${msgId}`;
   REACTIONS.forEach(r=>{
-    const btn=document.createElement('button');
-    btn.className='react-btn';
-    btn.dataset.id=r.id;
-    btn.dataset.cls=r.cls;
-    const cnt=document.createElement('span');
-    cnt.className='react-count';
-    cnt.id=`rcnt-${msgId}-${r.id}`;
-    const txt=document.createElement('span');
-    txt.className='react-txt';
-    txt.textContent=labels[r.id]||r.id;
-    btn.appendChild(document.createTextNode(r.emoji+' '));
-    btn.appendChild(txt);
-    btn.appendChild(cnt);
+    const btn=document.createElement('button');btn.className='react-btn';btn.dataset.id=r.id;btn.dataset.cls=r.cls;
+    const cnt=document.createElement('span');cnt.className='react-count';cnt.id=`rcnt-${msgId}-${r.id}`;
+    const txt=document.createElement('span');txt.className='react-txt';txt.textContent=labels[r.id]||r.id;
+    btn.appendChild(document.createTextNode(r.emoji+' '));btn.appendChild(txt);btn.appendChild(cnt);
     btn.onclick=()=>doReact(msgId,r,btn);
     row.appendChild(btn);
   });
-  wrap.appendChild(row);
-  return wrap;
+  wrap.appendChild(row);return wrap;
 }
-
 function doReact(msgId,reaction,btn){
   const row=document.getElementById(`react-${msgId}`);
   const already=row.querySelector('.reacted,.reacted-bad');
-  if(already===btn){
-    btn.className='react-btn';
-    const c=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
-    const v=parseInt(c.textContent)||0;
-    c.textContent=v>1?v-1:'';return;
-  }
-  if(already){
-    const oid=already.dataset.id;
-    already.className='react-btn';
-    const oc=document.getElementById(`rcnt-${msgId}-${oid}`);
-    if(oc){const v=parseInt(oc.textContent)||0;oc.textContent=v>1?v-1:'';}
-  }
-  btn.className='react-btn '+reaction.cls+' react-pop';
-  setTimeout(()=>btn.classList.remove('react-pop'),400);
-  const c=document.getElementById(`rcnt-${msgId}-${reaction.id}`);
-  c.textContent=(parseInt(c.textContent)||0)+1;
-  const lang=S.lang;
-  if(reaction.id==='ask'){
-    const reAsk={si:'කරුණාකර මෙය සරලව නැවත පැහැදිලි කරන්න.',ta:'இதை மீண்டும் எளிமையாக விளக்குங்கள்.',en:'Please explain this again more simply.'};
-    document.getElementById('qIn').value=reAsk[lang];
-    aH(document.getElementById('qIn'));
-  }
-  const goodMsg={si:'🌟 ලස්සනයි! ඉගෙනීම ඉදිරියට!',ta:'🌟 சிறந்தது! தொடர்ந்து கற்றுக்கொள்ளுங்கள்!',en:'🌟 Great! Keep learning!'};
-  const badMsg={si:'😟 සමාවෙන්න! 🔁 click කරන්න.',ta:'😟 மன்னிக்கவும்! 🔁 அழுத்துங்கள்.',en:'😟 Sorry about that! Click 🔁 to try again.'};
-  if(reaction.id==='good')showToast(goodMsg[lang]);
-  else if(reaction.id==='bad')showToast(badMsg[lang],3500);
+  if(already===btn){btn.className='react-btn';const c=document.getElementById(`rcnt-${msgId}-${reaction.id}`);const v=parseInt(c.textContent)||0;c.textContent=v>1?v-1:'';return;}
+  if(already){const oid=already.dataset.id;already.className='react-btn';const oc=document.getElementById(`rcnt-${msgId}-${oid}`);if(oc){const v=parseInt(oc.textContent)||0;oc.textContent=v>1?v-1:'';}}
+  btn.className='react-btn '+reaction.cls+' react-pop';setTimeout(()=>btn.classList.remove('react-pop'),400);
+  const c=document.getElementById(`rcnt-${msgId}-${reaction.id}`);c.textContent=(parseInt(c.textContent)||0)+1;
+  if(reaction.id==='ask'){const reAsk={si:'කරුණාකර මෙය සරලව නැවත පැහැදිලි කරන්න.',ta:'இதை மீண்டும் எளிமையாக விளக்குங்கள்.',en:'Please explain this again more simply.'};document.getElementById('qIn').value=reAsk[S.lang];aH(document.getElementById('qIn'));}
+  const goodMsg={si:'🌟 ලස්සනයි!',ta:'🌟 சிறந்தது!',en:'🌟 Great!'};
+  if(reaction.id==='good')showToast(goodMsg[S.lang]);
 }
 
-/* ══ IMAGE ══ */
-function onImgSel(e){
-  const f=e.target.files[0];if(!f)return;
-  document.getElementById('ipImg').src=URL.createObjectURL(f);
-  document.getElementById('ipWrap').style.display='inline-block';
-  document.getElementById('uplLbl').classList.add('hf');
-}
-function rmImg(){
-  document.getElementById('imgInp').value='';
-  document.getElementById('ipWrap').style.display='none';
-  document.getElementById('uplLbl').classList.remove('hf');
-}
+// ══ IMAGE ══
+function onImgSel(e){const f=e.target.files[0];if(!f)return;document.getElementById('ipImg').src=URL.createObjectURL(f);document.getElementById('ipWrap').style.display='inline-block';document.getElementById('uplLbl').classList.add('hf');}
+function rmImg(){document.getElementById('imgInp').value='';document.getElementById('ipWrap').style.display='none';document.getElementById('uplLbl').classList.remove('hf');}
 
-/* ══ VOICE ══ */
+// ══ VOICE ══
 let recog=null;
-let recSilenceTimer=null;
-const REC_SILENCE_MS=45000;
-
-function resetSilenceTimer(){
-  if(recSilenceTimer){clearTimeout(recSilenceTimer);recSilenceTimer=null;}
-}
-function startSilenceTimer(){
-  resetSilenceTimer();
-  recSilenceTimer=setTimeout(()=>{
-    if(S.rec){
-      stopMic();
-      const ta=document.getElementById('qIn');
-      if(ta&&ta.value.trim().length>0){
-        sendMsg();
-      }
-    }
-  },REC_SILENCE_MS);
-}
-
 if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recog=new SR();recog.continuous=true;recog.interimResults=true;
-  recog.onresult=e=>{
-    let t='';
-    for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;
-    const ta=document.getElementById('qIn');ta.value=t;aH(ta);
-    if(t.trim().length>0) startSilenceTimer();
-  };
+  recog.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;const ta=document.getElementById('qIn');ta.value=t;aH(ta);};
   recog.onend=()=>{if(S.rec)recog.start();};
 }
-function stopMic(){
-  if(!recog||!S.rec)return;
-  resetSilenceTimer();
-  recog.stop();S.rec=false;
-  const b=document.getElementById('micBtn');
-  b.textContent='🎤';b.classList.remove('rec');
-}
 function toggleMic(){
-  if(!recog){showToast('Voice not supported on this browser');return;}
+  if(!recog){showToast('Voice not supported');return;}
   const b=document.getElementById('micBtn');
-  if(S.rec){stopMic();}
-  else{
-    const lang=S.lang;
-    recog.lang=UI[lang].sp;
-    recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');
-    const listenMsg={si:'🎤 සවන් දෙමින්...',ta:'🎤 கேட்கிறேன்...',en:'🎤 Listening...'};
-    showToast(listenMsg[lang]);
-  }
+  if(S.rec){recog.stop();S.rec=false;b.textContent='🎤';b.classList.remove('rec');}
+  else{recog.lang=UI[S.lang].sp;recog.start();S.rec=true;b.textContent='⏹';b.classList.add('rec');showToast({si:'🎤 සවන් දෙමින්...',ta:'🎤 கேட்கிறேன்...',en:'🎤 Listening...'}[S.lang]);}
 }
-function speak(txt){
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));
-  u.lang=UI[S.lang].sp;u.rate=.93;
-  window.speechSynthesis.speak(u);
-}
+function speak(txt){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt.replace(/[*_#`]/g,''));u.lang=UI[S.lang].sp;u.rate=.93;window.speechSynthesis.speak(u);}
 
-/* ══ SEND — ✅ UPDATED WITH CONVERSATION MEMORY ══ */
+// ══ SEND ══
 async function sendMsg(){
   const inp=document.getElementById('qIn');const q=inp.value.trim();
   const t=UI[S.lang];
@@ -1113,57 +867,38 @@ async function sendMsg(){
   if(S.loading)return;
   const wc=document.getElementById('wcCard');if(wc)wc.remove();
   addUser(q);inp.value='';aH(inp);
-
-  // ✅ NEW — save user message to conversation
-  conversationMessages.push({ role: "user", text: q });
-
+  conversationMessages.push({role:'user',text:q});
   const imgFile=document.getElementById('imgInp').files[0]||null;
   rmImg();showTyp();setLoad(true);
   try{
     const fd=new FormData();
     fd.append('name',S.name);fd.append('grade',S.grade);fd.append('subject',S.subject);
-    fd.append('question',q);fd.append('language',S.lang);fd.append('is_crosscheck','false');
+    fd.append('question',q);fd.append('language',S.lang);
     if(imgFile)fd.append('image',imgFile);
-
-    // ✅ NEW — send conversation history to backend
-    fd.append('conversation_history', JSON.stringify(conversationMessages));
-
+    fd.append('conversation_history',JSON.stringify(conversationMessages));
     const res=await fetch(`${API}/solve`,{method:'POST',body:fd});
     const d=await res.json();
     hideTyp();setLoad(false);
-    if(d.status==='banned'){
-      addAI(d.answer||'⛔ Blocked.',null,false);
-    }
+    if(d.status==='banned'){addAI(d.answer||'⛔ Blocked.',null,false);}
     else if(d.status==='success'){
       addAI(d.answer,d.graph_url,true);
-      // ✅ NEW — save AI response to conversation
-      conversationMessages.push({ role: "ai", text: d.answer });
-      // 🎮 Update XP display
+      conversationMessages.push({role:'ai',text:d.answer});
       if(d.progress)updateXpDisplay(d.progress);
       if(d.new_badge)showToast('🎉 New Badge: '+d.new_badge,3500);
     }
     else addAI('⚠️ '+(d.message||'Error'),null,false);
   }catch(e){
     hideTyp();setLoad(false);
-    const errMsg={si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි විය.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect to server.'};
-    addAI(errMsg[S.lang],null,false);
+    addAI({si:'⚠️ Server සමඟ සම්බන්ධ වීමට නොහැකි.',ta:'⚠️ சர்வரில் பிழை.',en:'⚠️ Could not connect.'}[S.lang],null,false);
   }
 }
 
-/* ══ MESSAGES ══ */
-function addUser(txt){
-  const c=document.getElementById('chatArea'),w=document.createElement('div');
-  w.className='mw user';
-  w.innerHTML=`<div class="mav">👤</div><div class="mbody"><div class="mbub">${esc(txt)}</div></div>`;
-  c.appendChild(w);se();
-}
+// ══ MESSAGES ══
+function addUser(txt){const c=document.getElementById('chatArea'),w=document.createElement('div');w.className='mw user';w.innerHTML=`<div class="mav">👤</div><div class="mbody"><div class="mbub">${esc(txt)}</div></div>`;c.appendChild(w);se();}
 function addAI(md,graph,withReactions){
-  const c=document.getElementById('chatArea'),w=document.createElement('div');
-  w.className='mw ai';
-  const t=UI[S.lang];
+  const c=document.getElementById('chatArea'),w=document.createElement('div');w.className='mw ai';
+  const t=UI[S.lang];const safe=(md||'').replace(/\\/g,'\\\\').replace(/`/g,"'");const mid=++msgCounter;
   const gr=graph?`<img src="${graph}" class="m-graph" alt="Graph">`:'';
-  const safe=(md||'').replace(/\\/g,'\\\\').replace(/`/g,"'");
-  const mid=++msgCounter;
   w.innerHTML=`<div class="mav">🎓</div>
     <div class="mbody">
       <div class="mbub">${parseMD(md||'')}${gr}</div>
@@ -1172,58 +907,26 @@ function addAI(md,graph,withReactions){
         <button class="mact" onclick="cpyMsg(this,\`${safe}\`)">${t.copy}</button>
       </div>
     </div>`;
-  if(withReactions){
-    w.querySelector('.mbody').appendChild(buildReactions(mid));
-  }
+  if(withReactions)w.querySelector('.mbody').appendChild(buildReactions(mid));
   c.appendChild(w);
-  // 📐 KaTeX — render math equations
-  try{
-    const bub=w.querySelector('.mbub');
-    if(window.renderMathInElement){
-      renderMathInElement(bub,{
-        delimiters:[
-          {left:'$$',right:'$$',display:true},
-          {left:'$',right:'$',display:false},
-          {left:'\\(',right:'\\)',display:false},
-          {left:'\\[',right:'\\]',display:true},
-        ],
-        throwOnError:false
-      });
-    }
-  }catch(e){}
+  try{const bub=w.querySelector('.mbub');if(window.renderMathInElement)renderMathInElement(bub,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}
   se();
 }
-
 let typEl=null;
-function showTyp(){
-  hideTyp();
-  const c=document.getElementById('chatArea');
-  typEl=document.createElement('div');
-  typEl.id='typEl';typEl.className='ty-w';
-  typEl.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div><div class="ty-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
-  c.appendChild(typEl);se();
-}
+function showTyp(){hideTyp();const c=document.getElementById('chatArea');typEl=document.createElement('div');typEl.id='typEl';typEl.className='ty-w';typEl.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--primary),var(--primary-lt));color:#fff;">🎓</div><div class="ty-b"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;c.appendChild(typEl);se();}
 function hideTyp(){const e=document.getElementById('typEl');if(e)e.remove();typEl=null;}
 
-/* ══ UTILS ══ */
+// ══ UTILS ══
 function setLoad(v){S.loading=v;document.getElementById('sendBtn').disabled=v;}
 function se(){const c=document.getElementById('chatArea');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight);}
 function aH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,130)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function cpyMsg(btn,txt){
-  navigator.clipboard.writeText(txt).then(()=>{
-    const o=btn.innerHTML;
-    btn.innerHTML=UI[S.lang].copied;
-    setTimeout(()=>btn.innerHTML=o,2000);
-  });
-}
-function showToast(m,d=2800){
-  const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),d);
-}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cpyMsg(btn,txt){navigator.clipboard.writeText(txt).then(()=>{const o=btn.innerHTML;btn.innerHTML=UI[S.lang].copied;setTimeout(()=>btn.innerHTML=o,2000);});}
+function showToast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+function updateXpDisplay(progress){if(!progress)return;const xpEl=document.getElementById('tbXp');xpEl.style.display='flex';document.getElementById('tbXpVal').textContent=progress.xp||0;document.getElementById('tbStreak').textContent=progress.streak||0;}
 
-/* ══ MARKDOWN PARSER ══ */
+// ══ MARKDOWN ══
 function parseMD(md){
   if(!md)return'';let h=md;
   h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>');
@@ -1237,210 +940,58 @@ function parseMD(md){
   h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
   h=h.replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>');
   h=h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
-  h=h.replace(/^---+$/gm,'<hr>');
-  h=h.replace(/\n\n+/g,'</p><p>');
-  h=h.replace(/\n/g,'<br>');
-  h='<p>'+h+'</p>';
-  h=h.replace(/<p>\s*<\/p>/g,'');
-  ['pre','h1','h2','h3','ul','hr','blockquote'].forEach(tag=>{
-    h=h.replace(new RegExp(`<p>(<${tag}>)`,'g'),'$1');
-    h=h.replace(new RegExp(`(</${tag}>)<\\/p>`,'g'),'$1');
-  });
+  h=h.replace(/\n\n+/g,'</p><p>');h=h.replace(/\n/g,'<br>');h='<p>'+h+'</p>';h=h.replace(/<p>\s*<\/p>/g,'');
   return h;
 }
 
-/* ══ ADMIN SHORTCUT ══ */
-window.addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){e.preventDefault();window.location.href='dashboard.html';}
-});
-
-/* ══════════════════════════════════════════
-   🆕 FEATURE PANELS — Toggle Show/Hide
-   ══════════════════════════════════════════ */
+// ══ PANELS ══
 let openPanel=null;
-
 function togglePanel(name){
   const panel=document.getElementById('panel'+name.charAt(0).toUpperCase()+name.slice(1));
   const overlay=document.getElementById('spOverlay');
-  if(openPanel===name){
-    closeAllPanels();return;
-  }
-  closeAllPanels();
-  openPanel=name;
-  panel.classList.add('open');
-  overlay.classList.add('open');
-  // Auto-load data
-  if(name==='lb')loadLeaderboard();
-  if(name==='quiz')resetQuizPanel();
+  if(openPanel===name){closeAllPanels();return;}
+  closeAllPanels();openPanel=name;panel.classList.add('open');overlay.classList.add('open');
+  if(name==='lb')loadLeaderboard();if(name==='quiz')resetQuizPanel();
 }
+function closeAllPanels(){document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));document.getElementById('spOverlay').classList.remove('open');openPanel=null;}
 
-function closeAllPanels(){
-  document.querySelectorAll('.slide-panel').forEach(p=>p.classList.remove('open'));
-  document.getElementById('spOverlay').classList.remove('open');
-  document.querySelectorAll('.feat-btn').forEach(b=>b.classList.remove('active'));
-  openPanel=null;
-}
-
-/* ══ 🎮 XP DISPLAY ══ */
-function updateXpDisplay(progress){
-  if(!progress)return;
-  const xpEl=document.getElementById('tbXp');
-  xpEl.style.display='flex';
-  document.getElementById('tbXpVal').textContent=progress.xp||0;
-  document.getElementById('tbStreak').textContent=progress.streak||0;
-}
-
-/* ══ 📝 QUIZ ══ */
-let quizSessionId=null;
-let quizAnswered=false;
-
-function resetQuizPanel(){
-  document.getElementById('quizBody').innerHTML=`
-    <div style="text-align:center;color:var(--text-m);padding:16px 0;font-size:12px">
-      ${S.subject} විෂයේ ප්‍රශ්න 5ක Quiz එකක්!<br>
-      <small>Grade ${S.grade} · ${S.lang==='si'?'සිංහල':S.lang==='ta'?'தமிழ்':'English'}</small>
-    </div>
-    <button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>`;
-}
-
+// ══ QUIZ ══
+let quizSessionId=null,quizAnswered=false;
+function resetQuizPanel(){document.getElementById('quizBody').innerHTML=`<div style="text-align:center;color:var(--text-m);padding:16px 0;font-size:12px">${S.subject} Quiz · Grade ${S.grade}</div><button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button>`;}
 async function startQuiz(){
-  const body=document.getElementById('quizBody');
-  body.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-m)">⏳ Generating quiz...</div>';
-  try{
-    const res=await fetch(`${API}/quiz/start`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({user_name:S.name,grade:String(S.grade),subject:S.subject,language:S.lang})
-    });
-    const d=await res.json();
-    if(d.status==='success'){quizSessionId=d.session_id;renderQuizQ(d);}
-    else body.innerHTML=`<div style="text-align:center;padding:20px;color:var(--danger)">❌ ${d.message||'Failed'}</div>`;
-  }catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Server error</div>';}
+  const body=document.getElementById('quizBody');body.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-m)">⏳ Generating...</div>';
+  try{const res=await fetch(`${API}/quiz/start`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_name:S.name,grade:String(S.grade),subject:S.subject,language:S.lang})});const d=await res.json();if(d.status==='success'){quizSessionId=d.session_id;renderQuizQ(d);}else body.innerHTML=`<div style="text-align:center;padding:20px;color:var(--danger)">❌ ${d.message||'Failed'}</div>`;}catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Error</div>';}
 }
-
-function renderQuizQ(d){
-  quizAnswered=false;
-  const body=document.getElementById('quizBody');
-  body.innerHTML=`
-    <div class="qz-progress"><div class="qz-progress-fill" style="width:${d.progress_pct||0}%"></div></div>
-    <div class="qz-num">Question ${d.current}/${d.total} ${d.score_so_far!=null?'· Score: '+d.score_so_far:''}</div>
-    <div class="qz-question">${esc(d.question)}</div>
-    <div class="qz-opts">${(d.options||[]).map(o=>`<button class="qz-opt" onclick="answerQuiz('${esc(o.charAt(0))}',this)">${esc(o)}</button>`).join('')}</div>
-    <div id="qzExp"></div>`;
-}
-
+function renderQuizQ(d){quizAnswered=false;document.getElementById('quizBody').innerHTML=`<div class="qz-progress"><div class="qz-progress-fill" style="width:${d.progress_pct||0}%"></div></div><div class="qz-num">Question ${d.current}/${d.total}</div><div class="qz-question">${esc(d.question)}</div><div class="qz-opts">${(d.options||[]).map(o=>`<button class="qz-opt" onclick="answerQuiz('${esc(o.charAt(0))}',this)">${esc(o)}</button>`).join('')}</div><div id="qzExp"></div>`;}
 async function answerQuiz(ans,btn){
-  if(quizAnswered)return;
-  quizAnswered=true;
-  document.querySelectorAll('.qz-opt').forEach(b=>b.classList.add('locked'));
-  try{
-    const res=await fetch(`${API}/quiz/answer`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({session_id:quizSessionId,user_name:S.name,user_answer:ans})
-    });
-    const d=await res.json();
-    btn.classList.add(d.correct?'correct':'wrong');
-    document.getElementById('qzExp').innerHTML=`<div class="qz-exp"><strong>${d.correct?'✅':'❌'}</strong> ${esc(d.explanation||'')}</div>`;
-    if(d.status==='completed'){
-      setTimeout(()=>renderQuizResult(d),1200);
-    } else {
-      setTimeout(()=>renderQuizQ({...d,session_id:quizSessionId}),1400);
-    }
-  }catch(e){quizAnswered=false;showToast('⚠️ Error');}
+  if(quizAnswered)return;quizAnswered=true;document.querySelectorAll('.qz-opt').forEach(b=>b.classList.add('locked'));
+  try{const res=await fetch(`${API}/quiz/answer`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:quizSessionId,user_name:S.name,user_answer:ans})});const d=await res.json();btn.classList.add(d.correct?'correct':'wrong');document.getElementById('qzExp').innerHTML=`<div class="qz-exp"><strong>${d.correct?'✅':'❌'}</strong> ${esc(d.explanation||'')}</div>`;if(d.status==='completed'){setTimeout(()=>renderQuizResult(d),1200);}else{setTimeout(()=>renderQuizQ({...d}),1400);}}catch(e){quizAnswered=false;showToast('⚠️ Error');}
 }
-
 function renderQuizResult(d){
-  const pct=d.percent||0;
-  const cls=pct>=80?'great':pct>=50?'ok':'low';
-  document.getElementById('quizBody').innerHTML=`
-    <div class="qz-result">
-      <div class="qz-circle ${cls}"><span class="qz-pct">${pct}%</span><span class="qz-sc">${d.score}/${d.total}</span></div>
-      <h3 style="font-size:15px;margin-bottom:4px">${pct>=80?'🏆 Excellent!':pct>=50?'😊 Good job!':'😅 Keep trying!'}</h3>
-      <div class="xp-pill">⚡ +${d.xp_earned} XP</div>
-      <div style="display:flex;gap:7px;justify-content:center;margin:12px 0">
-        <button onclick="startQuiz()" style="padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔄 Again</button>
-        <button onclick="closeAllPanels()" style="padding:8px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-p)">Close</button>
-      </div>
-      <div class="qz-review"><div style="font-size:10px;font-weight:700;color:var(--text-m);margin-bottom:6px">REVIEW</div>
-        ${(d.answers||[]).map(a=>`<div class="qz-rev-item ${a.correct?'right':'wrong2'}"><div style="font-weight:700;margin-bottom:2px">${esc(a.question)}</div><div style="color:var(--text-m)">You: ${esc(a.user_answer)} · Answer: ${esc(a.right_answer)}</div></div>`).join('')}
-      </div>
-    </div>`;
-  // Refresh XP
+  const pct=d.percent||0;const cls=pct>=80?'great':pct>=50?'ok':'low';
+  document.getElementById('quizBody').innerHTML=`<div class="qz-result"><div class="qz-circle ${cls}"><span class="qz-pct">${pct}%</span><span class="qz-sc">${d.score}/${d.total}</span></div><h3>${pct>=80?'🏆 Excellent!':pct>=50?'😊 Good job!':'😅 Keep trying!'}</h3><div class="xp-pill">⚡ +${d.xp_earned} XP</div><div style="display:flex;gap:7px;justify-content:center;margin:12px 0"><button onclick="startQuiz()" style="padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔄 Again</button><button onclick="closeAllPanels()" style="padding:8px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;cursor:pointer;color:var(--text-p)">Close</button></div></div>`;
   loadProgress();
 }
 
-/* ══ 🏆 LEADERBOARD ══ */
+// ══ LEADERBOARD ══
 async function loadLeaderboard(){
-  const body=document.getElementById('lbBody');
-  body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">Loading...</div>';
-  try{
-    const res=await fetch(`${API}/leaderboard`);
-    const d=await res.json();
-    const list=d.leaderboard||[];
-    if(!list.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">No entries yet!</div>';return;}
-    body.innerHTML=list.map(e=>{
-      const rc=e.rank===1?'g':e.rank===2?'s':e.rank===3?'b':'n';
-      const emoji=e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':e.rank;
-      const isYou=e.name===S.name;
-      return`<div class="lb-row${isYou?' lb-you':''}">
-        <div class="lb-rank ${rc}">${emoji}</div>
-        <div class="lb-name">${esc(e.name)}${isYou?' <small style="color:var(--primary)">(you)</small>':''}</div>
-        <div style="font-size:10px;color:var(--text-m)">🔥${e.streak||0}d</div>
-        <div class="lb-xp">${e.xp||0} XP</div>
-      </div>`;
-    }).join('');
-  }catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Error</div>';}
+  const body=document.getElementById('lbBody');body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">Loading...</div>';
+  try{const res=await fetch(`${API}/leaderboard`);const d=await res.json();const list=d.leaderboard||[];if(!list.length){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-m)">No entries yet!</div>';return;}body.innerHTML=list.map(e=>{const rc=e.rank===1?'g':e.rank===2?'s':e.rank===3?'b':'n';const emoji=e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':e.rank;const isYou=e.name===S.name;return`<div class="lb-row${isYou?' lb-you':''}"><div class="lb-rank ${rc}">${emoji}</div><div class="lb-name">${esc(e.name)}${isYou?' <small style="color:var(--primary)">(you)</small>':''}</div><div style="font-size:10px;color:var(--text-m)">🔥${e.streak||0}d</div><div class="lb-xp">${e.xp||0} XP</div></div>`;}).join('');}catch(e){body.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">⚠️ Error</div>';}
 }
 
-/* ══ 🎨 IMAGE GENERATION ══ */
-async function genImage(){
-  const inp=document.getElementById('igInp');
-  const prompt=inp.value.trim();
-  if(!prompt){showToast('Describe what to draw!');return;}
-  const result=document.getElementById('igResult');
-  result.innerHTML='<div style="padding:20px;color:var(--text-m)">🎨 Drawing...</div>';
-  try{
-    const res=await fetch(`${API}/generate-image`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:prompt,subject:S.subject,language:S.lang})
-    });
-    const d=await res.json();
-    if(d.status==='success'&&d.image_url){
-      result.innerHTML=`<p style="font-size:12px;color:var(--text-p);margin-bottom:8px">${esc(d.description||'')}</p><img src="${d.image_url}" alt="Generated diagram">`;
-    } else {
-      result.innerHTML=`<div style="color:var(--text-m);padding:10px">${esc(d.description||d.message||'Could not generate image')}</div>`;
-    }
-  }catch(e){result.innerHTML='<div style="color:var(--danger);padding:10px">⚠️ Error</div>';}
-}
+// ══ IMAGE GEN ══
+async function genImage(){const inp=document.getElementById('igInp');const prompt=inp.value.trim();if(!prompt){showToast('Describe what to draw!');return;}const result=document.getElementById('igResult');result.innerHTML='<div style="padding:20px;color:var(--text-m)">🎨 Drawing...</div>';try{const res=await fetch(`${API}/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,subject:S.subject,language:S.lang})});const d=await res.json();if(d.status==='success'&&d.image_url){result.innerHTML=`<p style="font-size:12px;color:var(--text-p);margin-bottom:8px">${esc(d.description||'')}</p><img src="${d.image_url}" alt="Generated">"`;}else result.innerHTML=`<div style="color:var(--text-m);padding:10px">${esc(d.description||d.message||'Could not generate')}</div>`;}catch(e){result.innerHTML='<div style="color:var(--danger);padding:10px">⚠️ Error</div>';}}
 
-/* ══ 💬 FEEDBACK ══ */
+// ══ FEEDBACK ══
 let fbRating=0;
-function rateStar(n){
-  fbRating=n;
-  document.querySelectorAll('.fb-star').forEach((s,i)=>{
-    s.classList.toggle('lit',i<n);
-  });
-}
-function submitFeedback(){
-  const msg=document.getElementById('fbMsg').value.trim();
-  if(!fbRating){showToast('⭐ Please rate first!');return;}
-  // Save locally (or send to backend if you add endpoint)
-  const feedback={user:S.name,rating:fbRating,message:msg,time:new Date().toISOString()};
-  console.log('Feedback:',feedback);
-  showToast('🙏 Thank you for your feedback!');
-  closeAllPanels();
-  fbRating=0;
-  document.querySelectorAll('.fb-star').forEach(s=>s.classList.remove('lit'));
-  document.getElementById('fbMsg').value='';
-}
+function rateStar(n){fbRating=n;document.querySelectorAll('.fb-star').forEach((s,i)=>s.classList.toggle('lit',i<n));}
+function submitFeedback(){if(!fbRating){showToast('⭐ Please rate first!');return;}showToast('🙏 Thank you!');closeAllPanels();fbRating=0;document.querySelectorAll('.fb-star').forEach(s=>s.classList.remove('lit'));document.getElementById('fbMsg').value='';}
 
-/* ══ 📊 LOAD PROGRESS ══ */
-async function loadProgress(){
-  try{
-    const res=await fetch(`${API}/progress/${S.name}`);
-    const d=await res.json();
-    if(d.status==='success')updateXpDisplay(d.progress);
-  }catch(e){}
-}
+// ══ PROGRESS ══
+async function loadProgress(){try{const res=await fetch(`${API}/progress/${S.name}`);const d=await res.json();if(d.status==='success')updateXpDisplay(d.progress);}catch(e){}}
+
+// Admin shortcut
+window.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&e.key==='F2'){e.preventDefault();window.location.href='dashboard.html';}});
 </script>
 </body>
 </html>
