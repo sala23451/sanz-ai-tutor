@@ -85,7 +85,7 @@ if not GOOGLE_API_KEY:
     raise ValueError("GOOGLE_API_KEY not set!")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-gemini_flash = genai.GenerativeModel('gemini-2.5-flash')
+gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')  # 1000 RPD free — flash quota cut Dec 2025
 gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
 
 # ── File Paths ──
@@ -117,8 +117,8 @@ CACHE_TTL_HOURS            = 48
 
 # ── API Limits ──
 API_LIMITS = {
-    "gemini-2.5-flash":      500,
-    "gemini-2.5-flash-lite": 1000,
+    "gemini-2.5-flash-lite": 1000,   # main model — 1000 RPD free
+    "gemini-2.5-flash":      50,     # kept for reference (quota cut Dec 2025)
 }
 
 os.makedirs(PDF_FOLDER, exist_ok=True)
@@ -1036,7 +1036,7 @@ Return ONLY valid JSON:
 {{"questions":[{{"q":"Question","options":["A) opt1","B) opt2","C) opt3","D) opt4"],"answer":"A","explanation":"Why A is correct"}}]}}"""
     try:
         response  = gemini_flash.generate_content(prompt)
-        track_api_call("gemini-2.5-flash", "quiz_generate")
+        track_api_call("gemini-2.5-flash-lite", "quiz_generate")
         raw       = re.sub(r'^```json\s*|\s*```$', '', response.text.strip())
         data      = json.loads(raw)
         questions = data.get("questions", [])
@@ -1183,7 +1183,7 @@ Subject: {body.subject}
 Provide matplotlib code between [GRAPH_START] and [GRAPH_END] tags.
 Do NOT use plt.savefig()."""
         response = gemini_flash.generate_content(img_prompt)
-        track_api_call("gemini-2.5-flash", "image_generate")
+        track_api_call("gemini-2.5-flash-lite", "image_generate")
         answer      = response.text
         graph_url   = None
         graph_match = re.search(r'\[GRAPH_START\](.*?)\[GRAPH_END\]', answer, re.DOTALL)
@@ -1329,7 +1329,7 @@ Solve step by step. If graph needed, provide matplotlib code between [GRAPH_STAR
         # 10. Main answer
         response1 = gemini_flash.generate_content([instruction] + content_list)
         answer1   = response1.text
-        track_api_call("gemini-2.5-flash", "main_answer")
+        track_api_call("gemini-2.5-flash-lite", "main_answer")
 
         # 11. Cross-check (math only)
         if is_math:
@@ -1414,14 +1414,29 @@ ask ONE gentle guiding question. Be warm. 2-3 sentences max."""
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
-            retry_msgs = {
-                "si": "⏳ AI එක ටිකක් විවේක ගන්නවා! තත්පර 30කින් නැවත try කරන්න. 😊",
-                "en": "⏳ AI is taking a short break! Please try again in 30 seconds. 😊",
-                "ta": "⏳ AI சிறிது ஓய்வு எடுக்கிறது! 30 வினாடிகளில் மீண்டும் முயற்சிக்கவும். 😊"
-            }
-            return {"status": "success", "answer": retry_msgs.get(language, retry_msgs["en"]),
+            # Auto-retry once with flash-lite fallback after 5s
+            import time
+            time.sleep(5)
+            try:
+                fallback = gemini_check.generate_content(
+                    f"Answer this briefly for a Grade {grade} student in language '{language}': {question}"
+                )
+                track_api_call("gemini-2.5-flash-lite", "main_answer")
+                return {
+                    "status": "success", "answer": fallback.text,
                     "graph_url": None, "verified": True, "rag_used": False,
-                    "cache_hit": False, "detected_language": language}
+                    "cache_hit": False, "detected_language": language,
+                    "new_badge": None, "progress": get_progress(name.lower())
+                }
+            except Exception as e2:
+                retry_msgs = {
+                    "si": "⏳ AI server ටිකක් busy! තත්පර 10කින් නැවත try කරන්න. 😊",
+                    "en": "⏳ AI server is busy! Please try again in 10 seconds. 😊",
+                    "ta": "⏳ AI server பிஸியாக உள்ளது! 10 விநாடிகளில் மீண்டும் முயற்சிக்கவும். 😊"
+                }
+                return {"status": "rate_limit", "answer": retry_msgs.get(language, retry_msgs["en"]),
+                        "graph_url": None, "verified": True, "rag_used": False,
+                        "cache_hit": False, "detected_language": language}
         return {"status": "error", "message": error_msg}
 
 # ══════════════════════════════════════════
@@ -1518,7 +1533,10 @@ async def admin_parents(x_admin_password: str = Header(default="")):
         raise HTTPException(status_code=401, detail="Unauthorized")
     parents     = load_json(PARENTS_FILE, {})
     children_db = load_json(CHILDREN_FILE, {})
+    accounts    = get_user_accounts()
     result      = []
+
+    # Parent-system accounts
     for email, p in parents.items():
         children = [
             {"id": cid, "name": children_db[cid]["name"], "grade": children_db[cid]["grade"]}
@@ -1527,8 +1545,26 @@ async def admin_parents(x_admin_password: str = Header(default="")):
         result.append({
             "email": email, "name": p["name"],
             "children": children, "plan": p.get("plan", "free"),
-            "created": p.get("created", "")
+            "created": p.get("created", ""),
+            "type": "parent"
         })
+
+    # Self-registered student accounts
+    for uname, acc in accounts.items():
+        email  = acc.get("email", "")
+        phone  = acc.get("phone", "")
+        contact = email or phone
+        if not contact:
+            continue
+        result.append({
+            "email":    contact,
+            "name":     acc.get("full_name", uname),
+            "children": [{"id": uname, "name": acc.get("full_name", uname), "grade": acc.get("grade", "?")}],
+            "plan":     "student_account",
+            "created":  acc.get("created", ""),
+            "type":     "student_account"
+        })
+
     return {"status": "success", "parents": result, "total": len(result)}
 
 @app.post("/admin/email/send-now")
@@ -1640,3 +1676,193 @@ async def admin_list_pdfs(x_admin_password: str = Header(default="")):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
+
+# ══════════════════════════════════════════
+# ── USER SELF-REGISTRATION SYSTEM ──
+# ══════════════════════════════════════════
+USER_ACCOUNTS_FILE = "user_accounts.json"
+
+class UserRegisterRequest(BaseModel):
+    username: str
+    password: str
+    full_name: str
+    birthday: str      # "2010-05-14"
+    grade: str
+    email: str = ""
+    phone: str = ""
+    language: str = "si"
+
+class UserLoginRequest(BaseModel):
+    username: str
+    password: str
+
+class UserUpdateRequest(BaseModel):
+    username: str
+    full_name: str = ""
+    grade: str = ""
+    email: str = ""
+    phone: str = ""
+
+def get_user_accounts():
+    return load_json(USER_ACCOUNTS_FILE, {})
+
+def save_user_accounts(data):
+    save_json(USER_ACCOUNTS_FILE, data)
+
+def generate_temp_password() -> str:
+    """Generate a readable 8-char temp password"""
+    import random, string
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choices(chars, k=8))
+
+@app.post("/user/register")
+async def user_register(body: UserRegisterRequest):
+    accounts = get_user_accounts()
+    uname    = body.username.strip().lower().replace(" ", "_")
+
+    if not uname or len(uname) < 3:
+        raise HTTPException(status_code=400, detail="Username must be 3+ characters!")
+    if not body.password or len(body.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be 6+ characters!")
+    if uname in accounts:
+        raise HTTPException(status_code=400, detail="Username already taken!")
+    if not body.email and not body.phone:
+        raise HTTPException(status_code=400, detail="Email or phone required!")
+
+    age = calculate_age(body.birthday)
+
+    accounts[uname] = {
+        "username":       uname,
+        "full_name":      body.full_name.strip(),
+        "password_hash":  hashlib.sha256(body.password.encode()).hexdigest(),
+        "birthday":       body.birthday,
+        "age":            age,
+        "grade":          body.grade,
+        "email":          body.email.strip().lower(),
+        "phone":          body.phone.strip(),
+        "language":       body.language,
+        "created":        datetime.datetime.now().isoformat(),
+        "last_login":     None,
+        "active":         True,
+        "role":           "student"
+    }
+    save_user_accounts(accounts)
+
+    return {
+        "status":    "success",
+        "message":   f"Account created for {body.full_name}!",
+        "username":  uname,
+        "password":  body.password   # show once to user
+    }
+
+@app.post("/user/login")
+async def user_login(body: UserLoginRequest):
+    accounts = get_user_accounts()
+    uname    = body.username.strip().lower().replace(" ", "_")
+
+    if uname not in accounts:
+        raise HTTPException(status_code=401, detail="Username not found!")
+
+    acc     = accounts[uname]
+    pw_hash = hashlib.sha256(body.password.encode()).hexdigest()
+    if acc["password_hash"] != pw_hash:
+        raise HTTPException(status_code=401, detail="Wrong password!")
+    if not acc.get("active", True):
+        raise HTTPException(status_code=403, detail="Account disabled!")
+
+    # Update last login
+    accounts[uname]["last_login"] = datetime.datetime.now().isoformat()
+    save_user_accounts(accounts)
+
+    token = secrets.token_hex(32)
+    return {
+        "status":    "success",
+        "token":     token,
+        "username":  uname,
+        "full_name": acc["full_name"],
+        "grade":     acc["grade"],
+        "email":     acc["email"],
+        "phone":     acc["phone"],
+        "language":  acc["language"],
+        "age":       acc["age"],
+        "birthday":  acc["birthday"],
+        "role":      acc.get("role", "student")
+    }
+
+@app.get("/user/profile/{username}")
+async def user_profile(username: str):
+    accounts = get_user_accounts()
+    uname    = username.strip().lower()
+    if uname not in accounts:
+        raise HTTPException(status_code=404, detail="User not found!")
+    acc = accounts[uname].copy()
+    acc.pop("password_hash", None)
+    # Add progress
+    acc["progress"] = get_progress(uname)
+    return {"status": "success", "profile": acc}
+
+@app.put("/user/profile")
+async def update_user_profile(body: UserUpdateRequest):
+    accounts = get_user_accounts()
+    uname    = body.username.strip().lower()
+    if uname not in accounts:
+        raise HTTPException(status_code=404, detail="User not found!")
+    acc = accounts[uname]
+    if body.full_name: acc["full_name"] = body.full_name
+    if body.grade:     acc["grade"]     = body.grade
+    if body.email:     acc["email"]     = body.email.strip().lower()
+    if body.phone:     acc["phone"]     = body.phone.strip()
+    accounts[uname] = acc
+    save_user_accounts(accounts)
+    return {"status": "success", "message": "Profile updated!"}
+
+# ── ADMIN: View all user accounts ──
+@app.get("/admin/user-accounts")
+async def admin_user_accounts(x_admin_password: str = Header(default="")):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    accounts = get_user_accounts()
+    tokens   = load_json(USER_TOKENS_FILE, {})
+    today    = datetime.date.today().isoformat()
+    result   = []
+    for uname, acc in accounts.items():
+        safe = acc.copy()
+        safe.pop("password_hash", None)
+        # Add token usage
+        tok_data   = tokens.get(uname, {})
+        today_data = tok_data.get("today", {}).get(today, {})
+        safe["tokens_today"] = today_data.get("input", 0) + today_data.get("output", 0)
+        safe["total_tokens"] = tok_data.get("total_input", 0) + tok_data.get("total_output", 0)
+        # Add progress summary
+        prog = load_json(PROGRESS_FILE, {}).get(uname, {})
+        safe["xp"]             = prog.get("xp", 0)
+        safe["streak"]         = prog.get("streak", 0)
+        safe["total_questions"] = prog.get("total_questions", 0)
+        safe["badges_count"]   = len(prog.get("badges", []))
+        result.append(safe)
+    result.sort(key=lambda x: x.get("created", ""), reverse=True)
+    return {"status": "success", "accounts": result, "total": len(result)}
+
+@app.post("/admin/user-accounts/disable")
+async def admin_disable_user(body: BlacklistRemoveRequest, x_admin_password: str = Header(default="")):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    accounts = get_user_accounts()
+    uname    = body.user_name.strip().lower()
+    if uname not in accounts:
+        raise HTTPException(status_code=404, detail="User not found!")
+    accounts[uname]["active"] = False
+    save_user_accounts(accounts)
+    return {"status": "success", "message": f"{uname} disabled!"}
+
+@app.post("/admin/user-accounts/enable")
+async def admin_enable_user(body: BlacklistRemoveRequest, x_admin_password: str = Header(default="")):
+    if not check_admin(x_admin_password):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    accounts = get_user_accounts()
+    uname    = body.user_name.strip().lower()
+    if uname not in accounts:
+        raise HTTPException(status_code=404, detail="User not found!")
+    accounts[uname]["active"] = True
+    save_user_accounts(accounts)
+    return {"status": "success", "message": f"{uname} enabled!"}
