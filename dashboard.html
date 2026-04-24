@@ -236,6 +236,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <div class="nav-item" onclick="showPage('realtime',this)"><i class="fas fa-satellite-dish"></i>Live<span class="live-dot" style="margin-left:auto"></span></div>
 
     <div class="sb-section">Students</div>
+    <div class="nav-item" onclick="showPage('accounts',this)"><i class="fas fa-user-circle"></i>User Accounts <span class="nav-badge" id="accBadge">0</span></div>
     <div class="nav-item" onclick="showPage('parents',this)"><i class="fas fa-users"></i>Parents <span class="nav-badge" id="parentBadge">0</span></div>
     <div class="nav-item" onclick="showPage('users',this)"><i class="fas fa-user-graduate"></i>Students</div>
     <div class="nav-item" onclick="showPage('history',this)"><i class="fas fa-history"></i>History <span class="nav-badge" id="histBadge">0</span></div>
@@ -321,6 +322,25 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <!-- LIVE -->
     <div class="page" id="page-realtime">
       <div class="sc"><div class="sc-head"><h3><span class="online-dot"></span>LIVE Feed</h3><span id="rt-count" style="font-size:10px;color:var(--txt3)">0</span></div><div id="liveFeed" style="max-height:500px;overflow-y:auto;"><div class="empty-state">Waiting...</div></div></div>
+    </div>
+
+    <!-- USER ACCOUNTS -->
+    <div class="page" id="page-accounts">
+      <div class="sc">
+        <div class="sc-head">
+          <h3>👤 Registered User Accounts</h3>
+          <div style="display:flex;gap:6px;">
+            <input type="text" class="search-inp" id="accSearch" placeholder="Search..." oninput="filterAccounts()" style="width:140px;">
+            <button class="btn btn-pri" onclick="loadUserAccounts()"><i class="fas fa-sync-alt"></i></button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Username</th><th>Full Name</th><th>Grade</th><th>Age</th><th>Email/Phone</th><th>XP</th><th>Questions</th><th>Tokens Today</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="accBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- PARENTS -->
@@ -463,6 +483,7 @@ function showPage(n,el){
   if(n==='api')loadApiUsage();
   if(n==='tokens')loadTokenUsage();
   if(n==='parents')loadParents();
+  if(n==='accounts')loadUserAccounts();
   if(n==='email'){loadEmailLog();}
 }
 function timeAgo(ts){if(!ts)return'—';const d=Math.floor((Date.now()-new Date(ts).getTime())/1000);if(d<60)return d+'s ago';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
@@ -753,7 +774,75 @@ async function deletePDF(n){if(!confirm('Delete '+n+'?'))return;try{await fetch(
 /* ══ EXPORT ══ */
 function exportCSV(){if(!allHistory.length){showToast('No data');return;}const rows=[['#','Student','Grade','Subject','Question','Time']];allHistory.forEach((r,i)=>rows.push([i+1,r.user||'?',r.grade||'',r.subject||'',(r.question||'').replace(/"/g,"'"),r.time||'']));const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=`sanz_${new Date().toISOString().slice(0,10)}.csv`;a.click();showToast('✅ Exported');}
 
-function showToast(m){const t=document.getElementById('toastAdm');t.textContent=m;t.className='toast-adm show';setTimeout(()=>t.classList.remove('show'),3000);}
+/* ══ USER ACCOUNTS ══ */
+let allAccounts=[];
+async function loadUserAccounts(){
+  const tb=document.getElementById('accBody');
+  if(tb)tb.innerHTML='<tr><td colspan="12" class="empty-state">Loading...</td></tr>';
+  try{
+    const res=await fetch(`${BACKEND}/admin/user-accounts`,{headers:{'X-Admin-Password':ADMIN_PASS}});
+    if(!res.ok){if(tb)tb.innerHTML='<tr><td colspan="12" class="empty-state">Error</td></tr>';return;}
+    const d=await res.json();
+    allAccounts=d.accounts||[];
+    document.getElementById('accBadge').textContent=allAccounts.length;
+    renderAccounts(allAccounts);
+  }catch(e){if(tb)tb.innerHTML='<tr><td colspan="12" class="empty-state">⚠️ '+esc(e.message)+'</td></tr>';}
+}
+function renderAccounts(list){
+  const tb=document.getElementById('accBody');
+  if(!tb)return;
+  if(!list.length){tb.innerHTML='<tr><td colspan="12" class="empty-state">No accounts yet</td></tr>';return;}
+  tb.innerHTML=list.map((a,i)=>{
+    const contact=a.email||a.phone||'—';
+    const active=a.active!==false;
+    return`<tr>
+      <td style="color:var(--txt3)">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar">${ini(a.full_name||a.username)}</div><div><div style="font-size:11px;font-weight:700">${esc(a.username)}</div><div style="font-size:9px;color:var(--txt3)">${timeAgo(a.last_login)} last login</div></div></div></td>
+      <td style="font-weight:600">${esc(a.full_name||'—')}</td>
+      <td><span class="badge" style="background:var(--pri-dim);color:var(--pri)">G${esc(a.grade||'?')}</span></td>
+      <td>${a.age||'—'}</td>
+      <td style="color:var(--txt2);font-size:11px">${esc(contact)}</td>
+      <td style="color:var(--yel);font-weight:700">⚡${a.xp||0}</td>
+      <td>${a.total_questions||0}</td>
+      <td style="color:var(--acc)">${(a.tokens_today||0).toLocaleString()}</td>
+      <td style="color:var(--txt3);font-size:11px">${timeAgo(a.created)}</td>
+      <td>${active?'<span class="badge bd-online">Active</span>':'<span class="badge bd-ban">Disabled</span>'}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          ${active
+            ?`<button class="btn btn-dan" style="padding:3px 7px;font-size:9px" onclick="disableUser('${esc(a.username)}')">🚫</button>`
+            :`<button class="btn btn-ok" style="padding:3px 7px;font-size:9px" onclick="enableUser('${esc(a.username)}')">✅</button>`
+          }
+          <button class="btn" style="padding:3px 7px;font-size:9px" onclick="viewUser('${esc(a.username)}')">👁</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function filterAccounts(){
+  const q=document.getElementById('accSearch').value.toLowerCase();
+  renderAccounts(allAccounts.filter(a=>
+    (a.username||'').toLowerCase().includes(q)||
+    (a.full_name||'').toLowerCase().includes(q)||
+    (a.email||'').toLowerCase().includes(q)||
+    (a.grade||'').includes(q)
+  ));
+}
+async function disableUser(username){
+  if(!confirm('Disable '+username+'?'))return;
+  try{const r=await fetch(`${BACKEND}/admin/user-accounts/disable`,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':ADMIN_PASS},body:JSON.stringify({user_name:username})});if(r.ok){showToast('🚫 '+username+' disabled');loadUserAccounts();}else showToast('❌ Failed');}catch{showToast('❌ Error');}
+}
+async function enableUser(username){
+  if(!confirm('Enable '+username+'?'))return;
+  try{const r=await fetch(`${BACKEND}/admin/user-accounts/enable`,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Password':ADMIN_PASS},body:JSON.stringify({user_name:username})});if(r.ok){showToast('✅ '+username+' enabled');loadUserAccounts();}else showToast('❌ Failed');}catch{showToast('❌ Error');}
+}
+function viewUser(username){
+  const a=allAccounts.find(x=>x.username===username);
+  if(!a)return;
+  showToast(`${a.full_name} · G${a.grade} · XP:${a.xp} · Q:${a.total_questions} · ${a.email||a.phone||'No contact'}`,5000);
+}
+
+function showToast(m){const t=document.getElementById('toastAdm');t.textContent=m;t.className='toast-adm show';setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
 </body>
 </html>
