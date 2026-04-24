@@ -50,5 +50,31 @@
         "calls": 1
       }
     }
+  },
+  "ramani2023": {
+    "total_input": 36,
+    "total_output": 1545,
+    "total_calls": 1,
+    "today": {
+      "2026-04-24": {
+        "input": 36,
+        "output": 1545,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W16": {
+        "input": 36,
+        "output": 1545,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 36,
+        "output": 1545,
+        "calls": 1
+      }
+    }
   }
 }
