@@ -13,5 +13,20 @@
     "last_login": "2026-04-24T16:23:00.220534",
     "active": true,
     "role": "student"
+  },
+  "achini2023": {
+    "username": "achini2023",
+    "full_name": "achini",
+    "password_hash": "f673f8da575b5e51070b82accd34f7247bb22eb639098da0063af2af8f368aec",
+    "birthday": "2017-03-01",
+    "age": 9,
+    "grade": "9",
+    "email": "sanduniapple99@gmail.com",
+    "phone": "0789999984",
+    "language": "si",
+    "created": "2026-04-24T16:49:54.016288",
+    "last_login": null,
+    "active": true,
+    "role": "student"
   }
 }
