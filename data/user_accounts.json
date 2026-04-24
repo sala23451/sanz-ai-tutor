@@ -28,5 +28,20 @@
     "last_login": null,
     "active": true,
     "role": "student"
+  },
+  "ramani2023": {
+    "username": "ramani2023",
+    "full_name": "ramani",
+    "password_hash": "f673f8da575b5e51070b82accd34f7247bb22eb639098da0063af2af8f368aec",
+    "birthday": "2018-03-09",
+    "age": 8,
+    "grade": "9",
+    "email": "sandunihansika778@gmail.com",
+    "phone": "0789999984",
+    "language": "si",
+    "created": "2026-04-24T16:52:18.338801",
+    "last_login": null,
+    "active": true,
+    "role": "student"
   }
 }
