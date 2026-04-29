@@ -130,28 +130,28 @@
     }
   },
   "guest_9388": {
-    "total_input": 19,
-    "total_output": 50,
-    "total_calls": 1,
+    "total_input": 124,
+    "total_output": 125,
+    "total_calls": 2,
     "today": {
       "2026-04-29": {
-        "input": 19,
-        "output": 50,
-        "calls": 1
+        "input": 124,
+        "output": 125,
+        "calls": 2
       }
     },
     "weekly": {
       "2026-W17": {
-        "input": 19,
-        "output": 50,
-        "calls": 1
+        "input": 124,
+        "output": 125,
+        "calls": 2
       }
     },
     "monthly": {
       "2026-04": {
-        "input": 19,
-        "output": 50,
-        "calls": 1
+        "input": 124,
+        "output": 125,
+        "calls": 2
       }
     }
   }
