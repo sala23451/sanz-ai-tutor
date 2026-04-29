@@ -214,8 +214,8 @@
     ]
   },
   "guest_6452": {
-    "total_questions": 2,
-    "correct_answers": 2,
+    "total_questions": 3,
+    "correct_answers": 3,
     "subjects": {
       "Mathematics": {
         "asked": 1,
@@ -224,14 +224,18 @@
       "Geography": {
         "asked": 1,
         "correct": 1
+      },
+      "ICT": {
+        "asked": 1,
+        "correct": 1
       }
     },
     "daily_counts": {
-      "2026-04-29": 2
+      "2026-04-29": 3
     },
     "streak": 1,
     "last_active_date": "2026-04-29",
-    "xp": 10,
+    "xp": 15,
     "badges": [
       "Beginner"
     ],
