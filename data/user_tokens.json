@@ -102,5 +102,31 @@
         "calls": 1
       }
     }
+  },
+  "guest_7244": {
+    "total_input": 20,
+    "total_output": 72,
+    "total_calls": 1,
+    "today": {
+      "2026-04-29": {
+        "input": 20,
+        "output": 72,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W17": {
+        "input": 20,
+        "output": 72,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 20,
+        "output": 72,
+        "calls": 1
+      }
+    }
   }
 }
