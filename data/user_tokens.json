@@ -154,5 +154,31 @@
         "calls": 2
       }
     }
+  },
+  "guest_3411": {
+    "total_input": 22,
+    "total_output": 58,
+    "total_calls": 1,
+    "today": {
+      "2026-04-29": {
+        "input": 22,
+        "output": 58,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W17": {
+        "input": 22,
+        "output": 58,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 22,
+        "output": 58,
+        "calls": 1
+      }
+    }
   }
 }
