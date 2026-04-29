@@ -88,13 +88,24 @@ genai.configure(api_key=GOOGLE_API_KEY)
 gemini_flash = genai.GenerativeModel('gemini-2.5-flash-lite')  # 1000 RPD free — flash quota cut Dec 2025
 gemini_check = genai.GenerativeModel('gemini-2.5-flash-lite')
 
-# ── GitHub Storage Config ──
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO  = os.environ.get("GITHUB_REPO", "sala23451/sanz-ai-tutor")
-GITHUB_BRANCH = "main"
-GITHUB_DATA_PATH = "data"   # folder inside repo
+# ── SQLite Database Config ──
+from sqlalchemy import create_engine, text as sql_text
+DATABASE_FILE = os.environ.get("DATABASE_FILE", "sanz_tutor.db")
+DATABASE_URL  = f"sqlite:///{DATABASE_FILE}"
+db_engine     = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
-# ── File Paths (local cache) ──
+# Create the key-value table on startup
+with db_engine.connect() as _conn:
+    _conn.execute(sql_text("""
+        CREATE TABLE IF NOT EXISTS kv_store (
+            key        TEXT PRIMARY KEY,
+            value      TEXT NOT NULL,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    _conn.commit()
+
+# ── File Paths (kept as keys for DB) ──
 HISTORY_FILE      = "history.json"
 BLACKLIST_FILE    = "blacklist.json"
 PDF_FOLDER        = "textbooks"
@@ -104,14 +115,6 @@ PROGRESS_FILE     = "progress.json"
 QUIZ_FILE         = "quiz_sessions.json"
 LEADERBOARD_FILE  = "leaderboard.json"
 API_USAGE_FILE    = "api_usage.json"
-
-# ── GitHub persistent files (these get saved to GitHub) ──
-PERSISTENT_FILES = [
-    "history.json", "blacklist.json", "stats.json",
-    "progress.json", "leaderboard.json", "user_tokens.json",
-    "email_log.json", "parents.json", "children.json",
-    "user_accounts.json", "users.json"
-]
 PARENTS_FILE      = "parents.json"
 CHILDREN_FILE     = "children.json"
 USER_TOKENS_FILE  = "user_tokens.json"
@@ -282,82 +285,24 @@ def detect_language(text: str) -> str:
     return "en"
 
 # ══════════════════════════════════════════
-# ── GitHub Storage Functions ──
+# ── SQLite Storage Functions ──
 # ══════════════════════════════════════════
-import urllib.request
-
-def _gh_api(method: str, endpoint: str, body: dict = None):
-    """Low-level GitHub API call using only stdlib."""
-    if not GITHUB_TOKEN:
-        return None
-    url = f"https://api.github.com/{endpoint}"
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
-        "Content-Type": "application/json",
-        "User-Agent": "SanzAI"
-    }
-    data = json.dumps(body).encode() if body else None
-    req = urllib.request.Request(url, data=data, headers=headers, method=method)
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return json.loads(resp.read().decode())
-    except Exception as e:
-        print(f"GitHub API error ({method} {endpoint}): {e}")
-        return None
-
-def _gh_get_file(filename: str):
-    """Get file SHA and content from GitHub."""
-    path = f"{GITHUB_DATA_PATH}/{filename}"
-    result = _gh_api("GET", f"repos/{GITHUB_REPO}/contents/{path}?ref={GITHUB_BRANCH}")
-    return result
-
-def gh_load(filename: str, default):
-    """Load JSON from GitHub repo."""
-    try:
-        result = _gh_get_file(filename)
-        if result and "content" in result:
-            content = base64.b64decode(result["content"]).decode("utf-8")
-            return json.loads(content)
-    except Exception as e:
-        print(f"GitHub load error ({filename}): {e}")
-    # Fallback: local file
-    try:
-        with open(filename, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return default
-
-def gh_save(filename: str, data):
-    """Save JSON to GitHub repo."""
-    content = json.dumps(data, ensure_ascii=False, indent=2)
-    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
-    # Always save locally too
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(content)
-    except:
-        pass
-    if not GITHUB_TOKEN:
-        return
-    # Get current SHA (needed for update)
-    existing = _gh_get_file(filename)
-    sha = existing.get("sha") if existing else None
-    path = f"{GITHUB_DATA_PATH}/{filename}"
-    body = {
-        "message": f"update {filename}",
-        "content": encoded,
-        "branch": GITHUB_BRANCH
-    }
-    if sha:
-        body["sha"] = sha
-    _gh_api("PUT", f"repos/{GITHUB_REPO}/contents/{path}", body)
 
 def load_json(path: str, default):
-    """Load from GitHub if persistent, else local."""
-    filename = os.path.basename(path)
-    if filename in PERSISTENT_FILES and GITHUB_TOKEN:
-        return gh_load(filename, default)
+    """Load JSON data from SQLite database. Falls back to local file if not in DB."""
+    key = os.path.basename(path)
+    try:
+        with db_engine.connect() as conn:
+            result = conn.execute(
+                sql_text("SELECT value FROM kv_store WHERE key = :key"),
+                {"key": key}
+            )
+            row = result.fetchone()
+            if row:
+                return json.loads(row[0])
+    except Exception as e:
+        print(f"DB load error ({key}): {e}")
+    # Fallback: try reading from local JSON file (useful during migration)
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -365,13 +310,21 @@ def load_json(path: str, default):
         return default
 
 def save_json(path: str, data):
-    """Save to GitHub if persistent, else local."""
-    filename = os.path.basename(path)
-    if filename in PERSISTENT_FILES and GITHUB_TOKEN:
-        gh_save(filename, data)
-    else:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+    """Save JSON data to SQLite database."""
+    key   = os.path.basename(path)
+    value = json.dumps(data, ensure_ascii=False, indent=2)
+    try:
+        with db_engine.connect() as conn:
+            conn.execute(sql_text("""
+                INSERT INTO kv_store (key, value, updated_at)
+                VALUES (:key, :value, CURRENT_TIMESTAMP)
+                ON CONFLICT(key) DO UPDATE
+                  SET value      = excluded.value,
+                      updated_at = excluded.updated_at
+            """), {"key": key, "value": value})
+            conn.commit()
+    except Exception as e:
+        print(f"DB save error ({key}): {e}")
 
 def check_admin(x_admin_password: str = "") -> bool:
     return x_admin_password == ADMIN_PASSWORD
@@ -1805,7 +1758,7 @@ if __name__ == "__main__":
 # ══════════════════════════════════════════
 # ── USER SELF-REGISTRATION SYSTEM ──
 # ══════════════════════════════════════════
-USER_ACCOUNTS_FILE = "user_accounts.json"
+USER_ACCOUNTS_FILE = "user_accounts.json"  # stored as DB key
 
 class UserRegisterRequest(BaseModel):
     username: str
