@@ -175,14 +175,23 @@
     "quiz_scores": []
   },
   "guest_3411": {
-    "total_questions": 0,
+    "total_questions": 1,
     "correct_answers": 0,
-    "subjects": {},
-    "daily_counts": {},
-    "streak": 0,
-    "last_active_date": null,
-    "xp": 0,
-    "badges": [],
+    "subjects": {
+      "Mathematics": {
+        "asked": 1,
+        "correct": 0
+      }
+    },
+    "daily_counts": {
+      "2026-04-29": 1
+    },
+    "streak": 1,
+    "last_active_date": "2026-04-29",
+    "xp": 2,
+    "badges": [
+      "Beginner"
+    ],
     "quiz_scores": []
   }
 }
