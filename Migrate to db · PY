@@ -1,0 +1,99 @@
+"""
+migrate_to_db.py
+================
+පරණ JSON files ටික SQLite database එකට copy කරන script එකයි.
+Run this ONCE before starting the new app.
+
+Usage:
+    python migrate_to_db.py
+"""
+
+import os
+import json
+from sqlalchemy import create_engine, text as sql_text
+
+# ── Same DB file the new app uses ──
+DATABASE_FILE = os.environ.get("DATABASE_FILE", "sanz_tutor.db")
+DATABASE_URL  = f"sqlite:///{DATABASE_FILE}"
+engine        = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+# Create table if not exists
+with engine.connect() as conn:
+    conn.execute(sql_text("""
+        CREATE TABLE IF NOT EXISTS kv_store (
+            key        TEXT PRIMARY KEY,
+            value      TEXT NOT NULL,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    conn.commit()
+
+# ── JSON files to migrate ──
+JSON_FILES = [
+    "history.json",
+    "blacklist.json",
+    "stats.json",
+    "progress.json",
+    "leaderboard.json",
+    "user_tokens.json",
+    "email_log.json",
+    "parents.json",
+    "children.json",
+    "user_accounts.json",
+    "users.json",
+    "semantic_cache.json",
+    "quiz_sessions.json",
+    "api_usage.json",
+]
+
+def migrate_file(filename: str):
+    if not os.path.exists(filename):
+        print(f"  ⚠️  {filename} - file not found, skipping.")
+        return
+
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  ❌ {filename} - read error: {e}")
+        return
+
+    value = json.dumps(data, ensure_ascii=False, indent=2)
+    try:
+        with engine.connect() as conn:
+            conn.execute(sql_text("""
+                INSERT INTO kv_store (key, value, updated_at)
+                VALUES (:key, :value, CURRENT_TIMESTAMP)
+                ON CONFLICT(key) DO UPDATE
+                  SET value      = excluded.value,
+                      updated_at = excluded.updated_at
+            """), {"key": filename, "value": value})
+            conn.commit()
+        print(f"  ✅ {filename} - migrated successfully!")
+    except Exception as e:
+        print(f"  ❌ {filename} - DB write error: {e}")
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("  Sanz AI Tutor — JSON → SQLite Migration")
+    print("=" * 50)
+    print(f"  Database: {DATABASE_FILE}\n")
+
+    for fname in JSON_FILES:
+        migrate_file(fname)
+
+    # Verify
+    print("\n── Verification ──")
+    with engine.connect() as conn:
+        result = conn.execute(sql_text(
+            "SELECT key, length(value), updated_at FROM kv_store ORDER BY key"
+        ))
+        rows = result.fetchall()
+        if rows:
+            for row in rows:
+                print(f"  📦 {row[0]:30s}  {row[1]:>8} bytes   {row[2]}")
+        else:
+            print("  (No data found in database)")
+
+    print(f"\n✅ Done! Database saved to '{DATABASE_FILE}'")
+    print("   Now you can start the new app: python app.py\n")
