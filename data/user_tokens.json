@@ -128,5 +128,31 @@
         "calls": 1
       }
     }
+  },
+  "guest_9388": {
+    "total_input": 19,
+    "total_output": 50,
+    "total_calls": 1,
+    "today": {
+      "2026-04-29": {
+        "input": 19,
+        "output": 50,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W17": {
+        "input": 19,
+        "output": 50,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-04": {
+        "input": 19,
+        "output": 50,
+        "calls": 1
+      }
+    }
   }
 }
