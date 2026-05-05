@@ -234,28 +234,28 @@
     }
   },
   "guest_9345": {
-    "total_input": 29,
-    "total_output": 38,
-    "total_calls": 1,
+    "total_input": 107,
+    "total_output": 93,
+    "total_calls": 2,
     "today": {
       "2026-05-05": {
-        "input": 29,
-        "output": 38,
-        "calls": 1
+        "input": 107,
+        "output": 93,
+        "calls": 2
       }
     },
     "weekly": {
       "2026-W18": {
-        "input": 29,
-        "output": 38,
-        "calls": 1
+        "input": 107,
+        "output": 93,
+        "calls": 2
       }
     },
     "monthly": {
       "2026-05": {
-        "input": 29,
-        "output": 38,
-        "calls": 1
+        "input": 107,
+        "output": 93,
+        "calls": 2
       }
     }
   }
