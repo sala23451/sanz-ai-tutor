@@ -284,5 +284,31 @@
         "calls": 1
       }
     }
+  },
+  "guest_1815": {
+    "total_input": 22,
+    "total_output": 51,
+    "total_calls": 1,
+    "today": {
+      "2026-05-05": {
+        "input": 22,
+        "output": 51,
+        "calls": 1
+      }
+    },
+    "weekly": {
+      "2026-W18": {
+        "input": 22,
+        "output": 51,
+        "calls": 1
+      }
+    },
+    "monthly": {
+      "2026-05": {
+        "input": 22,
+        "output": 51,
+        "calls": 1
+      }
+    }
   }
 }
