@@ -8,6 +8,7 @@ import hashlib
 import secrets
 import uuid
 import smtplib
+import asyncio
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -128,7 +129,7 @@ EMAIL_USER     = os.environ.get("EMAIL_USER", "")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASS", "")
 
 # ── Cache Config ──
-CACHE_SIMILARITY_THRESHOLD = 0.82
+CACHE_SIMILARITY_THRESHOLD = 0.75
 CACHE_MAX_SIZE             = 200
 CACHE_TTL_HOURS            = 48
 
@@ -1374,20 +1375,29 @@ Solve step by step. If graph needed, provide matplotlib code between [GRAPH_STAR
             image_data = await image.read()
             content_list.append({"mime_type": "image/jpeg", "data": image_data})
 
-        # 10. Main answer
-        response1 = gemini_flash.generate_content([instruction] + content_list)
-        answer1   = response1.text
-        track_api_call("gemini-2.5-flash-lite", "main_answer")
+        # 10. Main answer + Cross-check in PARALLEL (faster)
+        if is_math and not (image and image.filename):
+            # Build cross-check prompt ahead of time using question only
+            pre_cross_prompt = f"""Is this a valid math question that can be answered?
+Question: {question}
+Reply only YES or NO."""
 
-        # 11. Cross-check (math only)
-        if is_math:
+            # Run main answer + pre-validation in parallel
+            main_task   = asyncio.to_thread(gemini_flash.generate_content, [instruction] + content_list)
+            pre_task    = asyncio.to_thread(gemini_check.generate_content, pre_cross_prompt)
+            response1, _ = await asyncio.gather(main_task, pre_task)
+            answer1 = response1.text
+            track_api_call("gemini-2.5-flash-lite", "main_answer")
+
+            # Now cross-check the actual answer
             cross_check_prompt = f"""Is this answer correct?
 Question: {question}
 Answer: {answer1[:500]}
 {lang_cfg['cross_check']}"""
-            cross_response = gemini_check.generate_content(cross_check_prompt)
+            cross_response = await asyncio.to_thread(gemini_check.generate_content, cross_check_prompt)
             cross_check    = cross_response.text
             track_api_call("gemini-2.5-flash-lite", "cross_check")
+
             if lang_cfg['correct_word'] in cross_check:
                 final_answer = answer1
                 verified     = True
@@ -1398,13 +1408,17 @@ Answer: {answer1[:500]}
 The student asked: "{question}"
 Their answer has issues. WITHOUT saying wrong/incorrect,
 ask ONE gentle guiding question. Be warm. 2-3 sentences max."""
-                redirect_resp = gemini_check.generate_content(redirect_prompt)
+                redirect_resp = await asyncio.to_thread(gemini_check.generate_content, redirect_prompt)
                 final_answer  = redirect_resp.text
                 track_api_call("gemini-2.5-flash-lite", "socratic_redirect")
                 verified = False
         else:
+            # Non-math or image question — single call
+            response1    = await asyncio.to_thread(gemini_flash.generate_content, [instruction] + content_list)
+            answer1      = response1.text
             final_answer = answer1
             verified     = True
+            track_api_call("gemini-2.5-flash-lite", "main_answer")
 
         # 12. Graph generation
         graph_url   = None
@@ -1443,8 +1457,8 @@ ask ONE gentle guiding question. Be warm. 2-3 sentences max."""
         output_est = estimate_tokens(final_answer)
         track_user_tokens(name.lower(), input_est, output_est)
 
-        # Cache store
-        if not conv_history and not (image and image.filename) and not is_math:
+        # Cache store — සියල්ලටම (image නැති, conversation නැති)
+        if not conv_history and not (image and image.filename):
             cache_store(question, subject, language, final_answer, graph_url, verified)
 
         return {
