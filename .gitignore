@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Database & Data
+data/*.db
+data/sanz_tutor.db
+admin_sessions.json
+local_database.db
+
+# Audio / Temp Files
+temp_audio/
+temp_audio/*
+.idea/
+.vscode/
+*.log
