@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanz AI · Smart Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+<!-- LANGUAGE SCREEN -->
+<div id="langScreen">
+  <div class="ls-bubbles" id="lsBubbles"></div>
+  <div class="ls-card">
+    <div class="ls-logo-wrap"><div class="ls-logo-ic">🎓</div><div class="ls-title">Sanz <span>AI</span></div></div>
+    <div class="ls-sub">Sri Lanka's Smart Tutor · Grade 1–13<br>ඔබේ භාෂාව තෝරන්න &nbsp;|&nbsp; உங்கள் மொழியை தேர்ந்தெடுங்கள்</div>
+    <div class="ls-btns">
+      <button class="ls-btn" onclick="chooseLang('si')"><span class="ls-flag">🇱🇰</span><span class="ls-name">සිංහල<span class="ls-native">Sinhala · සිංහල</span></span></button>
+      <button class="ls-btn" onclick="chooseLang('ta')"><span class="ls-flag">🇱🇰</span><span class="ls-name">தமிழ்<span class="ls-native">Tamil · தமிழ்</span></span></button>
+      <button class="ls-btn" onclick="chooseLang('en')"><span class="ls-flag">🇬🇧</span><span class="ls-name">English<span class="ls-native">English</span></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: CHOICE -->
+<div class="screen" id="scrChoice">
+  <div class="auth-card">
+    <div class="auth-banner choice">
+      <div class="auth-brand"><div class="auth-brand-ic">🎓</div><h1>Sanz <span>AI</span></h1></div>
+      <p id="choiceSub">ඔබේ account ෙකෙ login කරන්න හෝ නව account හදන්න</p>
+    </div>
+    <div class="auth-body">
+      <div class="choice-wrap">
+        <button class="choice-btn su" onclick="showScreen('scrSignup')">
+          <div class="choice-ic su">✏️</div>
+          <div class="choice-tx"><div class="choice-title" id="c1t">Sign Up</div><div class="choice-sub" id="c1s">නව account හදන්න</div></div>
+          <span style="color:var(--text-m);font-size:18px">›</span>
+        </button>
+        <button class="choice-btn li" onclick="showScreen('scrLogin')">
+          <div class="choice-ic li">🔐</div>
+          <div class="choice-tx"><div class="choice-title" id="c2t">Sign In</div><div class="choice-sub" id="c2s">Account ෙකෙ login කරන්න</div></div>
+          <span style="color:var(--text-m);font-size:18px">›</span>
+        </button>
+        <button class="choice-btn gu" onclick="guestMode()">
+          <div class="choice-ic gu">👤</div>
+          <div class="choice-tx"><div class="choice-title" id="c3t">Guest</div><div class="choice-sub" id="c3s">Account නැතිව continue</div></div>
+          <span style="color:var(--text-m);font-size:18px">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: SIGN UP -->
+<div class="screen" id="scrSignup">
+  <div class="auth-card">
+    <div class="auth-banner signup">
+      <div class="auth-brand"><div class="auth-brand-ic">✏️</div><h1 id="suTitle">Sign Up</h1></div>
+      <p id="suSub">නව account හදන්න</p>
+    </div>
+    <div class="auth-body">
+      <div class="creator-banner" id="creatorBanner"></div>
+      <div class="fg-row">
+        <div class="fg"><label id="suLbNm">Full Name</label><input type="text" id="suName" placeholder="Kasun Silva"></div>
+        <div class="fg"><label id="suLbUs">Username</label><input type="text" id="suUser" placeholder="kasun2010" oninput="this.value=this.value.toLowerCase().replace(/\s/g,'_');onNameType()"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label id="suLbBd">Birthday</label><input type="date" id="suBd"></div>
+        <div class="fg"><label id="suLbGr">Grade</label>
+          <select id="suGrade">
+            <option value="">Select...</option>
+            <optgroup label="Primary (1-5)"><option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option></optgroup>
+            <optgroup label="Secondary (6-11)"><option value="6">Grade 6</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option></optgroup>
+            <optgroup label="A/Level (12-13)"><option value="12">Grade 12</option><option value="13">Grade 13</option></optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label id="suLbEm">Email (Progress report ෙකෙ)</label><input type="email" id="suEmail" placeholder="kasun@gmail.com"></div>
+      <div class="fg"><label id="suLbPh">Phone (optional)</label><input type="tel" id="suPhone" placeholder="07X XXXXXXX"></div>
+      <div class="fg"><label id="suLbPw">Password</label>
+        <div class="pw-wrap"><input type="password" id="suPw" placeholder="Min 6 characters"><button class="pw-eye" onclick="togglePw('suPw',this)">👁</button></div>
+      </div>
+      <div class="fg"><label id="suLbP2">Confirm Password</label>
+        <div class="pw-wrap"><input type="password" id="suPw2" placeholder="Re-enter password"><button class="pw-eye" onclick="togglePw('suPw2',this)">👁</button></div>
+      </div>
+      <div class="form-err" id="suErr"></div>
+      <button class="auth-btn green" id="suBtn" onclick="doSignup()">✏️ <span id="suBtnTx">Create Account</span></button>
+      <div class="back-link"><a onclick="showScreen('scrChoice')">← Back</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: SUCCESS -->
+<div class="screen" id="scrSuccess">
+  <div class="auth-card">
+    <div class="auth-body" style="padding-top:24px;">
+      <div class="success-wrap">
+        <div class="success-ic">🎉</div>
+        <h3 id="sucTitle">Account හදා ගත්තා!</h3>
+        <p id="sucMsg">Login details save කරගන්න!</p>
+        <div class="cred-box">
+          <div class="cred-row"><span class="cred-lbl">Username</span><span class="cred-val" id="sucUser">—</span></div>
+          <div class="cred-row"><span class="cred-lbl">Password</span><span class="cred-val pw" id="sucPw">—</span></div>
+          <div class="cred-row"><span class="cred-lbl">Grade</span><span class="cred-val" id="sucGrade">—</span></div>
+          <div class="cred-row"><span class="cred-lbl">Email</span><span class="cred-val" id="sucEmail">—</span></div>
+        </div>
+        <div class="warn-note" id="warnNote">⚠️ <strong>වැදගත්!</strong> Username සහ password ලියාගන්න හෝ screenshot ගන්න. Password recover කරන්න බෑ!</div>
+        <button class="auth-btn blue" onclick="goToLogin()">🔐 <span id="sucBtnTx">Login ෙකෙ යන්න</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 5: LOGIN -->
+<div class="screen" id="scrLogin">
+  <div class="auth-card">
+    <div class="auth-banner login">
+      <div class="auth-brand"><div class="auth-brand-ic">🔐</div><h1 id="siTitle">Sign In</h1></div>
+      <p id="siSub">ඔයාගේ account ෙකෙ login කරන්න</p>
+    </div>
+    <div class="auth-body">
+      <div class="fg"><label id="siLbUs">Username</label><input type="text" id="siUser" placeholder="kasun2010" onkeydown="if(event.key==='Enter')document.getElementById('siPw').focus()"></div>
+      <div class="fg"><label id="siLbPw">Password</label>
+        <div class="pw-wrap"><input type="password" id="siPw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"><button class="pw-eye" onclick="togglePw('siPw',this)">👁</button></div>
+      </div>
+      <div class="form-err" id="siErr"></div>
+      <button class="auth-btn blue" id="siBtn" onclick="doLogin()">🔐 <span id="siBtnTx">Login</span></button>
+      <div class="back-link"><a onclick="showScreen('scrChoice')">← Back</a> &nbsp;·&nbsp; <a onclick="showScreen('scrSignup')" id="noAccLink">Account නෑද?</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-hd">
+    <div class="sb-logo"><div class="sb-li">🎓</div><h2>Sanz <span>AI</span></h2></div>
+    <div class="sb-meta" id="sbMeta">සාදරයෙන් පිළිගනිමු!</div>
+    <div class="sb-cat s" id="sbCat">📚 Secondary</div>
+  </div>
+  <div class="st-sel" id="stSel" style="display:none">
+    <div class="st-lbl" id="stLbl">Stream | ධාරාව</div>
+    <div class="st-btns" id="stBtns"></div>
+  </div>
+  <div class="sb-sec" id="sbSecLbl">SUBJECTS</div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="sb-ft">Developed by <b>Sanz</b> &nbsp;•&nbsp; v5.3</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-ic" id="tbIc">📐</div>
+      <div><div class="tb-nm" id="tbNm">Mathematics / ගණිතය</div><div class="tb-lc" id="tbLc">கணிதம்</div></div>
+    </div>
+    <div class="tb-r">
+      <div class="tb-xp" id="tbXp" style="display:none">⚡ <span id="tbXpVal">0</span> XP · 🔥<span id="tbStreak">0</span></div>
+      <div class="tb-b bs" id="tbGb">Grade 6</div>
+      <div class="tb-b bl" id="tbLb">සිංහල</div>
+    </div>
+  </div>
+  <div class="chat-area" id="chatArea">
+    <div class="wc-wrap" id="wcCard">
+      <div class="wc-card">
+        <div class="wc-brand"><div class="wc-brand-ic">🎓</div><div class="wc-brand-nm">Sanz <span>AI</span></div></div>
+        <h2 id="wcH">ආයුබෝවන්!</h2>
+        <p id="wcP">ඔබේ ප්‍රශ්නය ටයිප් කරන්න</p>
+        <div class="wc-chips">
+          <span class="wc-chip">📖 Step-by-Step</span><span class="wc-chip">📷 Image Upload</span>
+          <span class="wc-chip">🔊 Listen</span><span class="wc-chip">🎤 Voice</span><span class="wc-chip">📖 Read Page</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div id="ipWrap" class="ip-wrap" style="display:none"><img id="ipImg" class="ip-img" src="" alt=""><button class="ip-rm" onclick="rmImg()">✕</button></div>
+    <div class="in-tools">
+      <label class="it-upl" id="uplLbl" for="imgInp">📷</label>
+      <input type="file" id="imgInp" accept="image/*" onchange="onImgSel(event)">
+      <div class="feat-bar">
+        <button class="feat-btn quiz" onclick="togglePanel('quiz')">📝 Quiz</button>
+        <button class="feat-btn lb" onclick="togglePanel('lb')">🏆</button>
+        <button class="feat-btn img" onclick="togglePanel('img')">🎨 Draw</button>
+        <button class="feat-btn fb" onclick="togglePanel('fb')">💬</button>
+      </div>
+    </div>
+    <div class="in-box">
+      <textarea id="qIn" rows="1" placeholder="ප්‍රශ්නය ටයිප් කරන්න..." onkeydown="onKey(event)" oninput="aH(this)"></textarea>
+      <button class="bic" id="micBtn" onclick="toggleMic()">🎤</button>
+      <button class="bsend" id="sendBtn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- READ PAGE -->
+<div id="readPage" class="fs-md th-white">
+  <div class="rp-bar">
+    <button class="rp-back" onclick="closeReadPage()">←</button>
+    <div class="rp-title">📖 <span id="rpSubject">Reading</span></div>
+    <div class="rp-actions">
+      <button class="rp-btn" onclick="rpFont(-1)">A−</button>
+      <button class="rp-btn" onclick="rpFont(1)">A+</button>
+      <button class="rp-btn" id="rpThemeBtn" onclick="rpTheme()">🌙</button>
+      <button class="rp-btn" onclick="rpSpeak()">🔊</button>
+      <button class="rp-btn" onclick="rpCopy()">📋</button>
+    </div>
+  </div>
+  <div class="rp-progress" id="rpBar"></div>
+  <div class="rp-content" id="rpContent" onscroll="rpScroll()"></div>
+</div>
+
+<!-- PANELS -->
+<div class="sp-overlay" id="spOverlay" onclick="closeAllPanels()"></div>
+<div class="slide-panel" id="panelQuiz">
+  <div class="sp-head"><h3>📝 Quiz</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body" id="quizBody"><div style="text-align:center;color:var(--text-m);padding:20px">Touch "Start" to begin!</div><button onclick="startQuiz()" style="width:100%;padding:11px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">🚀 Start Quiz</button></div>
+</div>
+<div class="slide-panel" id="panelLb">
+  <div class="sp-head"><h3>🏆 Leaderboard</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body" id="lbBody"><div style="text-align:center;color:var(--text-m);padding:20px">Loading...</div></div>
+</div>
+<div class="slide-panel" id="panelImg">
+  <div class="sp-head"><h3>🎨 AI Diagram</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body"><div class="ig-input"><input class="ig-inp" id="igInp" placeholder="e.g. Photosynthesis diagram..."><button class="ig-btn" onclick="genImage()">🎨 Draw</button></div><div class="ig-result" id="igResult"></div></div>
+</div>
+<div class="slide-panel" id="panelFb">
+  <div class="sp-head"><h3>💬 Feedback</h3><button class="sp-close" onclick="closeAllPanels()">✕</button></div>
+  <div class="sp-body"><div style="text-align:center;font-size:12px;color:var(--text-m);margin-bottom:6px">ඔබේ අත්දැකීම?</div><div class="fb-stars" id="fbStars"><span class="fb-star" onclick="rateStar(1)">⭐</span><span class="fb-star" onclick="rateStar(2)">⭐</span><span class="fb-star" onclick="rateStar(3)">⭐</span><span class="fb-star" onclick="rateStar(4)">⭐</span><span class="fb-star" onclick="rateStar(5)">⭐</span></div><textarea class="fb-msg" id="fbMsg" placeholder="ඔබේ අදහස්..."></textarea><button class="fb-submit" onclick="submitFeedback()">📩 Send</button></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script defer src="js/index.js"></script>
+</body>
+</html>

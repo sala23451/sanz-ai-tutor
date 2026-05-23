@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sanz AI · Admin Dashboard</title>
+  <!-- Premium Fonts and Icons CDN references -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js CDN visual analytics library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<!-- AUTH OVERLAY GATE -->
+<div id="authGate">
+  <div class="auth-box">
+    <div class="auth-top">
+      <div class="auth-shield"><i class="fas fa-shield-halved"></i></div>
+      <h1>Sanz AI · Admin</h1>
+      <p>Secure Token Authorization · v3.1</p>
+    </div>
+    <div class="auth-body">
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" id="au" placeholder="Username" onkeydown="if(event.key==='Enter')document.getElementById('ap').focus()">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="ap" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()">
+      </div>
+      <button class="auth-btn" onclick="doAuth()"><i class="fas fa-unlock"></i> Access Dashboard</button>
+      <div class="auth-err" id="authErr">❌ Invalid administrator credentials</div>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR NAVIGATION -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">🎓</div>
+    <h2>Sanz <span>AI</span><span class="sb-badge">ADMIN</span></h2>
+  </div>
+  <div class="sb-body">
+    <!-- Accordion Category 1: Overview -->
+    <div class="sb-sec-head" onclick="toggleSidebarSection('group-overview', this)">
+      <span>Overview</span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="sb-sec-group" id="group-overview">
+      <div class="nav-item active" onclick="showPage('overview',this)"><i class="fas fa-chart-pie"></i>Dashboard</div>
+      <div class="nav-item" onclick="showPage('realtime',this)"><i class="fas fa-satellite-dish"></i>Live Feed<span class="live-dot" style="margin-left:auto"></span></div>
+    </div>
+
+    <!-- Accordion Category 2: Accounts -->
+    <div class="sb-sec-head" onclick="toggleSidebarSection('group-accounts', this)">
+      <span>Accounts</span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="sb-sec-group" id="group-accounts">
+      <div class="nav-item" onclick="showPage('accounts',this)"><i class="fas fa-user-circle"></i>User Accounts <span class="nav-badge" id="accBadge">0</span></div>
+      <div class="nav-item" onclick="showPage('parents',this)"><i class="fas fa-users"></i>Parents <span class="nav-badge" id="parentBadge">0</span></div>
+      <div class="nav-item" onclick="showPage('history',this)"><i class="fas fa-history"></i>Solve History <span class="nav-badge" id="histBadge">0</span></div>
+      <div class="nav-item" onclick="showPage('blacklist',this)"><i class="fas fa-user-slash"></i>Blacklist <span class="nav-badge" id="blBadge" style="background:var(--dan-dim);color:var(--dan)">0</span></div>
+    </div>
+
+    <!-- Accordion Category 3: Reports -->
+    <div class="sb-sec-head" onclick="toggleSidebarSection('group-reports', this)">
+      <span><i class="fas fa-file-invoice" style="margin-right:6px"></i>Reports</span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="sb-sec-group" id="group-reports">
+      <div class="nav-item" onclick="showPage('leaderboard',this)"><i class="fas fa-trophy"></i>Leaderboard</div>
+      <div class="nav-item" onclick="showPage('email',this)"><i class="fas fa-envelope"></i>Email Reports</div>
+    </div>
+
+    <!-- Accordion Category 4: Analytics -->
+    <div class="sb-sec-head" onclick="toggleSidebarSection('group-analytics', this)">
+      <span>Analytics</span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="sb-sec-group" id="group-analytics">
+      <div class="nav-item" onclick="showPage('api',this)"><i class="fas fa-bolt"></i>API Quota <span class="nav-badge" id="apiBadge" style="background:var(--yel-dim);color:var(--yel)">—</span></div>
+      <div class="nav-item" onclick="showPage('tokens',this)"><i class="fas fa-coins"></i>Tokens Today <span class="nav-badge" id="tokBadge" style="background:var(--acc-dim);color:var(--acc)">—</span></div>
+    </div>
+
+    <!-- Accordion Category 5: System -->
+    <div class="sb-sec-head" onclick="toggleSidebarSection('group-system', this)">
+      <span>System</span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="sb-sec-group" id="group-system">
+      <div class="nav-item" onclick="showPage('resources',this)"><i class="fas fa-cloud-upload-alt"></i>Data Ingestion</div>
+      <div class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i>Settings</div>
+      <div class="nav-item danger" onclick="doLogout()"><i class="fas fa-power-off"></i>Logout</div>
+    </div>
+  </div>
+  <div class="sb-footer">
+    <span class="live-dot"></span><span class="live-text">Auto-refresh 30s</span>
+  </div>
+</div>
+
+<!-- MAIN VIEWPORT CONTENT -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">Dashboard</h1>
+    <div class="tb-right">
+      <span class="tb-time" id="tbTime"></span>
+      <button class="btn btn-pri" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+      <button class="btn" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- 1. OVERVIEW PAGE -->
+    <div class="page active" id="page-overview">
+      <!-- Consolidated Breathable KPI Cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="sc-label"><i class="fas fa-circle-question"></i> Questions Solved</div>
+          <div class="sc-val" id="s-total">—</div>
+          <div class="sc-sub">All-time student query logs</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--ok)"><span class="online-dot"></span> Active Learners</div>
+          <div class="sc-val" id="s-online" style="color:var(--ok)">—</div>
+          <div class="sc-sub">Online within last 10 minutes</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--yel)"><i class="fas fa-bolt-lightning"></i> API Quota Quenches</div>
+          <div class="sc-val" id="s-apirem" style="color:var(--yel)">—</div>
+          <div class="sc-bar"><div class="sc-bar-fill" id="s-apibar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--acc)"><i class="fas fa-coins"></i> Total Token Cost</div>
+          <div class="sc-val" id="s-tokens" style="color:var(--acc)">—</div>
+          <div class="sc-sub" id="s-tokencost">Est: $— · LKR —</div>
+        </div>
+      </div>
+
+      <!-- Rich Analytics Visualizations Grid -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>📈 Combined Daily APIs & Token Volumes</h3>
+            <span style="font-size:10px;color:var(--txt3)">Last 7 Days</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="apiCallsChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>📊 Quota & Call Type Distribution</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="callDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Activities list -->
+      <div class="g2" style="margin-bottom:24px;">
+        <div class="sc">
+          <div class="sc-head"><h3>⚡ Active Students</h3></div>
+          <div id="ov-online"><div class="empty-state">No student online</div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-head"><h3>🏆 Top Tokens Burners Today</h3></div>
+          <div id="ov-tokens"><div class="empty-state">Loading usage...</div></div>
+        </div>
+      </div>
+      
+      <div class="sc">
+        <div class="sc-head"><h3>📝 Recent Activity Queries</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Student</th><th>Grade</th><th>Subject</th><th>Socratic Question</th><th>Time</th></tr>
+            </thead>
+            <tbody id="recentBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. LIVE FEED PAGE -->
+    <div class="page" id="page-realtime">
+      <div class="sc">
+        <div class="sc-head">
+          <h3><span class="online-dot"></span> LIVE Socratic Feed</h3>
+          <span id="rt-count" style="font-size:10px;color:var(--txt3)">0 events</span>
+        </div>
+        <div id="liveFeed" style="max-height:500px;overflow-y:auto;">
+          <div class="empty-state">Waiting for student queries...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. USER ACCOUNTS PAGE -->
+    <div class="page" id="page-accounts">
+      <div class="sc">
+        <div class="sc-head">
+          <h3>👤 Student Self-Registered Profiles</h3>
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="search-inp" id="accSearch" placeholder="Search accounts..." oninput="filterAccounts()">
+            <button class="btn btn-pri" onclick="loadUserAccounts()"><i class="fas fa-sync-alt"></i></button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Username</th><th>Full Name</th><th>Grade</th><th>Age</th><th>Contact info</th><th>XP</th><th>Total Q</th><th>Tokens Today</th><th>Joined</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="accBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PARENTS PAGE -->
+    <div class="page" id="page-parents">
+      <div class="sc">
+        <div class="sc-head">
+          <h3>👪 Registered Parents Profiles</h3>
+          <span id="parent-count" class="nav-badge">0 parents</span>
+        </div>
+        <div id="parentList"><div class="empty-state">Loading parents...</div></div>
+      </div>
+    </div>
+
+    <!-- 5. SOLVE HISTORY PAGE -->
+    <div class="page" id="page-history">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="text" class="search-inp" id="histSearch" placeholder="Search history..." oninput="filterHistory()">
+        <select class="filter-sel" id="histGrade" onchange="filterHistory()"><option value="">All Grades</option></select>
+        <select class="filter-sel" id="histSubject" onchange="filterHistory()"><option value="">All Subjects</option></select>
+      </div>
+      <div class="sc">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Student</th><th>Grade</th><th>Subject</th><th>Question</th><th>Time</th><th>Action</th></tr>
+            </thead>
+            <tbody id="histBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. BLACKLIST PAGE -->
+    <div class="page" id="page-blacklist">
+      <div class="sc">
+        <div class="sc-head">
+          <h3>🚫 Blacklisted Suspected Misbehaves</h3>
+          <span id="bl-count" style="font-size:10px;font-weight:700;color:var(--dan)">0</span>
+        </div>
+        <div id="blContainer"><div class="empty-state">Clean workspace, no bans active! ✅</div></div>
+      </div>
+    </div>
+
+    <!-- 7. API QUOTA PAGE -->
+    <div class="page" id="page-api">
+      <div class="stat-grid" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--yel)">⚡ Daily Calls</div>
+          <div class="sc-val" id="api-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--ok)">✅ Daily Remaining</div>
+          <div class="sc-val" id="api-rem">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">📅 Logs Date</div>
+          <div class="sc-val" id="api-date" style="font-size:16px;padding-top:10px">—</div>
+        </div>
+      </div>
+      
+      <div class="g2" style="margin-bottom:20px;">
+        <div class="sc">
+          <div class="sc-head"><h3>⚡ Quotas Allocated per Model</h3></div>
+          <div style="padding:16px;" id="apiModels"><div class="empty-state">Loading...</div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-head"><h3>📊 Usage by API Call Type</h3></div>
+          <div style="padding:16px;" id="apiTypes"><div class="empty-state">Loading...</div></div>
+        </div>
+      </div>
+      
+      <div class="sc">
+        <div class="sc-head"><h3>📈 API Usage Daily History</h3></div>
+        <div style="padding:16px;" id="apiHistory"><div class="empty-state">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- 8. TOKENS TODAY PAGE -->
+    <div class="page" id="page-tokens">
+      <div class="stat-grid" style="margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--acc)">Total Tokens Used</div>
+          <div class="sc-val" id="tok-total">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label" style="color:var(--ok)">Estimated Cost Today</div>
+          <div class="sc-val" id="tok-cost-usd" style="font-size:22px;padding-top:8px">$—</div>
+          <div class="sc-sub" id="tok-cost-lkr">LKR —</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Active Tokens Users</div>
+          <div class="sc-val" id="tok-users">—</div>
+        </div>
+      </div>
+      
+      <div class="sc">
+        <div class="sc-head">
+          <h3>📊 Per-Student Active Tokens Cost Charts</h3>
+          <button class="btn btn-pri" onclick="loadTokenUsage()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Student</th><th>Today Tokens</th><th>Calls Today</th><th>Month Tokens</th><th>Total Tokens</th><th>Cost Today</th><th>LKR Cost</th></tr>
+            </thead>
+            <tbody id="tokenBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. LEADERBOARD PAGE -->
+    <div class="page" id="page-leaderboard">
+      <div class="sc">
+        <div class="sc-head">
+          <h3>🏆 Student Leaderboard (XP & Streaks)</h3>
+          <button class="btn btn-pri" onclick="loadLeaderboard()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Rank</th><th>Student</th><th>Total XP</th><th>Streaks</th><th>Questions Solved</th><th>Grade</th></tr>
+            </thead>
+            <tbody id="lbBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. EMAIL REPORTS PAGE -->
+    <div class="page" id="page-email">
+      <div class="g2" style="margin-bottom:20px;">
+        <div class="sc">
+          <div class="sc-head"><h3>📧 Dispatches Weekly Parental Advisor Report</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <div style="font-size:10px;color:var(--txt3);font-weight:700;margin-bottom:6px;">PARENT EMAIL ADDRESS</div>
+              <input type="email" class="form-input" id="emailTo" placeholder="parent@gmail.com">
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--txt3);font-weight:700;margin-bottom:6px;">CHILD FULL NAME</div>
+              <input type="text" class="form-input" id="emailChild" placeholder="Child's registered name">
+            </div>
+            <button class="btn btn-yel" style="width:100%;justify-content:center;padding:12px;font-size:13px;" onclick="sendEmailNow()">
+              <i class="fas fa-paper-plane"></i> Dispatch Email Advisor Report
+            </button>
+          </div>
+        </div>
+        
+        <div class="sc">
+          <div class="sc-head"><h3>⚙️ APScheduler Trigger Logs</h3></div>
+          <div class="mini-stat"><div class="ms-ic" style="background:var(--yel-dim)">📅</div><div><div class="ms-val">Every Sunday 8:00 PM</div><div class="ms-lbl">Auto-send scheduler</div></div></div>
+          <div class="mini-stat"><div class="ms-ic" style="background:var(--ok-dim)">✅</div><div><div class="ms-val">APScheduler Core</div><div class="ms-lbl">Cron background dispatcher</div></div></div>
+          <div class="mini-stat"><div class="ms-ic" style="background:var(--pri-dim)">🤖</div><div><div class="ms-val">Gemini 2.5 Flash-Lite</div><div class="ms-lbl">Weekly advisory advisor</div></div></div>
+        </div>
+      </div>
+      
+      <div class="sc">
+        <div class="sc-head">
+          <h3>📋 Parent Email Dispatches Logs</h3>
+          <button class="btn btn-pri" onclick="loadEmailLog()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div id="emailLog" style="padding:10px;"><div class="empty-state">Loading logs...</div></div>
+      </div>
+    </div>
+
+    <!-- 11. DATA INGESTION HUB PAGE -->
+    <div class="page" id="page-resources">
+      <div class="sc" style="margin-bottom:20px;">
+        <div class="sc-head"><h3>📤 Data Ingestion Hub</h3></div>
+        <div class="upload-zone" onclick="document.getElementById('pdfInput').click()">
+          <i class="fas fa-cloud-upload-alt"></i>Click here to select document files for RAG data ingestion (Pinecone auto-vector indexing enabled)
+          <input type="file" id="pdfInput" accept=".pdf" multiple style="display:none" onchange="uploadPDF(event)">
+          <div id="uploadProgress" style="display:none;margin-top:10px;color:var(--pri);font-weight:700;"></div>
+        </div>
+      </div>
+      
+      <div class="sc">
+        <div class="sc-head">
+          <h3>📚 Ingested Knowledge Documents</h3>
+          <button class="btn" onclick="loadPDFs()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div id="pdfList"><div class="empty-state">Loading ingested knowledge...</div></div>
+      </div>
+    </div>
+
+    <!-- 12. SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="sc" style="max-width:550px;">
+        <div class="sc-head"><h3>⚙️ System Settings</h3></div>
+        <div class="mini-stat"><div class="ms-ic" style="background:var(--pri-dim)">🖥️</div><div><div class="ms-val">Unified Modular Server API</div><div class="ms-lbl">Server backend host</div></div></div>
+        <div class="mini-stat"><div class="ms-ic" style="background:var(--acc-dim)">🤖</div><div><div class="ms-val">Gemini 2.5 Flash-Lite</div><div class="ms-lbl">Active AI tutoring system</div></div></div>
+        <div class="mini-stat"><div class="ms-ic" style="background:var(--ok-dim)">🌍</div><div><div class="ms-val">සිංහල · தமிழ் · English</div><div class="ms-lbl">Active language support</div></div></div>
+        <div class="mini-stat"><div class="ms-ic" style="background:var(--yel-dim)">🎮</div><div><div class="ms-val">XP · Badge Achievements · Leaderboard</div><div class="ms-lbl">Gamification metrics</div></div></div>
+        <div class="mini-stat"><div class="ms-ic" style="background:var(--pur-dim)">👑</div><div><div class="ms-val">Socratic math & science tutor</div><div class="ms-lbl">Created by Sanduni Hansika</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PREMIUM ACCENT CUSTOM MODAL OVERLAY -->
+<div id="customModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+    <div class="modal-body" id="modalBody">Are you sure you want to proceed?</div>
+    <div class="modal-actions">
+      <button class="btn" id="modalCancelBtn" onclick="closeCustomModal()">Cancel</button>
+      <button class="btn btn-dan" id="modalConfirmBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-adm" id="toastAdm"></div>
+
+<script defer src="js/dashboard.js"></script>
+</body>
+</html>
